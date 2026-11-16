@@ -1,9 +1,10 @@
 /* PeixeCrew: guarda a app no aparelho para funcionar sem rede.
    Mude VERSION a cada publicação: os aparelhos detetam a versão nova e mostram «Atualizar». */
-const VERSION='2026-11-16-2';
+const VERSION='2026-11-16-3';
 const CACHE='peixecrew-'+VERSION;
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
+// cache:'reload' obriga a ir ao servidor: o GitHub Pages deixa os navegadores guardar ficheiros 10 min, e sem isto a versão nova podia ficar com o index antigo
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'})))))});
 self.addEventListener('message',e=>{if(e.data==='skipWaiting')self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('peixecrew-')&&k!==CACHE&&k!=='peixecrew-fontes').map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
