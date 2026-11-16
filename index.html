@@ -298,7 +298,8 @@ ol.ethic li::before{content:counter(e);position:absolute;left:14px;top:10px;font
 .dfs{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px 12px;margin:0}
 .dfs legend{font-weight:700;font-size:15px;padding:0 6px}
 .dcaps{display:grid;gap:6px}
-.dcap{display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:6px;align-items:center}
+.dcap{display:grid;grid-template-columns:1.7fr .8fr 1fr 1fr auto;gap:6px;align-items:center}
+.dcap input:disabled{opacity:.45}
 .dcap input,.dcap select{min-width:0}
 .dcap button{all:unset;cursor:pointer;color:var(--stop);font-weight:700;padding:4px 6px}
 .entry .cond{font-size:13.5px;color:var(--muted)}
@@ -611,7 +612,7 @@ footer ul{padding-left:20px}
           </div>
         </fieldset>
         <div class="f"><span style="font-size:15px;font-weight:600">Fotografias</span><div class="fotoprev" id="dFotoPrev"></div><label class="btn ghost fotobtn">📷 Juntar fotografias<input type="file" id="dFotos" accept="image/*" multiple hidden></label></div>
-        <div class="f"><span style="font-size:15px;font-weight:600">Capturas</span><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Juntar captura</button></div>
+        <div class="f"><span style="font-size:15px;font-weight:600">Capturas <span class="small muted" style="font-weight:400">(espécie · quantidade · peso total · tamanho, só com quantidade 1)</span></span><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Juntar captura</button></div>
         <label class="f">Notas<textarea id="dNotas" maxlength="300" placeholder="Só para si: o que correu bem, o que mudaria…"></textarea></label>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit" id="dSubmit">Guardar saída</button><button class="btn ghost" type="button" id="dCancel" hidden>Cancelar edição</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button></div>
         <p class="msg" id="dMsg" aria-live="polite"></p>
@@ -1792,6 +1793,9 @@ function useLastForecast(offline){
 /* Previsão para um local: vários modelos de ondulação e de vento, nascer e pôr do sol. Lança erro se falhar. */
 async function fetchForecast(r,range){
   const q=range?`timezone=auto&start_date=${range[0]}&end_date=${range[1]}`:'timezone=auto&past_days=2&forecast_days=7';
+  /* Datas antigas (mais de ~3 meses): reconstrução histórica. Ondulação: Météo-France (desde 2022) e reanálise ERA5;
+     vento e chuva: arquivo ERA5. A previsão normal só aceita os últimos ~3 meses. */
+  const hist=!!range&&(Date.now()-new Date(range[0]+'T12:00'))/864e5>85, MM=hist?['meteofrance_wave','era5_ocean']:MMOD;
   /* Vários modelos independentes. Quando concordam, a previsão é fiável; quando discordam, usa-se o valor mais prudente.
      Junto à costa a quadrícula de um modelo pode cair em terra: afasta-se o ponto um pouco para o mar. */
   let face=r.faceDeg??r.face;
@@ -1799,33 +1803,34 @@ async function fetchForecast(r,range){
   const tries=face==null?[[0,0],[0,-.05],[.05,0],[-.05,0],[0,.05]]:[0,.03,.06,.12].map(k=>[Math.cos(face*RAD)*k,Math.sin(face*RAD)*k/Math.cos(r.lat*RAD)]);
   const get=u=>fetch(u).then(x=>{if(!x.ok)throw 0;return x.json()});
   try{
-    const wP=get(`https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}&${q}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=kn&models=${WMOD.join(',')}`);
-    const sP=get(`https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}&${q}&daily=sunrise,sunset`);
+    const wP=hist?get(`https://archive-api.open-meteo.com/v1/archive?latitude=${r.lat}&longitude=${r.lon}&${q}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=kn`)
+      :get(`https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}&${q}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=kn&models=${WMOD.join(',')}`);
+    const sP=hist?Promise.resolve(null):get(`https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}&${q}&daily=sunrise,sunset`).catch(()=>null);
     let m=null,mp=null;
     for(const[dl,dn]of tries){
       const la=(r.lat+dl).toFixed(4),lo=(r.lon+dn).toFixed(4);
-      const j=await get(`https://marine-api.open-meteo.com/v1/marine?latitude=${la}&longitude=${lo}&${q}&hourly=wave_height,wave_direction,swell_wave_height,swell_wave_direction,swell_wave_peak_period,wind_wave_height&models=${MMOD.join(',')}`).catch(()=>null);
-      const ok=j&&j.hourly?MMOD.filter(md=>(j.hourly['wave_height_'+md]||[]).some(v=>v!=null&&v>.05)).length:0;
-      if(ok>=2){m=j;mp=[la,lo];break}
+      const j=await get(`https://marine-api.open-meteo.com/v1/marine?latitude=${la}&longitude=${lo}&${q}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_peak_period,wind_wave_height&models=${MM.join(',')}`).catch(()=>null);
+      const ok=j&&j.hourly?MM.filter(md=>(j.hourly['wave_height_'+md]||[]).some(v=>v!=null&&v>.05)).length:0;
+      if(ok>=(hist?1:2)){m=j;mp=[la,lo];break}
     }
     if(!m)throw 0;
     const sst=await get(`https://marine-api.open-meteo.com/v1/marine?latitude=${mp[0]}&longitude=${mp[1]}&${q}&hourly=sea_surface_temperature`).catch(()=>null);
     const w=await wP, sun=await sP;
     const H={}, mh=m.hourly, wh=w.hourly;
     mh.time.forEach((t,i)=>{
-      const col=(v)=>MMOD.map(md=>mh[v+'_'+md]?.[i]);
+      const col=(v)=>MM.map(md=>mh[v+'_'+md]?.[i]);
       const hs=col('wave_height'), ok=hs.map(v=>v!=null&&v>.05);
       const pick=(v)=>col(v).filter((x,k)=>ok[k]&&x!=null);
       H[t]={hsL:hs.filter((v,k)=>ok[k]),swH:pick('swell_wave_height'),wwH:pick('wind_wave_height'),
-        swD:pick('swell_wave_direction'),wD:pick('wave_direction'),tp:pick('swell_wave_peak_period'),
+        swD:pick('swell_wave_direction'),wD:pick('wave_direction'),tp:pick('swell_wave_peak_period').length?pick('swell_wave_peak_period'):pick('wave_period'),
         sst:sst?.hourly?.sea_surface_temperature?.[i]};
     });
     wh.time.forEach((t,i)=>{
-      const col=v=>WMOD.map(md=>wh[v+'_'+md]?.[i]).filter(x=>x!=null);
+      const col=v=>(hist?[wh[v]?.[i]]:WMOD.map(md=>wh[v+'_'+md]?.[i])).filter(x=>x!=null);
       Object.assign(H[t]||(H[t]={}),{wL:col('wind_speed_10m'),gL:col('wind_gusts_10m'),wdL:col('wind_direction_10m'),rL:col('precipitation')});
     });
-    const SUN={};sun.daily.time.forEach((d,i)=>{const f=s=>{const x=s.split('T')[1].split(':');return +x[0]+x[1]/60};SUN[d]={sr:f(sun.daily.sunrise[i]),ss:f(sun.daily.sunset[i])}});
-    return {H,times:mh.time,SUN,name:r.n,loc:r};
+    const SUN={};if(sun&&sun.daily)sun.daily.time.forEach((d,i)=>{const f=s=>{const x=s.split('T')[1].split(':');return +x[0]+x[1]/60};SUN[d]={sr:f(sun.daily.sunrise[i]),ss:f(sun.daily.sunset[i])}});
+    return {H,times:mh.time,SUN,name:r.n,loc:r,hist};
   }catch(e){throw e}
 }
 const MMOD=['meteofrance_wave','ecmwf_wam','dwd_ewam','ncep_gfswave016'];
@@ -2160,6 +2165,7 @@ let D=load(KD,[]);
 // registos antigos (uma espécie e um peso por saída) passam ao formato novo
 D=D.map(e=>e&&e.v===2?e:{id:e.id||rnd(),v:2,date:e.date,t0:'',t1:'',spot:null,ll:null,loc:e.loc||'',tec:e.tec||'',obs:{},vistas:[],
   caps:(e.sp&&e.sp!=='outro')||e.kg?[{sp:e.sp||'outro',kg:+e.kg||0,cm:null}]:[],notas:e.notas||''});
+const qn=c=>Math.max(1,Math.round(+(c&&c.n)||1));
 const capOpts='<option value="">Espécie</option>'+Object.entries(CATS).map(([c,l])=>`<optgroup label="${l}">${SP.filter(s=>s.cat===c).map(s=>`<option value="${s.k}">${s.n}</option>`).join('')}</optgroup>`).join('')+'<option value="outro">Outra</option>';
 $('dDate').value=iso(today);
 function paintDSpot(){
@@ -2169,10 +2175,12 @@ function paintDSpot(){
   $('dLocW').hidden=el.value!=='';
 }
 $('dSpot').addEventListener('change',()=>{$('dLocW').hidden=$('dSpot').value!==''});
-function addCapRow(sp='',kg='',cm=''){
+function addCapRow(sp='',kg='',cm='',n=1){
   const r=document.createElement('div');r.className='dcap';
-  r.innerHTML=`<select aria-label="Espécie">${capOpts}</select><input type="number" min="0" step="0.05" inputmode="decimal" placeholder="kg" aria-label="Peso em kg"><input type="number" min="0" step="0.5" inputmode="decimal" placeholder="cm" aria-label="Tamanho em cm"><button type="button" aria-label="Tirar captura">✕</button>`;
-  r.querySelector('select').value=sp;r.querySelectorAll('input')[0].value=kg;r.querySelectorAll('input')[1].value=cm;
+  r.innerHTML=`<select aria-label="Espécie">${capOpts}</select><input type="number" min="1" step="1" inputmode="numeric" placeholder="qtd" aria-label="Quantidade" class="cq"><input type="number" min="0" step="0.05" inputmode="decimal" placeholder="kg" aria-label="Peso total em kg"><input type="number" min="0" step="0.5" inputmode="decimal" placeholder="cm" aria-label="Tamanho em cm (só com quantidade 1)"><button type="button" aria-label="Tirar captura">✕</button>`;
+  const [qI,kI,cI]=r.querySelectorAll('input');
+  r.querySelector('select').value=sp;qI.value=n>1?n:1;kI.value=kg;cI.value=cm;
+  const sync=()=>{const many=(+qI.value||1)>1;cI.disabled=many;if(many)cI.value='';kI.placeholder=many?'kg total':'kg'};sync();qI.addEventListener('input',sync);
   r.querySelector('button').onclick=()=>r.remove();$('dCaps').appendChild(r);
 }
 $('dCapAdd').addEventListener('click',()=>addCapRow());
@@ -2221,7 +2229,7 @@ async function fetchCond(e){
     const T=tideDay(loc,e.date);
     e.cond={h,hs:o.hs,med:Math.round(o.fc.hs.med*10)/10,mn:Math.round(o.fc.hs.mn*10)/10,mx:Math.round(o.fc.hs.mx*10)/10,n:o.fc.hs.n,
       swDir:o.fc.swDir==null?null:Math.round(o.fc.swDir),tp:o.tp,wind:o.wind,wdDeg:o.fc.wdDeg==null?null:Math.round(o.fc.wdDeg),gust:o.gust,
-      rain48:o.fc.rain48,hs48:o.fc.hs48,visF:o.fc.visF,mare:o.mare||null,cls:T?T.cls:null};
+      rain48:o.fc.rain48,hs48:o.fc.hs48,visF:o.fc.visF,mare:o.mare||null,cls:T?T.cls:null,hist:!!fc.hist};
   }catch(err){e.condErr=true}
   save(KD,D);renderDiary();
 }
@@ -2232,18 +2240,20 @@ function lawCheck(e){
   const caps=(e.caps||[]).filter(c=>byK[c.sp]);
   for(const c of caps){
     const sp=byK[c.sp], L=LEX[c.sp], m=L&&/^(\d+(?:,\d+)?)\s*cm/.exec(L.min);
-    if(m&&c.cm!=null&&c.cm<parseFloat(m[1].replace(',','.')))W.push(`${sp.n} com ${fmt(c.cm,c.cm%1?1:0)} cm: abaixo do mínimo legal de ${L.min}.`);
-    if(c.sp==='polvo'&&c.kg&&c.kg<.75)W.push(`Polvo com ${fmt(c.kg,2)} kg: abaixo do mínimo legal de 750 g.`);
+    if(m&&c.cm!=null&&qn(c)===1&&c.cm<parseFloat(m[1].replace(',','.')))W.push(`${sp.n} com ${fmt(c.cm,c.cm%1?1:0)} cm: abaixo do mínimo legal de ${L.min}.`);
+    if(c.sp==='polvo'&&c.kg&&c.kg/qn(c)<.75)W.push(qn(c)>1?`${qn(c)} polvos com ${fmt(c.kg,2)} kg: peso médio de ${Math.round(c.kg/qn(c)*1000)} g, abaixo do mínimo legal de 750 g por polvo.`:`Polvo com ${fmt(c.kg,2)} kg: abaixo do mínimo legal de 750 g.`);
     for(const x of closures(c.sp,e.date,Z))(x.z==='sim'?W:I).push(`${sp.n}: ${x.z==='sim'?'estava em defeso':'pode ter estado em defeso'} nesse dia (${x.d.t}).`);
   }
-  const fc=caps.filter(c=>['peixe','cefalopode'].includes(byK[c.sp].cat)).map(c=>c.kg||0).sort((a,b)=>b-a);
+  // cada exemplar conta por si: numa linha com quantidade, cada um pesa o peso médio
+  const units=list=>list.flatMap(c=>Array(qn(c)).fill((c.kg||0)/qn(c)));
+  const fc=units(caps.filter(c=>['peixe','cefalopode'].includes(byK[c.sp].cat))).sort((a,b)=>b-a);
   const tfc=fc.slice(1).reduce((a,b)=>a+b,0);
   if(tfc>15)W.push(`Peixes e cefalópodes: ${fmt(tfc)} kg sem contar o maior exemplar, acima do limite de 15 kg por dia da pesca submarina.`);
-  const ot=caps.filter(c=>!['peixe','cefalopode'].includes(byK[c.sp].cat)&&c.sp!=='mexilhao').map(c=>c.kg||0).sort((a,b)=>b-a);
+  const ot=units(caps.filter(c=>!['peixe','cefalopode'].includes(byK[c.sp].cat)&&c.sp!=='mexilhao')).sort((a,b)=>b-a);
   const tot=ot.slice(1).reduce((a,b)=>a+b,0);if(tot>2)W.push(`Marisco e bivalves: ${fmt(tot)} kg, acima do limite de 2 kg por dia.`);
   const mex=caps.filter(c=>c.sp==='mexilhao').reduce((a,c)=>a+(c.kg||0),0);if(mex>3)W.push(`Mexilhão: ${fmt(mex)} kg, acima do limite de 3 kg por dia.`);
-  const jul=caps.filter(c=>c.sp==='juliana').length;if(jul>2)W.push(`${jul} juliana: o máximo são 2 por pescador e por dia.`);
-  if(caps.some(c=>c.sp==='robalo'))I.push('Robalo: lembre-se de comunicar a captura na aplicação RecFishing.');
+  const jul=caps.filter(c=>c.sp==='juliana').reduce((a,c)=>a+qn(c),0);if(jul>2)W.push(`${jul} juliana: o máximo são 2 por pescador e por dia.`);
+  if(e.date>='2026-01-01'&&caps.some(c=>c.sp==='robalo'))I.push('Robalo: lembre-se de comunicar a captura na aplicação RecFishing (obrigatório desde janeiro de 2026).');
   return {W,I};
 }
 
@@ -2252,7 +2262,7 @@ const dLabel=d=>new Date(d+'T12:00').toLocaleDateString('pt-PT',{day:'numeric',m
 function condText(e){
   const c=e.cond;
   if(!c)return e.condErr?`Não foi possível obter as condições previstas. <button type="button" class="linkb" data-cond="${e.id}">Tentar de novo</button>`:entrySpot(e)?'A obter as condições previstas…':'Sem local com ficha: a app não sabe as condições.';
-  return `Previsto às ${String(c.h).padStart(2,'0')}h: ondulação ${fmt(c.med)} m${c.n>1?` (${fmt(c.mn)}–${fmt(c.mx)})`:''}${c.swDir!=null?' de '+d16(c.swDir):''}, ${c.tp} s · vento ${c.wind} nós · ${c.mare?MAREN[c.mare]:''}${c.cls?` (marés ${c.cls})`:''}${c.rain48>=5?` · chuva 48 h: ${c.rain48} mm`:''}`;
+  return `${c.hist?'Reconstrução histórica':'Previsto'} às ${String(c.h).padStart(2,'0')}h: ondulação ${fmt(c.med)} m${c.n>1?` (${fmt(c.mn)}–${fmt(c.mx)})`:''}${c.swDir!=null?' de '+d16(c.swDir):''}, ${c.tp} s · vento ${c.wind} nós · ${c.mare?MAREN[c.mare]:''}${c.cls?` (marés ${c.cls})`:''}${c.rain48>=5?` · chuva 48 h: ${c.rain48} mm`:''}${c.hist?' <span class="srcp t-modelo" title="Para datas antigas: reanálise ERA5 e arquivo da Météo-France (Open-Meteo), não a previsão desse dia">🌊 Histórico</span>':''}`;
 }
 function renderDiary(){
   paintDSpot();
@@ -2281,7 +2291,7 @@ function renderDiary(){
   $('dstats').innerHTML=h;
   $('dlist').innerHTML=all.map(e=>{
     const s=entrySpot(e), L=e.from?{W:[],I:[]}:lawCheck(e), o=e.obs||{};
-    const caps=(e.caps||[]).map(c=>`${esc(byK[c.sp]?.n||'Outra')}${c.kg?' '+fmt(c.kg,c.kg<1?2:1)+' kg':''}${c.cm?' ('+fmt(c.cm,c.cm%1?1:0)+' cm)':''}`).join(' · ');
+    const caps=(e.caps||[]).map(c=>`${qn(c)>1?qn(c)+' × ':''}${esc(byK[c.sp]?.n||'Outra')}${c.kg?' '+fmt(c.kg,c.kg<1?2:1)+' kg'+(qn(c)>1?' no total':''):''}${c.cm?' ('+fmt(c.cm,c.cm%1?1:0)+' cm)':''}`).join(' · ');
     const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':'',o.acerto==='sim'?'a app acertou':o.acerto==='parcial'?'a app acertou mais ou menos':o.acerto==='nao'?'a app errou':''].filter(Boolean).join(' · ');
     return `<div class="entry"><div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b> <span class="small muted">${dLabel(e.date)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span>
       ${e.from?`<div class="from small">Relatório de ${esc(e.from.nome)}</div>`:''}
@@ -2403,7 +2413,7 @@ function editEntry(id){
   $('dDate').value=e.date;$('dT0').value=e.t0||'';$('dT1').value=e.t1||'';
   paintDSpot();$('dSpot').value=e.spot&&P.spots.some(s=>s.id===e.spot)?e.spot:'';$('dLocW').hidden=$('dSpot').value!=='';$('dLoc').value=e.spot?'':(e.loc||'');
   $('dTec').value=e.tec||'';$('dVis').value=o.vis??'';$('dMarH').value=o.marH==null?'':String(o.marH);$('dCorr').value=o.corr||'';$('dSaida').value=o.saida||'';$('dAcerto').value=o.acerto||'';
-  $('dNotas').value=e.notas||'';$('dCaps').innerHTML='';(e.caps||[]).forEach(c=>addCapRow(c.sp,c.kg??'',c.cm??''));
+  $('dNotas').value=e.notas||'';$('dCaps').innerHTML='';(e.caps||[]).forEach(c=>addCapRow(c.sp,c.kg??'',c.cm??'',qn(c)));
   paintAmigos();document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=(e.comIds||[]).includes(i.value));
   $('dCom').value=(e.com||[]).join(', ');
   $('dSubmit').textContent='Guardar alterações';$('dCancel').hidden=false;$('dform').classList.add('editing');
@@ -2477,7 +2487,8 @@ async function openFoto(id,entryId){
 $('dform').addEventListener('submit',ev=>{
   ev.preventDefault();
   const sid=$('dSpot').value, s=P.spots.find(x=>x.id===sid);
-  const caps=[...document.querySelectorAll('#dCaps .dcap')].map(r=>({sp:r.querySelector('select').value,kg:numOr(r.querySelectorAll('input')[0].value,200),cm:numOr(r.querySelectorAll('input')[1].value,400)})).filter(c=>c.sp);
+  const caps=[...document.querySelectorAll('#dCaps .dcap')].map(r=>{const [qI,kI,cI]=r.querySelectorAll('input'),n=Math.max(1,Math.min(999,Math.round(+qI.value||1)));
+    const c={sp:r.querySelector('select').value,kg:numOr(kI.value,500),cm:n>1?null:numOr(cI.value,400)};if(n>1)c.n=n;return c}).filter(c=>c.sp);
   const e={id:rnd(),v:2,date:$('dDate').value,t0:$('dT0').value,t1:$('dT1').value,spot:s?s.id:null,ll:s?[s.lat,s.lon]:null,loc:s?s.n:$('dLoc').value.trim(),tec:$('dTec').value,
     obs:{vis:numOr($('dVis').value,40),marH:$('dMarH').value===''?null:+$('dMarH').value,corr:$('dCorr').value,saida:$('dSaida').value,acerto:$('dAcerto').value},
     vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim(),
@@ -2523,7 +2534,7 @@ $('dCsv').addEventListener('click',()=>{
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const rows=[['data','entrada','saida','local','tecnica','visibilidade_m','mar_no_local_m','com_quem','corrente','saida_da_agua','app_acertou','especies_vistas','capturas','kg_total','prev_ondulacao_m','prev_direcao','prev_periodo_s','prev_vento_nos','mare','tipo_mare','chuva_48h_mm','notas','relatorio_de'],
     ...D.map(e=>{const s=entrySpot(e),o=e.obs||{},c=e.cond||{};return [e.date,e.t0,e.t1,s?s.n:e.loc,e.tec,o.vis,o.marH,(e.com||[]).join(', '),o.corr,o.saida,o.acerto,(e.vistas||[]).map(k=>byK[k]?.n).join(', '),
-      (e.caps||[]).map(x=>`${byK[x.sp]?.n||'Outra'}${x.kg?' '+x.kg+' kg':''}${x.cm?' '+x.cm+' cm':''}`).join(', '),(e.caps||[]).reduce((a,x)=>a+(+x.kg||0),0),
+      (e.caps||[]).map(x=>`${qn(x)>1?qn(x)+'x ':''}${byK[x.sp]?.n||'Outra'}${x.kg?' '+x.kg+' kg':''}${x.cm?' '+x.cm+' cm':''}`).join(', '),(e.caps||[]).reduce((a,x)=>a+(+x.kg||0),0),
       c.med,c.swDir!=null?d16(c.swDir):'',c.tp,c.wind,c.mare?MAREN[c.mare]:'',c.cls,c.rain48,e.notas,e.from?e.from.nome:'']})];
   const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='diario-peixecrew.csv';document.body.appendChild(a);a.click();a.remove();
@@ -2539,36 +2550,36 @@ function renderStats(){
   const E=mine.filter(e=>!sel.value||e.date.startsWith(sel.value));
   if(!E.length){el.innerHTML=`<p class="muted">Ainda não há caçadas registadas${sel.value?' em '+sel.value:''}. Registe as saídas no Diário.</p>`;return}
   const nm=e=>{const s=entrySpot(e);return s?s.n:(e.loc||'Local sem nome')};
-  const kgE=e=>(e.caps||[]).reduce((a,c)=>a+(+c.kg||0),0), nE=e=>(e.caps||[]).filter(c=>c.sp).length;
+  const kgE=e=>(e.caps||[]).reduce((a,c)=>a+(+c.kg||0),0), nE=e=>(e.caps||[]).filter(c=>c.sp).reduce((a,c)=>a+qn(c),0);
   const C=[];E.forEach(e=>(e.caps||[]).forEach(c=>{if(c.sp)C.push(Object.assign({},c,{e}))}));
-  const tot=C.reduce((a,c)=>a+(+c.kg||0),0), withCap=E.filter(nE).length, nsp=new Set(C.map(c=>c.sp)).size;
+  const tot=C.reduce((a,c)=>a+(+c.kg||0),0), nCap=C.reduce((a,c)=>a+qn(c),0), withCap=E.filter(nE).length, nsp=new Set(C.map(c=>c.sp)).size;
   const spN=k=>byK[k]?.n||'Outra', kgT=v=>fmt(v,v<10?2:1);
   const pic=e=>e&&e.fotos&&e.fotos.length?`<img data-fid="${e.fotos[0]}" alt="">`:'';
   const hil=(ico,title,main,sub,e)=>`<div class="hil"><div class="ico">${pic(e)||ico}</div><div><small>${title}</small><b>${main}</b><small>${sub}</small></div></div>`;
   const where=e=>`${esc(nm(e))} · ${dLabel(e.date)}`;
   let h=`<div class="sttiles">
     <div class="sttile"><b>${E.length}</b><span>${E.length===1?'saída':'saídas'}</span></div>
-    <div class="sttile"><b>${C.length}</b><span>capturas</span></div>
+    <div class="sttile"><b>${nCap}</b><span>capturas</span></div>
     <div class="sttile"><b>${kgT(tot)}</b><span>kg no total</span></div>
     <div class="sttile"><b>${nsp}</b><span>${nsp===1?'espécie':'espécies'}</span></div>
     <div class="sttile"><b>${E.length?kgT(tot/E.length):'0'}</b><span>kg por saída</span></div>
     <div class="sttile"><b>${withCap} de ${E.length}</b><span>saídas com captura</span></div></div>`;
   // destaques
-  const big=C.filter(c=>c.kg).sort((a,b)=>b.kg-a.kg)[0], long=C.filter(c=>c.cm).sort((a,b)=>b.cm-a.cm)[0];
+  const one=C.filter(c=>qn(c)===1), big=one.filter(c=>c.kg).sort((a,b)=>b.kg-a.kg)[0], long=one.filter(c=>c.cm).sort((a,b)=>b.cm-a.cm)[0];
   const bestKg=E.filter(kgE).sort((a,b)=>kgE(b)-kgE(a))[0], bestN=E.filter(nE).sort((a,b)=>nE(b)-nE(a)||kgE(b)-kgE(a))[0];
-  const L={};E.forEach(e=>{const k=nm(e),o=L[k]||(L[k]={n:0,cap:0,kg:0,np:0,sp:{}});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++;(e.caps||[]).forEach(c=>{if(c.sp)o.sp[c.sp]=(o.sp[c.sp]||0)+1})});
+  const L={};E.forEach(e=>{const k=nm(e),o=L[k]||(L[k]={n:0,cap:0,kg:0,np:0,sp:{}});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++;(e.caps||[]).forEach(c=>{if(c.sp)o.sp[c.sp]=(o.sp[c.sp]||0)+qn(c)})});
   const Lr=Object.entries(L), bestL=(Lr.filter(([,o])=>o.n>=2).sort((a,b)=>b[1].kg/b[1].n-a[1].kg/a[1].n)[0])||Lr.sort((a,b)=>b[1].kg-a[1].kg)[0];
   const M={};E.forEach(e=>{const m=+e.date.slice(5,7)-1;M[m]=(M[m]||0)+kgE(e)});const bestM=Object.entries(M).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
   const hs=[];
   if(big)hs.push(hil('🏆','Maior peixe (peso)',`${esc(spN(big.sp))}, ${kgT(big.kg)} kg`,where(big.e)+(big.cm?` · ${fmt(big.cm,big.cm%1?1:0)} cm`:''),big.e));
   if(long&&(!big||long!==big))hs.push(hil('📏','Maior peixe (tamanho)',`${esc(spN(long.sp))}, ${fmt(long.cm,long.cm%1?1:0)} cm`,where(long.e),long.e));
-  if(bestKg)hs.push(hil('⚖️','Melhor caçada (peso)',`${kgT(kgE(bestKg))} kg`,`${where(bestKg)} · ${nE(bestKg)} ${nE(bestKg)===1?'peixe':'peixes'}`,bestKg));
+  if(bestKg)hs.push(hil('⚖️','Melhor caçada (peso)',`${kgT(kgE(bestKg))} kg`,`${where(bestKg)} · ${nE(bestKg)} ${nE(bestKg)===1?'captura':'capturas'}`,bestKg));
   if(bestN&&bestN!==bestKg)hs.push(hil('🐟','Caçada com mais capturas',`${nE(bestN)} capturas`,`${where(bestN)} · ${kgT(kgE(bestN))} kg`,bestN));
   if(bestL&&bestL[1].kg>0)hs.push(hil('📍','Local mais produtivo',esc(bestL[0]),`${kgT(bestL[1].kg/bestL[1].n)} kg por saída · ${bestL[1].n} ${bestL[1].n===1?'saída':'saídas'}`));
   if(bestM)hs.push(hil('📅','Melhor mês',MESF[bestM[0]].replace(/^./,x=>x.toUpperCase()),`${kgT(bestM[1])} kg no total`));
   if(hs.length)h+=`<div><h3>Destaques</h3><div class="hilites">${hs.join('')}</div></div>`;
   // recordes por espécie
-  const S={};C.forEach(c=>{const o=S[c.sp]||(S[c.sp]={n:0,kg:0,mx:null,mcm:null,day:{}});o.n++;o.kg+=+c.kg||0;if(c.kg&&(!o.mx||c.kg>o.mx.kg))o.mx=c;if(c.cm&&(!o.mcm||c.cm>o.mcm.cm))o.mcm=c;o.day[c.e.id]=(o.day[c.e.id]||0)+1});
+  const S={};C.forEach(c=>{const o=S[c.sp]||(S[c.sp]={n:0,kg:0,mx:null,mcm:null,day:{}}),q=qn(c);o.n+=q;o.kg+=+c.kg||0;if(q===1&&c.kg&&(!o.mx||c.kg>o.mx.kg))o.mx=c;if(q===1&&c.cm&&(!o.mcm||c.cm>o.mcm.cm))o.mcm=c;o.day[c.e.id]=(o.day[c.e.id]||0)+q});
   const Sr=Object.entries(S).sort((a,b)=>b[1].n-a[1].n||b[1].kg-a[1].kg);
   if(Sr.length)h+=`<div><h3>Recordes por espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th class="n">Capturas</th><th class="n">Total kg</th><th>Maior (peso)</th><th>Maior (tamanho)</th><th class="n">Mais num dia</th></tr></thead><tbody>${Sr.map(([k,o])=>`<tr><td><b>${esc(spN(k))}</b></td><td class="n">${o.n}</td><td class="n">${o.kg?kgT(o.kg):'—'}</td><td>${o.mx?`${kgT(o.mx.kg)} kg <span class="muted small">${dLabel(o.mx.e.date)}</span>`:'—'}</td><td>${o.mcm?`${fmt(o.mcm.cm,o.mcm.cm%1?1:0)} cm`:'—'}</td><td class="n">${Math.max(...Object.values(o.day))}</td></tr>`).join('')}</tbody></table></div></div>`;
   // melhores caçadas
