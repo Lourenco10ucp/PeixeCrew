@@ -1590,8 +1590,8 @@ function useLastForecast(offline){
   const lf=load('ml_lastfc',null), r=currentLoc();
   if(!lf||!lf.fc||Date.now()-lf.t>48*36e5||lf.id!==(r.id||'reg:'+P.reg))return false;
   FC=lf.fc;buildDays();
-  const hrs=Math.max(1,Math.round((Date.now()-lf.t)/36e5));
-  setSrc(`${offline?'Sem ligação: a':'A'} mostrar a última previsão guardada para ${FC.name}, carregada há ${hrs} h. ${offline?'':'Carregue de novo para a atualizar.'}`);
+  const mins=Math.round((Date.now()-lf.t)/6e4), quando=mins<60?(mins<2?'agora mesmo':`há ${mins} min`):`há ${Math.round(mins/60)} h`;
+  setSrc(`${offline?'Sem ligação: a':'A'} mostrar a última previsão guardada para ${FC.name}, carregada ${quando}. ${offline?'':'Carregue de novo para a atualizar.'}`);
   return true;
 }
 /* Previsão para um local: vários modelos de ondulação e de vento, nascer e pôr do sol. Lança erro se falhar. */

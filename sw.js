@@ -1,6 +1,6 @@
 /* PeixeCrew: guarda a app no aparelho para funcionar sem rede.
    Mude VERSION a cada publicação: os aparelhos detetam a versão nova e mostram «Atualizar». */
-const VERSION='2026-11-16-1';
+const VERSION='2026-11-16-2';
 const CACHE='peixecrew-'+VERSION;
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
