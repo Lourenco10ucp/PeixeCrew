@@ -83,7 +83,7 @@ section.block{padding-block:46px 6px;scroll-margin-top:60px}
 /* formulários */
 label.f{display:grid;gap:4px;font-size:15px;font-weight:600}
 label.f span.v{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-input[type=text],input[type=number],input[type=date],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px;width:100%}
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px;width:100%}
 textarea{min-height:70px;resize:vertical}
 input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .btn{font:inherit;font-weight:700;font-size:16px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:44px}
@@ -162,6 +162,36 @@ a.srcp:hover{border-color:var(--accent)}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:15px;max-width:calc(100vw - 32px)}
 .updbar .btn{padding:6px 14px;font-size:14px}
 .install{margin-bottom:18px}
+/* Fotografias */
+.fotoprev,.thumbs{display:flex;flex-wrap:wrap;gap:6px}
+.fotoprev:empty{display:none}
+.fotoprev .ph,.thumb{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);background:var(--surface2);padding:0;cursor:pointer}
+.fotoprev img,.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.fotoprev .ph button{position:absolute;top:2px;right:2px;all:unset;cursor:pointer;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;font-size:13px}
+.fotobtn{justify-self:start;padding:6px 12px;font-size:14px;min-height:38px;display:inline-flex;align-items:center;gap:6px}
+.addfoto{display:inline-grid;place-items:center;width:72px;height:72px;border-radius:10px;border:1.5px dashed var(--line);color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;text-align:center}
+.fotobig{width:100%;height:auto;border-radius:12px;display:block}
+/* Estatísticas */
+.stctl{max-width:220px;margin-top:14px}
+.statsbody{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:14px}
+.statsbody>div{min-width:0}
+.sttiles,.hilites{min-width:0}
+.sttiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.sttile{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.sttile b{display:block;font-family:var(--f-display);font-size:26px;line-height:1.1}
+.sttile span{font-size:13.5px;color:var(--muted)}
+.hilites{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.hil{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.hil .ico{width:56px;height:56px;border-radius:10px;overflow:hidden;display:grid;place-items:center;font-size:26px;background:var(--surface2)}
+.hil .ico img{width:100%;height:100%;object-fit:cover}
+.hil small{display:block;color:var(--muted);font-size:13px}
+.hil b{font-size:17px}
+.sttable{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--surface);border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.sttable th,.sttable td{padding:7px 10px;text-align:left;border-top:1px solid var(--line);white-space:nowrap}
+.sttable thead th{border-top:0;font-size:13px;color:var(--muted)}
+.sttable td.n,.sttable th.n{text-align:right;font-variant-numeric:tabular-nums}
+.stwrap{overflow-x:auto}
+.statsbody h3{font-size:21px;margin-bottom:6px}
 .ondeday{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:15px}
 .ondeday input{max-width:180px}
 /* Perfis, partilha, ficha do local, onde ir */
@@ -314,7 +344,7 @@ footer ul{padding-left:20px}
 @media (max-width:760px){
   body.m{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
   body.m .nav{display:none}
-  body.m .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  body.m .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
   .tabbar button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted);padding:6px 2px;border-radius:10px;-webkit-tap-highlight-color:transparent}
   .tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tabbar button[aria-current="page"]{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
@@ -323,7 +353,13 @@ footer ul{padding-left:20px}
   body.m[data-tab="onde"] [data-t]:not([data-t~="onde"]),
   body.m[data-tab="locais"] [data-t]:not([data-t~="locais"]),
   body.m[data-tab="diario"] [data-t]:not([data-t~="diario"]),
-  body.m[data-tab="mais"] [data-t]:not([data-t~="mais"]){display:none!important}
+  body.m[data-tab="mais"] [data-t]:not([data-t~="mais"]),
+  body.m[data-tab="stats"] [data-t]:not([data-t~="stats"]){display:none!important}
+  .tabbar button{font-size:11px}
+  .sttable{font-size:13.5px}
+  .sttable th,.sttable td{padding:6px 8px}
+  .sttiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sttile b{font-size:22px}
   body.m .hero{padding-block:12px 0}
   body.m .hero > div:first-child{display:none}
   body.m section.block{padding-block:18px 6px}
@@ -349,7 +385,7 @@ footer ul{padding-left:20px}
 <header class="top"><div class="wrap">
   <div class="logo"><img src="data:image/png;base64,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" alt="" width="32" height="32" style="border-radius:8px">PeixeCrew</div>
   <nav class="nav" aria-label="Secções">
-    <a href="#hoje">Hoje</a><a href="#calendario">Calendário</a><a href="#tecnicas">Técnicas</a><a href="#seguranca">Segurança</a><a href="#diario">Diário</a>
+    <a href="#hoje">Hoje</a><a href="#calendario">Calendário</a><a href="#tecnicas">Técnicas</a><a href="#seguranca">Segurança</a><a href="#diario">Diário</a><a href="#stats">Estatísticas</a>
   </nav>
 </div></header>
 
@@ -561,7 +597,7 @@ footer ul{padding-left:20px}
             <label class="f">Sair da água foi<select id="dSaida"><option value="">Normal</option><option value="facil">Fácil</option><option value="dificil">Difícil</option></select></label>
           </div>
         </fieldset>
-        <div class="f"><span style="font-size:15px;font-weight:600">Espécies que viu</span><div class="spchips" id="dVistas"></div></div>
+        <div class="f"><span style="font-size:15px;font-weight:600">Fotografias</span><div class="fotoprev" id="dFotoPrev"></div><label class="btn ghost fotobtn">📷 Juntar fotografias<input type="file" id="dFotos" accept="image/*" multiple hidden></label></div>
         <div class="f"><span style="font-size:15px;font-weight:600">Capturas</span><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Juntar captura</button></div>
         <label class="f">Notas<textarea id="dNotas" maxlength="300" placeholder="Só para si: o que correu bem, o que mudaria…"></textarea></label>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit">Guardar saída</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button></div>
@@ -573,6 +609,12 @@ footer ul{padding-left:20px}
       </div>
     </div>
   </section>
+  <section class="block" id="stats" data-t="stats">
+    <h2>Estatísticas</h2>
+    <p class="lead">Os seus recordes e as caçadas que se destacam. Conta só as suas saídas (não os relatórios de amigos).</p>
+    <label class="f stctl">Período<select id="stYear"></select></label>
+    <div id="statsBody" class="statsbody"></div>
+  </section>
 </main>
 
 <nav class="tabbar" id="tabbar" aria-label="Separadores">
@@ -580,6 +622,7 @@ footer ul{padding-left:20px}
   <button data-tab="onde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Onde ir</button>
   <button data-tab="locais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Locais</button>
   <button data-tab="diario"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10l3 3v15H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>Diário</button>
+  <button data-tab="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>Recordes</button>
   <button data-tab="mais"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mais</button>
 </nav>
 <div class="updbar" id="updBar" hidden role="status">Há uma versão nova da PeixeCrew. <button class="btn" id="updBtn">Atualizar</button></div>
@@ -612,6 +655,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
 const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MESF=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const DIA=['dom','seg','ter','qua','qui','sex','sáb'];
 const fmt=(n,d=1)=>Number(n).toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d});
 
@@ -1245,7 +1289,7 @@ $('pDel').addEventListener('click',()=>{
   if(!confirm(`Apagar o perfil «${cur.nome}», com os seus locais e o seu diário? Se tiver dúvidas, faça antes uma cópia de segurança.`))return;
   PROFS.list=PROFS.list.filter(p=>p.id!==cur.id);PROFS.active=PROFS.list[0].id;save('ml_perfis',PROFS);
   try{localStorage.removeItem(KP);localStorage.removeItem(KD)}catch(e){}
-  location.reload();
+  FDB.all().then(fs=>Promise.all(fs.filter(x=>x.prof===cur.id).map(x=>FDB.del(x.id)))).catch(()=>{}).finally(()=>location.reload());
 });
 $('pNome').addEventListener('input',()=>{const p=PROFS.list.find(x=>x.id===PROFS.active);if(p){p.nome=P.nome||'Sem nome';save('ml_perfis',PROFS);paintProfSel()}});
 
@@ -1409,7 +1453,7 @@ function backupObj(){
   for(const p of PROFS.list)dados[p.id]={perfil:load('ml_perfil:'+p.id,{}),diario:load('ml_diario:'+p.id,[])};
   return {app:'marlivre',t:'copia',v:1,em:new Date().toISOString(),perfis:PROFS,dados,mares:MR};
 }
-function restoreBackup(obj){
+async function restoreBackup(obj){
   if(!obj||!obj.perfis||!Array.isArray(obj.perfis.list)||!obj.dados)throw new Error('Cópia inválida.');
   const n=obj.perfis.list.length, quando=String(obj.em||'').slice(0,10);
   if(!confirm(`Repor a cópia de ${quando} (${n} ${n===1?'perfil':'perfis'})? Os perfis, locais e diários deste aparelho são substituídos pelos da cópia.`))return;
@@ -1422,13 +1466,29 @@ function restoreBackup(obj){
   }
   save('ml_perfis',{active:list.some(p=>p.id===obj.perfis.active)?obj.perfis.active:list[0].id,list});
   if(obj.mares&&typeof obj.mares==='object')save('ml_mares',Object.assign(load('ml_mares',{}),obj.mares));
+  if(obj.fotos&&typeof obj.fotos==='object'){
+    const toBlob=d=>fetch(d).then(r=>r.blob());
+    for(const [id,x] of Object.entries(obj.fotos)){
+      if(!/^f[\w-]{1,40}$/.test(id)||!x||!/^data:image\//.test(x.full||'')||!/^data:image\//.test(x.thumb||''))continue;
+      try{await FDB.put({id,prof:String(x.prof||''),entry:String(x.entry||''),full:await toBlob(x.full),thumb:await toBlob(x.thumb),t:Date.now()})}catch(e){}
+    }
+  }
   location.reload();
 }
 $('shareBtn').addEventListener('click',()=>openShare([]));
 $('recvBtn').addEventListener('click',()=>openReceive(''));
 /* Cópia com um toque: no telemóvel abre «Partilhar» (WhatsApp, e-mail, Drive…); no PC descarrega o ficheiro */
+const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b)});
 async function backupNow(){
-  const obj=backupObj(), name=`peixecrew-copia-${iso(new Date())}.json`, json=JSON.stringify(obj,null,1);
+  const obj=backupObj(), name=`peixecrew-copia-${iso(new Date())}.json`;
+  try{
+    const fs=await FDB.all();
+    if(fs.length){const mb=fs.reduce((a,x)=>a+(x.full?x.full.size:0),0)/1048576*1.37;
+      if(confirm(`Incluir as ${fs.length} fotografias na cópia? O ficheiro fica com cerca de ${Math.max(1,Math.round(mb))} MB. (Cancelar = cópia sem fotografias)`)){
+        obj.fotos={};for(const x of fs)obj.fotos[x.id]={prof:x.prof,entry:x.entry,full:await blobToData(x.full),thumb:await blobToData(x.thumb)};
+      }}
+  }catch(e){}
+  const json=JSON.stringify(obj);
   let ok=false;
   try{
     const file=new File([json],name,{type:'application/json'});
@@ -1454,7 +1514,7 @@ $('fileIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
   try{
     const obj=JSON.parse(await f.text());
-    if(obj&&obj.t==='copia')restoreBackup(obj);
+    if(obj&&obj.t==='copia')await restoreBackup(obj);
     else if(obj&&(obj.t==='locais'||obj.t==='relatorios')){if(!$('rvOut'))openReceive('');previewShare(obj)}
     else throw new Error('Este ficheiro não é da app.');
   }catch(err){alert(err.message||'Não consegui ler o ficheiro.')}
@@ -2084,7 +2144,6 @@ D=D.map(e=>e&&e.v===2?e:{id:e.id||rnd(),v:2,date:e.date,t0:'',t1:'',spot:null,ll
   caps:(e.sp&&e.sp!=='outro')||e.kg?[{sp:e.sp||'outro',kg:+e.kg||0,cm:null}]:[],notas:e.notas||''});
 const capOpts='<option value="">Espécie</option>'+Object.entries(CATS).map(([c,l])=>`<optgroup label="${l}">${SP.filter(s=>s.cat===c).map(s=>`<option value="${s.k}">${s.n}</option>`).join('')}</optgroup>`).join('')+'<option value="outro">Outra</option>';
 $('dDate').value=iso(today);
-$('dVistas').innerHTML=SP.map(x=>`<label><input type="checkbox" value="${x.k}">${esc(x.n)}</label>`).join('');
 function paintDSpot(){
   const el=$('dSpot');if(!el)return;const cur=el.value;
   el.innerHTML=P.spots.map(s=>`<option value="${s.id}">${esc(s.n)}</option>`).join('')+'<option value="">Outro local (sem ficha)</option>';
@@ -2213,9 +2272,63 @@ function renderDiary(){
       ${ob?`<div class="small">${esc(ob)}</div>`:''}
       <div class="cond">${condText(e)}</div>
       ${L.W.map(t=>`<div class="laww">⛔ ${esc(t)}</div>`).join('')}${L.I.map(t=>`<div class="lawi">⚠️ ${esc(t)}</div>`).join('')}
-      ${e.notas?`<div class="small">${esc(e.notas)}</div>`:''}</div>
+      ${e.notas?`<div class="small">${esc(e.notas)}</div>`:''}
+      ${e.from?'':`<div class="thumbs" style="margin-top:6px">${(e.fotos||[]).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}<label class="addfoto">+ foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label></div>`}</div>
       <button data-id="${e.id}" aria-label="Apagar registo">Apagar</button></div>`;
   }).join('');
+  hydrateThumbs($('dlist'));renderStats();
+}
+/* ---- Fotografias das caçadas: guardadas no aparelho (IndexedDB), reduzidas para ocupar pouco ---- */
+const FDB=(()=>{let p=null;
+  const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('peixecrew',1);r.onupgradeneeded=()=>r.result.createObjectStore('fotos',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const run=async(mode,fn)=>{const db=await open();return new Promise((res,rej)=>{const t=db.transaction('fotos',mode),q=fn(t.objectStore('fotos'));t.oncomplete=()=>res(q&&'result' in q?q.result:undefined);t.onerror=()=>rej(t.error)})};
+  return {put:o=>run('readwrite',s=>s.put(o)),get:id=>run('readonly',s=>s.get(id)),del:id=>run('readwrite',s=>s.delete(id)),all:()=>run('readonly',s=>s.getAll())};
+})();
+async function shrink(file,max,q){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(r,'image/jpeg',q));
+  }finally{URL.revokeObjectURL(url)}
+}
+async function makeFotos(files){
+  const out=[];
+  for(const f of files){if(!/^image\//.test(f.type))continue;
+    try{const full=await shrink(f,1600,.78),thumb=await shrink(f,260,.7);if(full&&thumb)out.push({id:'f'+rnd(),full,thumb})}catch(e){}}
+  if(out.length&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  return out;
+}
+let PEND=[];
+const TURL={};
+function paintPend(){
+  $('dFotoPrev').innerHTML=PEND.map((p,i)=>`<span class="ph"><img src="${p.url}" alt="Fotografia a juntar"><button type="button" data-rmp="${i}" aria-label="Tirar fotografia">✕</button></span>`).join('');
+}
+$('dFotos').addEventListener('change',async e=>{
+  const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+  $('dMsg').textContent='A preparar as fotografias…';
+  for(const p of await makeFotos(fs)){p.url=URL.createObjectURL(p.thumb);PEND.push(p)}
+  $('dMsg').textContent='';paintPend();
+});
+$('dFotoPrev').addEventListener('click',e=>{const b=e.target.closest('[data-rmp]');if(!b)return;const p=PEND.splice(+b.dataset.rmp,1)[0];if(p)URL.revokeObjectURL(p.url);paintPend()});
+async function storeFotos(entry,list){
+  for(const p of list){await FDB.put({id:p.id,prof:PROFS.active,entry:entry.id,full:p.full,thumb:p.thumb,t:Date.now()});(entry.fotos=entry.fotos||[]).push(p.id)}
+  save(KD,D);
+}
+function hydrateThumbs(root=document){
+  root.querySelectorAll('img[data-fid]:not([src])').forEach(async img=>{
+    const id=img.dataset.fid;
+    try{if(!TURL[id]){const r=await FDB.get(id);if(!r){img.closest('.thumb,.ico')?.remove();return}TURL[id]=URL.createObjectURL(r.thumb)}img.src=TURL[id]}catch(e){}
+  });
+}
+async function openFoto(id,entryId){
+  const r=await FDB.get(id).catch(()=>null);if(!r){alert('Fotografia não encontrada neste aparelho.');return}
+  const url=URL.createObjectURL(r.full), e=D.find(x=>x.id===entryId);
+  showDlg(`<h3>${esc(e?(entrySpot(e)?.n||e.loc||'Caçada'):'Caçada')}</h3><p class="small muted" style="margin:-4px 0 0">${e?dLabel(e.date):''}</p>
+    <img class="fotobig" src="${url}" alt="Fotografia da caçada">
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn ghost" href="${url}" download="peixecrew-${e?e.date:'foto'}-${id}.jpg">Guardar no aparelho</a><button class="btn ghost" id="fDel" style="color:var(--stop);border-color:var(--stop)">Apagar fotografia</button></div>`);
+  $('fDel').onclick=async()=>{if(!confirm('Apagar esta fotografia?'))return;await FDB.del(id).catch(()=>{});if(e){e.fotos=(e.fotos||[]).filter(x=>x!==id);save(KD,D)}delete TURL[id];closeDlg();renderDiary()};
 }
 $('dform').addEventListener('submit',ev=>{
   ev.preventDefault();
@@ -2230,13 +2343,20 @@ $('dform').addEventListener('submit',ev=>{
   const L=lawCheck(e);
   $('dMsg').textContent=L.W.length?'Saída guardada, mas veja os avisos legais no registo.':'Saída guardada.'+(s?' A obter as condições previstas para essa hora…':'');
   $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';
-  document.querySelectorAll('#dVistas input').forEach(i=>i.checked=false);
-  renderDiary();if(s)fetchCond(e);
+  const fot=PEND;PEND=[];paintPend();
+  renderDiary();if(fot.length)storeFotos(e,fot).then(renderDiary).catch(()=>alert('Não foi possível guardar as fotografias neste aparelho.'));if(s)fetchCond(e);
 });
 $('dlist').addEventListener('click',ev=>{
   const c=ev.target.closest('[data-cond]');if(c){const e=D.find(x=>x.id===c.dataset.cond);if(e){e.condErr=false;renderDiary();fetchCond(e)}return}
-  const b=ev.target.closest('button[data-id]');if(!b)return;if(!confirm('Apagar este registo?'))return;
+  const ft=ev.target.closest('[data-foto]');if(ft){openFoto(ft.dataset.foto,ft.dataset.entry);return}
+  const b=ev.target.closest('button[data-id]');if(!b)return;if(!confirm('Apagar este registo e as suas fotografias?'))return;
+  const gone=D.find(x=>x.id===b.dataset.id);(gone&&gone.fotos||[]).forEach(id=>FDB.del(id).catch(()=>{}));
   D=D.filter(x=>x.id!==b.dataset.id);save(KD,D);renderDiary();
+});
+$('dlist').addEventListener('change',async ev=>{
+  const inp=ev.target.closest('[data-addfoto]');if(!inp)return;
+  const e=D.find(x=>x.id===inp.dataset.addfoto), fs=[...inp.files];inp.value='';if(!e||!fs.length)return;
+  try{await storeFotos(e,await makeFotos(fs));renderDiary()}catch(err){alert('Não foi possível guardar as fotografias neste aparelho.')}
 });
 $('dCsv').addEventListener('click',()=>{
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
@@ -2247,6 +2367,64 @@ $('dCsv').addEventListener('click',()=>{
   const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='diario-peixecrew.csv';document.body.appendChild(a);a.click();a.remove();
 });
+
+/* ---- Estatísticas: recordes e caçadas que se destacam (só as saídas do próprio) ---- */
+$('stYear').addEventListener('change',renderStats);
+function renderStats(){
+  const el=$('statsBody');if(!el)return;
+  const mine=D.filter(e=>!e.from&&e.date), sel=$('stYear'), cur=sel.value;
+  const years=[...new Set(mine.map(e=>e.date.slice(0,4)))].sort().reverse();
+  sel.innerHTML='<option value="">Sempre</option>'+years.map(y=>`<option${y===cur?' selected':''}>${y}</option>`).join('');
+  const E=mine.filter(e=>!sel.value||e.date.startsWith(sel.value));
+  if(!E.length){el.innerHTML=`<p class="muted">Ainda não há caçadas registadas${sel.value?' em '+sel.value:''}. Registe as saídas no Diário.</p>`;return}
+  const nm=e=>{const s=entrySpot(e);return s?s.n:(e.loc||'Local sem nome')};
+  const kgE=e=>(e.caps||[]).reduce((a,c)=>a+(+c.kg||0),0), nE=e=>(e.caps||[]).filter(c=>c.sp).length;
+  const C=[];E.forEach(e=>(e.caps||[]).forEach(c=>{if(c.sp)C.push(Object.assign({},c,{e}))}));
+  const tot=C.reduce((a,c)=>a+(+c.kg||0),0), withCap=E.filter(nE).length, nsp=new Set(C.map(c=>c.sp)).size;
+  const spN=k=>byK[k]?.n||'Outra', kgT=v=>fmt(v,v<10?2:1);
+  const pic=e=>e&&e.fotos&&e.fotos.length?`<img data-fid="${e.fotos[0]}" alt="">`:'';
+  const hil=(ico,title,main,sub,e)=>`<div class="hil"><div class="ico">${pic(e)||ico}</div><div><small>${title}</small><b>${main}</b><small>${sub}</small></div></div>`;
+  const where=e=>`${esc(nm(e))} · ${dLabel(e.date)}`;
+  let h=`<div class="sttiles">
+    <div class="sttile"><b>${E.length}</b><span>${E.length===1?'saída':'saídas'}</span></div>
+    <div class="sttile"><b>${C.length}</b><span>capturas</span></div>
+    <div class="sttile"><b>${kgT(tot)}</b><span>kg no total</span></div>
+    <div class="sttile"><b>${nsp}</b><span>${nsp===1?'espécie':'espécies'}</span></div>
+    <div class="sttile"><b>${E.length?kgT(tot/E.length):'0'}</b><span>kg por saída</span></div>
+    <div class="sttile"><b>${withCap} de ${E.length}</b><span>saídas com captura</span></div></div>`;
+  // destaques
+  const big=C.filter(c=>c.kg).sort((a,b)=>b.kg-a.kg)[0], long=C.filter(c=>c.cm).sort((a,b)=>b.cm-a.cm)[0];
+  const bestKg=E.filter(kgE).sort((a,b)=>kgE(b)-kgE(a))[0], bestN=E.filter(nE).sort((a,b)=>nE(b)-nE(a)||kgE(b)-kgE(a))[0];
+  const L={};E.forEach(e=>{const k=nm(e),o=L[k]||(L[k]={n:0,cap:0,kg:0,np:0,sp:{}});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++;(e.caps||[]).forEach(c=>{if(c.sp)o.sp[c.sp]=(o.sp[c.sp]||0)+1})});
+  const Lr=Object.entries(L), bestL=(Lr.filter(([,o])=>o.n>=2).sort((a,b)=>b[1].kg/b[1].n-a[1].kg/a[1].n)[0])||Lr.sort((a,b)=>b[1].kg-a[1].kg)[0];
+  const M={};E.forEach(e=>{const m=+e.date.slice(5,7)-1;M[m]=(M[m]||0)+kgE(e)});const bestM=Object.entries(M).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
+  const hs=[];
+  if(big)hs.push(hil('🏆','Maior peixe (peso)',`${esc(spN(big.sp))}, ${kgT(big.kg)} kg`,where(big.e)+(big.cm?` · ${fmt(big.cm,big.cm%1?1:0)} cm`:''),big.e));
+  if(long&&(!big||long!==big))hs.push(hil('📏','Maior peixe (tamanho)',`${esc(spN(long.sp))}, ${fmt(long.cm,long.cm%1?1:0)} cm`,where(long.e),long.e));
+  if(bestKg)hs.push(hil('⚖️','Melhor caçada (peso)',`${kgT(kgE(bestKg))} kg`,`${where(bestKg)} · ${nE(bestKg)} ${nE(bestKg)===1?'peixe':'peixes'}`,bestKg));
+  if(bestN&&bestN!==bestKg)hs.push(hil('🐟','Caçada com mais capturas',`${nE(bestN)} capturas`,`${where(bestN)} · ${kgT(kgE(bestN))} kg`,bestN));
+  if(bestL&&bestL[1].kg>0)hs.push(hil('📍','Local mais produtivo',esc(bestL[0]),`${kgT(bestL[1].kg/bestL[1].n)} kg por saída · ${bestL[1].n} ${bestL[1].n===1?'saída':'saídas'}`));
+  if(bestM)hs.push(hil('📅','Melhor mês',MESF[bestM[0]].replace(/^./,x=>x.toUpperCase()),`${kgT(bestM[1])} kg no total`));
+  if(hs.length)h+=`<div><h3>Destaques</h3><div class="hilites">${hs.join('')}</div></div>`;
+  // recordes por espécie
+  const S={};C.forEach(c=>{const o=S[c.sp]||(S[c.sp]={n:0,kg:0,mx:null,mcm:null,day:{}});o.n++;o.kg+=+c.kg||0;if(c.kg&&(!o.mx||c.kg>o.mx.kg))o.mx=c;if(c.cm&&(!o.mcm||c.cm>o.mcm.cm))o.mcm=c;o.day[c.e.id]=(o.day[c.e.id]||0)+1});
+  const Sr=Object.entries(S).sort((a,b)=>b[1].n-a[1].n||b[1].kg-a[1].kg);
+  if(Sr.length)h+=`<div><h3>Recordes por espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th class="n">Capturas</th><th class="n">Total kg</th><th>Maior (peso)</th><th>Maior (tamanho)</th><th class="n">Mais num dia</th></tr></thead><tbody>${Sr.map(([k,o])=>`<tr><td><b>${esc(spN(k))}</b></td><td class="n">${o.n}</td><td class="n">${o.kg?kgT(o.kg):'—'}</td><td>${o.mx?`${kgT(o.mx.kg)} kg <span class="muted small">${dLabel(o.mx.e.date)}</span>`:'—'}</td><td>${o.mcm?`${fmt(o.mcm.cm,o.mcm.cm%1?1:0)} cm`:'—'}</td><td class="n">${Math.max(...Object.values(o.day))}</td></tr>`).join('')}</tbody></table></div></div>`;
+  // melhores caçadas
+  const top=E.filter(kgE).sort((a,b)=>kgE(b)-kgE(a)).slice(0,5);
+  if(top.length)h+=`<div><h3>As melhores caçadas</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Local</th><th class="n">kg</th><th class="n">Capturas</th><th>O quê</th></tr></thead><tbody>${top.map(e=>`<tr><td>${dLabel(e.date)}</td><td>${esc(nm(e))}</td><td class="n"><b>${kgT(kgE(e))}</b></td><td class="n">${nE(e)}</td><td>${esc([...new Set((e.caps||[]).map(c=>spN(c.sp)))].join(', '))}</td></tr>`).join('')}</tbody></table></div></div>`;
+  // por local
+  if(Lr.length)h+=`<div><h3>Por local</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Local</th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">kg</th><th class="n">kg/saída</th><th>Mais apanhada</th></tr></thead><tbody>${Object.entries(L).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>{const t=Object.entries(o.sp).sort((a,b)=>b[1]-a[1])[0];return `<tr><td><b>${esc(k)}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td><td>${t?esc(spN(t[0]))+' ('+t[1]+')':'—'}</td></tr>`}).join('')}</tbody></table></div></div>`;
+  // análise: o que funciona melhor
+  const dims=[['Maré',e=>e.cond&&e.cond.mare?MAREN[e.cond.mare]:null],['Tipo de maré',e=>e.cond&&e.cond.cls?'marés '+e.cond.cls:null],['Técnica',e=>e.tec||null],
+    ['Visibilidade',e=>e.obs&&e.obs.vis!=null?(e.obs.vis<3?'menos de 3 m':e.obs.vis<6?'3 a 6 m':'6 m ou mais'):null],
+    ['Hora de entrada',e=>e.t0?(+e.t0.slice(0,2)<10?'antes das 10h':+e.t0.slice(0,2)<15?'10h às 15h':'depois das 15h'):null]];
+  const an=dims.map(([lab,fn])=>{const G={};E.forEach(e=>{const k=fn(e);if(!k)return;const o=G[k]||(G[k]={n:0,kg:0,cap:0});o.n++;o.kg+=kgE(e);if(nE(e))o.cap++});
+    const r=Object.entries(G);if(r.length<2)return '';
+    return `<tr class="grp"><th colspan="4">${lab}</th></tr>`+r.sort((a,b)=>b[1].kg/b[1].n-a[1].kg/a[1].n).map(([k,o])=>`<tr><td>${esc(k)}</td><td class="n">${o.n}</td><td class="n">${o.cap} de ${o.n}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}).join('');
+  if(an)h+=`<div><h3>O que funciona melhor</h3><p class="small muted" style="margin:0 0 6px">Com poucas saídas estes números variam muito: olhe para quantas saídas há em cada linha.</p><div class="stwrap"><table class="sttable"><thead><tr><th></th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">kg/saída</th></tr></thead><tbody>${an}</tbody></table></div></div>`;
+  el.innerHTML=h;hydrateThumbs(el);
+}
 
 /* ---- Relatórios partilhados: condições e observações, sem pesos nem notas ---- */
 $('dShare').addEventListener('click',()=>{

@@ -1,6 +1,6 @@
 /* PeixeCrew: guarda a app no aparelho para funcionar sem rede.
    Mude VERSION a cada publicação: os aparelhos detetam a versão nova e mostram «Atualizar». */
-const VERSION='2026-11-16-4';
+const VERSION='2026-11-16-5';
 const CACHE='peixecrew-'+VERSION;
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
 // cache:'reload' obriga a ir ao servidor: o GitHub Pages deixa os navegadores guardar ficheiros 10 min, e sem isto a versão nova podia ficar com o index antigo
