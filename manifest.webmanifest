@@ -1,0 +1,16 @@
+{
+  "name": "PeixeCrew",
+  "short_name": "PeixeCrew",
+  "description": "Planeador de caça submarina e apanha: estado do mar, marés, espécies, os seus locais e o seu diário.",
+  "lang": "pt-PT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#045150",
+  "theme_color": "#045150",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
