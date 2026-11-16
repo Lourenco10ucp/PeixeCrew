@@ -588,6 +588,7 @@ footer ul{padding-left:20px}
         <label class="f">Local<select id="dSpot"></select></label>
         <label class="f" id="dLocW" hidden>Nome do local<input type="text" id="dLoc" maxlength="60" list="dLocs" placeholder="Ex.: Pedra da Nau, Peniche"><datalist id="dLocs"></datalist></label>
         <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
+        <label class="f">Com quem <span class="small muted" style="font-weight:400">(opcional; separe os nomes por vírgulas)</span><input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Ex.: João, Rui" autocomplete="off"><datalist id="dComL"></datalist></label>
         <fieldset class="dfs"><legend>O que encontrou</legend>
           <div class="drow2">
             <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
@@ -2267,6 +2268,7 @@ function renderDiary(){
     const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':'',o.acerto==='sim'?'a app acertou':o.acerto==='parcial'?'a app acertou mais ou menos':o.acerto==='nao'?'a app errou':''].filter(Boolean).join(' · ');
     return `<div class="entry"><div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b> <span class="small muted">${dLabel(e.date)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span>
       ${e.from?`<div class="from small">Relatório de ${esc(e.from.nome)}</div>`:''}
+      ${e.com&&e.com.length?`<div class="small">👥 Com ${esc(e.com.join(', '))}</div>`:''}
       ${caps?`<div>${caps}</div>`:''}
       ${e.vistas&&e.vistas.length?`<div class="small">Viu: ${esc(e.vistas.map(k=>byK[k]?.n).filter(Boolean).join(', '))}</div>`:''}
       ${ob?`<div class="small">${esc(ob)}</div>`:''}
@@ -2276,7 +2278,7 @@ function renderDiary(){
       ${e.from?'':`<div class="thumbs" style="margin-top:6px">${(e.fotos||[]).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}<label class="addfoto">+ foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label></div>`}</div>
       <button data-id="${e.id}" aria-label="Apagar registo">Apagar</button></div>`;
   }).join('');
-  hydrateThumbs($('dlist'));renderStats();
+  hydrateThumbs($('dlist'));paintCom();renderStats();
 }
 /* ---- Fotografias das caçadas: guardadas no aparelho (IndexedDB), reduzidas para ocupar pouco ---- */
 const FDB=(()=>{let p=null;
@@ -2299,6 +2301,12 @@ async function makeFotos(files){
     try{const full=await shrink(f,1600,.78),thumb=await shrink(f,260,.7);if(full&&thumb)out.push({id:'f'+rnd(),full,thumb})}catch(e){}}
   if(out.length&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   return out;
+}
+/* «Com quem»: nomes separados por vírgula, «e» ou «/» */
+const splitNames=s=>[...new Set(String(s||'').split(/\s*(?:,|;|\/|\se\s)\s*/).map(x=>x.trim().replace(/\s+/g,' ').slice(0,30)).filter(Boolean))].slice(0,10);
+function paintCom(){
+  const cnt={};D.filter(e=>!e.from).forEach(e=>(e.com||[]).forEach(n=>cnt[n]=(cnt[n]||0)+1));
+  $('dComL').innerHTML=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([n])=>`<option value="${esc(n)}"></option>`).join('');
 }
 let PEND=[];
 const TURL={};
@@ -2336,13 +2344,14 @@ $('dform').addEventListener('submit',ev=>{
   const caps=[...document.querySelectorAll('#dCaps .dcap')].map(r=>({sp:r.querySelector('select').value,kg:numOr(r.querySelectorAll('input')[0].value,200),cm:numOr(r.querySelectorAll('input')[1].value,400)})).filter(c=>c.sp);
   const e={id:rnd(),v:2,date:$('dDate').value,t0:$('dT0').value,t1:$('dT1').value,spot:s?s.id:null,ll:s?[s.lat,s.lon]:null,loc:s?s.n:$('dLoc').value.trim(),tec:$('dTec').value,
     obs:{vis:numOr($('dVis').value,40),marH:$('dMarH').value===''?null:+$('dMarH').value,corr:$('dCorr').value,saida:$('dSaida').value,acerto:$('dAcerto').value},
-    vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim()};
+    vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim(),
+    com:splitNames($('dCom').value)};
   if(!e.date){$('dMsg').textContent='Indique a data.';return}
   D.push(e);
   if(!save(KD,D))alert('O navegador não deixou guardar. O registo fica só até fechar a página.');
   const L=lawCheck(e);
   $('dMsg').textContent=L.W.length?'Saída guardada, mas veja os avisos legais no registo.':'Saída guardada.'+(s?' A obter as condições previstas para essa hora…':'');
-  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';
+  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';
   const fot=PEND;PEND=[];paintPend();
   renderDiary();if(fot.length)storeFotos(e,fot).then(renderDiary).catch(()=>alert('Não foi possível guardar as fotografias neste aparelho.'));if(s)fetchCond(e);
 });
@@ -2360,8 +2369,8 @@ $('dlist').addEventListener('change',async ev=>{
 });
 $('dCsv').addEventListener('click',()=>{
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=[['data','entrada','saida','local','tecnica','visibilidade_m','mar_no_local_m','corrente','saida_da_agua','app_acertou','especies_vistas','capturas','kg_total','prev_ondulacao_m','prev_direcao','prev_periodo_s','prev_vento_nos','mare','tipo_mare','chuva_48h_mm','notas','relatorio_de'],
-    ...D.map(e=>{const s=entrySpot(e),o=e.obs||{},c=e.cond||{};return [e.date,e.t0,e.t1,s?s.n:e.loc,e.tec,o.vis,o.marH,o.corr,o.saida,o.acerto,(e.vistas||[]).map(k=>byK[k]?.n).join(', '),
+  const rows=[['data','entrada','saida','local','tecnica','visibilidade_m','mar_no_local_m','com_quem','corrente','saida_da_agua','app_acertou','especies_vistas','capturas','kg_total','prev_ondulacao_m','prev_direcao','prev_periodo_s','prev_vento_nos','mare','tipo_mare','chuva_48h_mm','notas','relatorio_de'],
+    ...D.map(e=>{const s=entrySpot(e),o=e.obs||{},c=e.cond||{};return [e.date,e.t0,e.t1,s?s.n:e.loc,e.tec,o.vis,o.marH,(e.com||[]).join(', '),o.corr,o.saida,o.acerto,(e.vistas||[]).map(k=>byK[k]?.n).join(', '),
       (e.caps||[]).map(x=>`${byK[x.sp]?.n||'Outra'}${x.kg?' '+x.kg+' kg':''}${x.cm?' '+x.cm+' cm':''}`).join(', '),(e.caps||[]).reduce((a,x)=>a+(+x.kg||0),0),
       c.med,c.swDir!=null?d16(c.swDir):'',c.tp,c.wind,c.mare?MAREN[c.mare]:'',c.cls,c.rain48,e.notas,e.from?e.from.nome:'']})];
   const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
@@ -2415,9 +2424,14 @@ function renderStats(){
   if(top.length)h+=`<div><h3>As melhores caçadas</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Local</th><th class="n">kg</th><th class="n">Capturas</th><th>O quê</th></tr></thead><tbody>${top.map(e=>`<tr><td>${dLabel(e.date)}</td><td>${esc(nm(e))}</td><td class="n"><b>${kgT(kgE(e))}</b></td><td class="n">${nE(e)}</td><td>${esc([...new Set((e.caps||[]).map(c=>spN(c.sp)))].join(', '))}</td></tr>`).join('')}</tbody></table></div></div>`;
   // por local
   if(Lr.length)h+=`<div><h3>Por local</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Local</th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">kg</th><th class="n">kg/saída</th><th>Mais apanhada</th></tr></thead><tbody>${Object.entries(L).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>{const t=Object.entries(o.sp).sort((a,b)=>b[1]-a[1])[0];return `<tr><td><b>${esc(k)}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td><td>${t?esc(spN(t[0]))+' ('+t[1]+')':'—'}</td></tr>`}).join('')}</tbody></table></div></div>`;
+  // com quem (só as suas capturas em cada saída)
+  const W={};E.forEach(e=>{const ns=e.com&&e.com.length?e.com:['(sozinho ou sem indicação)'];ns.forEach(n=>{const o=W[n]||(W[n]={n:0,kg:0,cap:0,np:0});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++})});
+  const Wr=Object.entries(W);
+  if(Wr.some(([k])=>k[0]!=='('))h+=`<div><h3>Com quem</h3><p class="small muted" style="margin:0 0 6px">Saídas com cada companheiro e o que <b>você</b> apanhou nelas.</p><div class="stwrap"><table class="sttable"><thead><tr><th>Com</th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">Capturas</th><th class="n">kg/saída</th></tr></thead><tbody>${Wr.sort((a,b)=>(a[0][0]==='(')-(b[0][0]==='(')||b[1].n-a[1].n).map(([k,o])=>`<tr><td><b>${esc(k)}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${o.np}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div></div>`;
   // análise: o que funciona melhor
   const dims=[['Maré',e=>e.cond&&e.cond.mare?MAREN[e.cond.mare]:null],['Tipo de maré',e=>e.cond&&e.cond.cls?'marés '+e.cond.cls:null],['Técnica',e=>e.tec||null],
     ['Visibilidade',e=>e.obs&&e.obs.vis!=null?(e.obs.vis<3?'menos de 3 m':e.obs.vis<6?'3 a 6 m':'6 m ou mais'):null],
+    ['Companhia',e=>e.com&&e.com.length?'com companhia':'sozinho ou sem indicação'],
     ['Hora de entrada',e=>e.t0?(+e.t0.slice(0,2)<10?'antes das 10h':+e.t0.slice(0,2)<15?'10h às 15h':'depois das 15h'):null]];
   const an=dims.map(([lab,fn])=>{const G={};E.forEach(e=>{const k=fn(e);if(!k)return;const o=G[k]||(G[k]={n:0,kg:0,cap:0});o.n++;o.kg+=kgE(e);if(nE(e))o.cap++});
     const r=Object.entries(G);if(r.length<2)return '';
