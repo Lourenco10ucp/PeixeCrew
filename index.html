@@ -162,6 +162,8 @@ a.srcp:hover{border-color:var(--accent)}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:15px;max-width:calc(100vw - 32px)}
 .updbar .btn{padding:6px 14px;font-size:14px}
 .install{margin-bottom:18px}
+.ondeday{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:15px}
+.ondeday input{max-width:180px}
 /* Perfis, partilha, ficha do local, onde ir */
 .profbar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding-bottom:12px;border-bottom:1.5px dashed var(--line)}
 .spotbar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
@@ -304,6 +306,43 @@ dialog::backdrop{background:rgba(5,15,20,.55)}
 
 footer{padding-block:40px 60px;color:var(--muted);font-size:14px}
 footer ul{padding-left:20px}
+
+/* ===== Telemóvel: separadores em baixo. Só abaixo de 760 px; no PC fica tudo igual ===== */
+.tabbar,.mtog{display:none}
+.bkbar{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;border-color:var(--warn);background:var(--warn-bg);font-size:15px}
+.bkbar .btn{padding:6px 14px;font-size:14px;min-height:38px}
+@media (max-width:760px){
+  body.m{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+  body.m .nav{display:none}
+  body.m .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted);padding:6px 2px;border-radius:10px;-webkit-tap-highlight-color:transparent}
+  .tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .tabbar button[aria-current="page"]{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
+  .tabbar button:focus-visible{outline:3px solid var(--focus)}
+  body.m[data-tab="hoje"] [data-t]:not([data-t~="hoje"]),
+  body.m[data-tab="onde"] [data-t]:not([data-t~="onde"]),
+  body.m[data-tab="locais"] [data-t]:not([data-t~="locais"]),
+  body.m[data-tab="diario"] [data-t]:not([data-t~="diario"]),
+  body.m[data-tab="mais"] [data-t]:not([data-t~="mais"]){display:none!important}
+  body.m .hero{padding-block:12px 0}
+  body.m .hero > div:first-child{display:none}
+  body.m section.block{padding-block:18px 6px}
+  body.m[data-tab="onde"] .onde{margin-top:0}
+  body.m .block > h2{font-size:28px}
+  body.m .mtog{display:block;width:100%;margin-top:12px}
+  body.m .condcard:not(.open) .inputs{display:none}
+  body.m .updbar{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  body.m .pbox{margin-top:14px}
+  body.m #hoje > .lead,body.m #diario > .lead{display:none}
+  body.m .drow3{grid-template-columns:1fr 1fr}
+  body.m .drow3 > label:first-child{grid-column:1/-1}
+  .ondeday{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:15px}
+  .card{padding:14px}
+  input,select,textarea{font-size:16px!important}
+  dialog{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;inset:0;border-radius:0;border:0}
+  .dlg{padding:12px 16px calc(28px + env(safe-area-inset-bottom,0px))}
+  .dlg .close{position:sticky;top:0;z-index:2}
+}
 </style>
 </head>
 <body>
@@ -315,7 +354,8 @@ footer ul{padding-left:20px}
 </div></header>
 
 <main class="wrap">
-  <section class="hero">
+  <div class="card bkbar" id="bkBar" data-t="hoje locais" hidden></div>
+  <section class="hero" data-t="hoje">
     <div>
       <h1 id="hello">O mar certo, <em>na altura certa.</em></h1>
       <p>Um planeador de caça submarina e apanha à sua medida. Diz-lhe se o mar está bom para entrar, que técnica usar e que espécies estão na melhor altura. Baseia-se no <i>Manual de Caça Submarina</i> do blogue Mar Livre.</p>
@@ -323,7 +363,7 @@ footer ul{padding-left:20px}
     <div class="today" id="todayBox" aria-live="polite"></div>
   </section>
 
-  <details class="pbox card" id="pbox">
+  <details class="pbox card" id="pbox" data-t="locais">
     <summary><span style="font-family:var(--f-display);font-size:22px">O seu perfil</span><span class="chips" id="pchips"></span><span class="edit">Editar</span></summary>
     <div class="prof">
       <div class="f wide profbar">
@@ -372,17 +412,18 @@ footer ul{padding-left:20px}
   </details>
 
   <!-- HOJE -->
-  <section class="block" id="hoje">
-    <h2>Vale a pena ir ao mar?</h2>
-    <p class="lead">Carregue a previsão da sua região ou ajuste os valores à mão. O veredicto tem em conta o seu nível: o mesmo mar pode ser bom para um experiente e perigoso para um iniciante.</p>
-    <div class="cond">
-      <div class="card">
+  <section class="block" id="hoje" data-t="hoje onde">
+    <h2 data-t="hoje">Vale a pena ir ao mar?</h2>
+    <p class="lead" data-t="hoje">Carregue a previsão da sua região ou ajuste os valores à mão. O veredicto tem em conta o seu nível: o mesmo mar pode ser bom para um experiente e perigoso para um iniciante.</p>
+    <div class="cond" data-t="hoje">
+      <div class="card condcard">
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
           <h3 style="font-size:22px">Condições</h3>
           <button class="btn" id="loadFc">Carregar previsão de 7 dias</button>
         </div>
         <label class="f" style="margin-top:12px">Local<select id="cLoc"></select></label>
         <div class="days" id="days" style="margin-top:12px" hidden></div>
+        <button type="button" class="btn ghost mtog" id="inTog" aria-expanded="false">Ajustar os valores à mão</button>
         <div class="inputs">
           <label class="f">Dia<input type="date" id="cDate"></label>
           <label class="f">Hora <span class="v" id="cHoraV"></span><input type="range" id="cHora" min="5" max="21" step="1"></label>
@@ -417,17 +458,18 @@ footer ul{padding-left:20px}
         <div class="card"><h3 style="font-size:22px">Leve consigo</h3><ul class="kit" id="kit"></ul></div>
       </div>
     </div>
-    <div class="card onde" id="ondeBox">
+    <div class="card onde" id="ondeBox" data-t="onde">
       <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
         <div><h3 style="font-size:22px">Onde ir</h3><p class="small muted" style="margin:4px 0 0" id="ondeLead">Compara todos os seus locais no dia escolhido em «Condições», com a melhor hora de cada um.</p></div>
         <button class="btn" id="ondeBtn">Comparar os meus locais</button>
       </div>
+      <label class="ondeday">Dia a comparar <input type="date" id="ondeDate"></label>
       <div id="onde" aria-live="polite"></div>
     </div>
   </section>
 
   <!-- CALENDÁRIO -->
-  <section class="block" id="calendario">
+  <section class="block" id="calendario" data-t="mais">
     <h2>Melhor altura do ano</h2>
     <p class="lead">Quando cada espécie está mais perto da costa e em melhor estado. Os meses riscados são de defeso ou de retenção proibida. Toque no nome para ver a ficha completa.</p>
     <div class="calctl">
@@ -448,7 +490,7 @@ footer ul{padding-left:20px}
   </section>
 
   <!-- TÉCNICAS -->
-  <section class="block" id="tecnicas">
+  <section class="block" id="tecnicas" data-t="mais">
     <h2>As três técnicas do manual</h2>
     <p class="lead">O manual recomenda começar o dia em água livre, com esperas e caça à índio, e só passar ao buraco quando o peixe desaparece.</p>
     <div class="grid" style="margin-top:18px" id="techcards"></div>
@@ -472,7 +514,7 @@ footer ul{padding-left:20px}
   </section>
 
   <!-- SEGURANÇA -->
-  <section class="block" id="seguranca">
+  <section class="block" id="seguranca" data-t="mais">
     <h2>Um peixe não vale uma vida</h2>
     <p class="lead">Segundo o manual, a principal causa de morte na caça submarina em Portugal é a síncope. Acontece sobretudo a caçadores experientes que passaram os seus limites ou facilitaram na segurança.</p>
     <div class="rules">
@@ -497,7 +539,7 @@ footer ul{padding-left:20px}
   </section>
 
   <!-- DIÁRIO -->
-  <section class="block" id="diario">
+  <section class="block" id="diario" data-t="diario">
     <h2>O seu diário de mar</h2>
     <p class="lead">Registe cada saída. A app junta sozinha as condições previstas para essa hora e, com o tempo, aprende como se comporta cada um dos seus locais. Fica guardado só neste perfil, neste aparelho; só sai daqui o que escolher partilhar.</p>
     <div class="diary">
@@ -515,6 +557,7 @@ footer ul{padding-left:20px}
             <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
             <label class="f">Ondulação no local<select id="dMarH"><option value="">Não sei</option><option value="0.2">Plano (menos de 0,3 m)</option><option value="0.5">Cerca de 0,5 m</option><option value="1">Cerca de 1 m</option><option value="1.5">Cerca de 1,5 m</option><option value="2.2">2 m ou mais</option></select></label>
             <label class="f">Corrente<select id="dCorr"><option value="">Não sei</option><option value="nenhuma">Nenhuma</option><option value="fraca">Fraca</option><option value="forte">Forte</option></select></label>
+            <label class="f">A previsão da app acertou?<select id="dAcerto"><option value="">Não sei</option><option value="sim">Acertou</option><option value="parcial">Mais ou menos</option><option value="nao">Errou</option></select></label>
             <label class="f">Sair da água foi<select id="dSaida"><option value="">Normal</option><option value="facil">Fácil</option><option value="dificil">Difícil</option></select></label>
           </div>
         </fieldset>
@@ -532,8 +575,15 @@ footer ul{padding-left:20px}
   </section>
 </main>
 
+<nav class="tabbar" id="tabbar" aria-label="Separadores">
+  <button data-tab="hoje"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c2 0 2-1.6 4-1.6S9 14 11 14s2-1.6 4-1.6 2 1.6 4 1.6M3 19c2 0 2-1.6 4-1.6S9 19 11 19s2-1.6 4-1.6 2 1.6 4 1.6"/><circle cx="12" cy="6.5" r="3"/></svg>Hoje</button>
+  <button data-tab="onde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Onde ir</button>
+  <button data-tab="locais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Locais</button>
+  <button data-tab="diario"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10l3 3v15H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>Diário</button>
+  <button data-tab="mais"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mais</button>
+</nav>
 <div class="updbar" id="updBar" hidden role="status">Há uma versão nova da PeixeCrew. <button class="btn" id="updBtn">Atualizar</button></div>
-<footer class="wrap">
+<footer class="wrap" data-t="mais">
   <div class="card install" id="installBox">
     <h3 style="font-size:20px">Instalar no telemóvel</h3>
     <p class="small" style="margin:6px 0 0"><b>Android (Chrome):</b> abra este endereço, toque em <b>⋮</b> e depois em <b>Instalar aplicação</b> (ou no botão abaixo, se aparecer). <b>iPhone (Safari):</b> toque em <b>Partilhar</b> e depois em <b>Adicionar ao ecrã principal</b>. Depois de instalada, a app abre em ecrã inteiro e funciona sem rede (as previsões precisam de rede; sem ela, mostra a última guardada).</p>
@@ -648,7 +698,8 @@ const SANDY=['choco','salmonete','dourada','ameijoa','berbigao','lula'];
 /* ================= Regras oficiais e fontes =================
  Tudo o que é lei vem de documentos oficiais, com a data em que foi confirmado (VERIF).
  Quando a DGRM publicar novas tabelas ou despachos, atualize LEX e DEF e mude VERIF. */
-const VERIF='16 de novembro de 2026';
+const VERIF='16 de novembro de 2026', VERIF_ISO='2026-11-16';
+const VERIF_DAYS=()=>Math.floor((Date.now()-new Date(VERIF_ISO+'T12:00'))/864e5);
 const ST={lei:'⚖️ Lei',oficial:'🏛️ Oficial',ciencia:'🔬 Científica',modelo:'🌊 Modelos',diario:'📓 Os seus registos',manual:'📘 Experiência',estim:'≈ Estimativa',voce:'👤 Seu valor'};
 const STD={lei:'Regra legal, de documento oficial',oficial:'Dado ou aviso de uma instituição oficial (IPMA, Instituto Hidrográfico)',ciencia:'Cálculo científico a partir de dados medidos (marégrafos, terreno), validado pela app',modelo:'Previsão de modelos numéricos de vários centros, comparados entre si',manual:'Experiência do autor do manual Mar Livre: indicativo, não oficial',estim:'Estimativa ou critério desta app, sem fonte oficial',diario:'Aprendido com as saídas registadas no diário neste local (incluindo relatórios de amigos que aceitou); diz sempre em quantas se baseia',voce:'Valor indicado por si'};
 const SRC={
@@ -665,6 +716,7 @@ const SRC={
   ih:{t:'oficial',n:'Instituto Hidrográfico, Tabela de Marés 2026',u:'https://www.hidrografico.pt/paginas-genericas/dt/doc/previsao-oceanografica/?child=altura-de-mare'},
   om:{t:'modelo',n:'Open-Meteo: comparação de modelos de ondulação (Météo-France, ECMWF, DWD, NOAA) e de vento (ECMWF, DWD ICON, Météo-France, Met Office, NOAA GFS)',u:'https://open-meteo.com/en/docs/marine-weather-api'},
   ticon:{t:'ciencia',n:'Previsão astronómica da maré com as constantes harmónicas medidas no marégrafo mais próximo (TICON-3, DGFI-TUM, CC BY 4.0). Validada pela app contra tabelas publicadas: erro até 6 minutos',u:'https://doi.org/10.1594/PANGAEA.951610'},
+  icnf:{t:'oficial',n:'ICNF, regimes de proteção dos planos de ordenamento das áreas protegidas (dados oficiais, consultados para cada local)',u:'https://sigservices.icnf.pt/server/rest/services/BDG/POAP/MapServer'},
   dem:{t:'ciencia',n:'Orientação e mar aberto do local calculados com o modelo de terreno Copernicus (Open-Meteo Elevation)',u:'https://open-meteo.com/en/docs/elevation-api'},
   ml:{t:'manual',n:'Manual de Caça Submarina, blogue Mar Livre (2013)',u:'https://marlivre.blogspot.com/2013/09/manual-caca-submarina-este-pequeno.html'},
   app:{t:'estim',n:'Critério ou estimativa desta app (sem fonte oficial)'},
@@ -743,7 +795,9 @@ function zonesAt(loc){
       // Parque Marinho Luiz Saldanha: da Praia da Foz (38,454° N, a norte do Cabo Espichel) até à Praia da Figueirinha (-8,945°).
       // Costa oeste: só da Praia da Foz para sul (a Praia das Bicas, 1,2 km a norte, fica fora). Costa sul: do Espichel à Figueirinha.
       arrabida:yn(box(38.38,38.456,-9.30,-9.17)||box(38.38,38.50,-9.17,-8.94)),berlengas:yn(near(39.415,-9.51,8)),
-      litnorte:yn(box(41.45,41.65,-8.85,-8.76)),valado:yn(near(37.06,-8.33,5))};
+      litnorte:yn(box(41.45,41.65,-8.85,-8.76)),valado:yn(near(37.06,-8.33,5)),
+      ...(loc.icnfOk?{oficial:true,icnf:loc.icnf,arrabida:yn(loc.icnf&&loc.icnf.poap==='PNARR'),berlengas:yn(loc.icnf&&loc.icnf.poap==='RNB'),
+        pnsacv:yn(loc.icnf&&loc.icnf.poap==='PNSACV'),litnorte:yn(loc.icnf&&loc.icnf.poap==='PNLN')}:{})};
   }
   const r=P.reg, ilhas=r==='acores'||r==='madeira';
   return {spot:false,all:'sim',cont:ilhas?'nao':'sim',
@@ -787,7 +841,27 @@ function lawRows(s){
 function areaReasons(Z,add){
   if(Z.cont==='nao'){add('info','Açores e Madeira têm regras regionais próprias e a licença da DGRM não é válida lá. Esta app só verifica as regras do continente.','faq26');return}
   if(!Z.spot)return;
-  const ap=' (limites aproximados: confirme no mapa do ICNF)';
+  if(Z.oficial){
+    const I=Z.icnf;
+    if(I&&POAPN[I.poap]){
+      const nm=POAPN[I.poap], zona=`${nm}, zona de ${protTxt(I.protecao)}${I.tipo==='Marinha'?' (marinha)':''}`;
+      if(I.poap==='PNARR')add('stop',`${zona}: a caça submarina e a apanha são proibidas em todo o Parque.`,'icnf','faq26');
+      else if(I.poap==='RNB')add('stop',`${zona}: a pesca submarina e a apanha são proibidas na Reserva.`,'icnf','faq26');
+      else if(I.poap==='PNSACV'){
+        if(I.rp==='PT'||I.rp==='PPI')add('stop',`${zona}: a pesca lúdica é proibida em todas as modalidades.`,'icnf','faq26');
+        else if(I.rp==='PPII')add('stop',`${zona}: a pesca submarina é proibida.`,'icnf','faq26');
+        else add('info',`${zona}: a pesca submarina é permitida, com as regras gerais e os defesos próprios do Parque.`,'icnf','faq26');
+      }
+      else if(I.poap==='PNLN'){
+        if(I.rp==='PPI')add('stop',`${zona}: a pesca lúdica é proibida em todas as modalidades.`,'icnf','faq26');
+        else add('info',`${zona}.`,'icnf');
+      }
+      else add('warn',`${zona}. A DGRM não indica regras de pesca lúdica para esta reserva: confirme no ICNF antes de caçar.`,'icnf');
+    }
+    if(Z.valado==='sim')add('warn','Pedra do Valado (Parque Natural Marinho do Recife do Algarve): a pesca lúdica precisa de autorização do ICNF (limites aproximados).','faq26');
+    return;
+  }
+  const ap=' (limites aproximados, porque não foi possível consultar o ICNF: confirme no mapa do ICNF)';
   if(Z.arrabida==='sim')add('stop','Este local parece estar no Parque Marinho da Arrábida (da Praia da Foz, a norte do Cabo Espichel, até à Figueirinha): a caça submarina e a apanha são proibidas em todo o Parque'+ap+'.','faq26');
   if(Z.berlengas==='sim')add('stop','Reserva Natural das Berlengas: a pesca submarina e a apanha são proibidas'+ap+'.','faq26');
   if(Z.pnsacv==='sim')add('warn','Está na área do PNSACV: nas zonas de proteção total, parcial I e parcial II a pesca submarina é proibida. Confirme em que zona fica este local'+ap+'.','faq26');
@@ -998,18 +1072,35 @@ function exposure(open,dir){
   return 0;
 }
 let coastBusy=false;
-async function fillCoast(){ // calcula a orientação dos locais que ainda não a têm, um de cada vez
+/* Área protegida e regime de proteção do local, nos dados oficiais do ICNF (planos de ordenamento) */
+const protTxt=p=>String(p||'').toLowerCase().replace(/tipo (i+)$/,(m,x)=>'tipo '+x.toUpperCase());
+const POAPN={PNARR:'Parque Natural da Arrábida',PNSACV:'Parque Natural do Sudoeste Alentejano e Costa Vicentina',RNB:'Reserva Natural das Berlengas',PNLN:'Parque Natural do Litoral Norte',RNDSJ:'Reserva Natural das Dunas de São Jacinto',RNLSAS:'Reserva Natural das Lagoas de Santo André e da Sancha'};
+async function icnfQuery(lat,lon){
+  const u=`https://sigservices.icnf.pt/server/rest/services/BDG/POAP/MapServer/7/query?geometry=${lon},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=poap,rp,protecao,tipo_area&returnGeometry=false&f=json`;
+  const j=await fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()});
+  if(j.error||!Array.isArray(j.features))throw 0;
+  const a=(j.features.find(x=>x.attributes.tipo_area==='Marinha')||j.features[0]||{}).attributes;
+  return a?{poap:a.poap,rp:a.rp,protecao:a.protecao,tipo:a.tipo_area}:null;
+}
+async function fillCoast(){ // orientação e área protegida dos locais que ainda não as têm, um de cada vez
   if(coastBusy)return;coastBusy=true;
   try{
     for(const s of P.spots){
-      if(s.open)continue;
-      $('smsg').textContent=`A calcular a orientação de «${s.n}»…`;
-      try{
-        const a=await analyseCoast(s.lat,s.lon);
-        s.open=a.open;
-        if(a.face!=null&&(s.face==null||s.faceAuto)){s.faceAuto=true;s.faceDeg=a.face;s.face=Math.round(a.face/45)%8*45}
-        s.coastNote=a.note;save(KP,P);
-      }catch(e){$('smsg').textContent='Não foi possível calcular a orientação (sem ligação?). Tento de novo da próxima vez.';coastBusy=false;return}
+      const needCoast=!s.open, needIcnf=!s.icnfOk||Date.now()-(s.icnfT||0)>365*864e5;
+      if(!needCoast&&!needIcnf)continue;
+      if(needCoast){
+        $('smsg').textContent=`A calcular a orientação de «${s.n}»…`;
+        try{
+          const a=await analyseCoast(s.lat,s.lon);
+          s.open=a.open;
+          if(a.face!=null&&(s.face==null||s.faceAuto)){s.faceAuto=true;s.faceDeg=a.face;s.face=Math.round(a.face/45)%8*45}
+          s.coastNote=a.note;save(KP,P);
+        }catch(e){$('smsg').textContent='Não foi possível calcular a orientação (sem ligação?). Tento de novo da próxima vez.';coastBusy=false;return}
+      }
+      if(needIcnf){
+        $('smsg').textContent=`A confirmar no ICNF se «${s.n}» fica numa área protegida…`;
+        try{s.icnf=await icnfQuery(s.lat,s.lon);s.icnfOk=true;s.icnfT=Date.now();save(KP,P)}catch(e){/* sem ligação: fica para depois e usam-se os limites aproximados */}
+      }
       await new Promise(r=>setTimeout(r,1200));
     }
     $('smsg').textContent='';
@@ -1121,6 +1212,7 @@ const rnd=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function spotLoc(s){
   const fd=s.faceDeg??s.face;
   return {n:s.n,lat:s.lat,lon:s.lon,face:s.face,faceDeg:fd,off:fd==null?null:(fd+180)%360,fundo:s.fundo,open:s.open||null,spot:true,id:s.id,
+    icnf:s.icnf||null,icnfOk:!!s.icnfOk,
     pMin:s.pMin??null,pMax:s.pMax??null,nivelMin:s.nivelMin||'',perigos:s.perigos||'',entrada:s.entrada||'',especies:s.especies||[]};
 }
 function spotExtra(s){
@@ -1129,6 +1221,7 @@ function spotExtra(s){
   if(s.nivelMin)bits.push('a partir de nível '+LV[s.nivelMin].toLowerCase());
   if(s.especies&&s.especies.length)bits.push('visto: '+s.especies.map(k=>byK[k]?.n).filter(Boolean).join(', '));
   let h=bits.length?`<span class="extra">${esc(bits.join(' · '))}</span>`:'';
+  if(s.icnfOk)h+=`<span class="extra">${s.icnf&&POAPN[s.icnf.poap]?`🛡️ ${esc(POAPN[s.icnf.poap])}, ${esc(protTxt(s.icnf.protecao))}`:'Fora de áreas protegidas'} ${pill('icnf')}</span>`;
   if(s.perigos)h+=`<span class="extra">⚠️ ${esc(s.perigos)}</span>`;
   if(s.from)h+=`<span class="from">Partilhado por ${esc(s.from.nome)}${s.from.em?' em '+esc(s.from.em):''}</span>`;
   return h;
@@ -1189,7 +1282,7 @@ function openSpotEdit(id){
     const c=parseCoords($('eC').value);if(!c){$('eMsg').textContent='Não percebi as coordenadas.';return}
     const moved=Math.abs(c.lat-s.lat)>1e-5||Math.abs(c.lon-s.lon)>1e-5;
     s.n=$('eN').value.trim().slice(0,40)||s.n;s.lat=c.lat;s.lon=c.lon;s.fundo=$('eFundo').value;
-    if(moved){delete s.open;delete s.coastNote}
+    if(moved){delete s.open;delete s.coastNote;delete s.icnfOk;delete s.icnf}
     const f=$('eFace').value;
     if(f===''){if(!s.faceAuto||moved){delete s.face;delete s.faceDeg;delete s.open}s.faceAuto=true}
     else{s.face=+f;s.faceDeg=+f;s.faceAuto=false}
@@ -1306,7 +1399,7 @@ function previewShare(obj){
     }
     closeDlg();commitProfile();fillCoast();
     $('smsg').textContent=`${nNew?nNew+(nNew===1?' local novo':' locais novos'):''}${nNew&&nUpd?' e ':''}${nUpd?nUpd+(nUpd===1?' local atualizado':' locais atualizados'):''}${!nNew&&!nUpd?'Nada juntado.':'.'}`;
-    $('pbox').open=true;
+    $('pbox').open=true;if(MQ.matches)setTab('locais');
   };
 }
 
@@ -1333,7 +1426,29 @@ function restoreBackup(obj){
 }
 $('shareBtn').addEventListener('click',()=>openShare([]));
 $('recvBtn').addEventListener('click',()=>openReceive(''));
-$('bkBtn').addEventListener('click',()=>{downloadJSON(backupObj(),`peixecrew-copia-${iso(new Date())}.json`);$('smsg').textContent='Cópia guardada na pasta de transferências. Guarde-a num sítio seguro (ou envie-a para o telemóvel e use «Repor uma cópia»).'});
+/* Cópia com um toque: no telemóvel abre «Partilhar» (WhatsApp, e-mail, Drive…); no PC descarrega o ficheiro */
+async function backupNow(){
+  const obj=backupObj(), name=`peixecrew-copia-${iso(new Date())}.json`, json=JSON.stringify(obj,null,1);
+  let ok=false;
+  try{
+    const file=new File([json],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Cópia PeixeCrew',text:'Cópia de segurança da app PeixeCrew. Guarde-a: serve para repor os seus locais e o diário.'});ok=true}
+  }catch(e){if(e&&e.name==='AbortError')return false}
+  if(!ok){downloadJSON(obj,name);ok=true}
+  save('ml_lastbk',Date.now());$('bkBar').hidden=true;
+  $('smsg').textContent='Cópia feita. Guarde o ficheiro num sítio seguro; para repor, use «Repor uma cópia».';
+  return true;
+}
+$('bkBtn').addEventListener('click',backupNow);
+function checkBackup(){
+  const has=P.spots.length||(typeof D!=='undefined'&&D.length), last=load('ml_lastbk',0), snooze=load('ml_bksnooze',0);
+  const days=last?Math.floor((Date.now()-last)/864e5):null;
+  if(!has||(last&&days<30)||Date.now()<snooze){$('bkBar').hidden=true;return}
+  $('bkBar').innerHTML=`<span>${last?`A última cópia de segurança foi há ${days} dias.`:'Ainda não fez nenhuma cópia de segurança.'} Os seus locais e o diário estão só neste aparelho.</span><span style="display:flex;gap:8px"><button class="btn" id="bkNow">Fazer cópia agora</button><button class="btn ghost" id="bkLater">Mais tarde</button></span>`;
+  $('bkBar').hidden=false;
+  $('bkNow').onclick=backupNow;
+  $('bkLater').onclick=()=>{save('ml_bksnooze',Date.now()+7*864e5);$('bkBar').hidden=true};
+}
 $('rsBtn').addEventListener('click',()=>$('fileIn').click());
 $('fileIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
@@ -1440,6 +1555,7 @@ function evaluate(c,loc){
   if(L.luz==='noite')add('stop',`Fora do horário: a pesca submarina é proibida entre o pôr do sol (${hh(L.ss)}) e o nascer do sol (${hh(L.sr)}).`,'p14');
   ipmaReasons(c,reg,add);
   areaReasons(Z,add);
+  if(VERIF_DAYS()>365)add('warn',`As regras legais desta app foram confirmadas a ${VERIF}, há mais de um ano. Antes de sair, confirme tamanhos mínimos e defesos na DGRM.`,'dgrmDef');
   if(reg.nivelMin&&LVORD[P.nivel]<LVORD[reg.nivelMin])add('stop',`Na ficha deste local indicou que é para nível ${LV[reg.nivelMin].toLowerCase()} ou acima.`,'voce');
   if(reg.perigos)add('warn',`Perigos anotados para este local: ${reg.perigos}`,'voce');
   if(reg.entrada&&c.hs>=1)add('info',`Entrada e saída: ${reg.entrada}`,'voce');
@@ -1528,6 +1644,7 @@ function evaluate(c,loc){
 
 const TECHLBL={buraco:'Ao buraco',borda:'Borda',indio:'À índio',espera:'Espera',apanha:'Apanha à mão'};
 function evaluateAndRender(){
+  if(typeof syncOnde==='function')try{syncOnde()}catch(e){}
   const mOf=mareOficial(C.date,C.hora);
   if(mOf){C.mare=mOf;$('cMare').value=mOf;mareSrc='ih'}
   else if(mareBase==='voce')mareSrc='voce';
@@ -1749,12 +1866,15 @@ async function compareSpots(){
   }).join('');
 }
 $('ondeBtn').addEventListener('click',compareSpots);
+// o dia de «Onde ir» é o mesmo de «Condições»: mudar um muda o outro
+$('ondeDate').addEventListener('change',e=>{if(!e.target.value)return;$('cDate').value=e.target.value;$('cDate').dispatchEvent(new Event('input'))});
+const syncOnde=()=>{if($('ondeDate').value!==C.date)$('ondeDate').value=C.date};
 $('onde').addEventListener('click',e=>{
   const b=e.target.closest('.orow[data-i]');if(!b)return;
   const x=ONDE[+b.dataset.i];if(!x||!x.best)return;
   P.spot=x.s.id;save(KP,P);paintProfile();renderToday();renderCal();
   FC=x.fc;buildDays(true);applyForecast(C.date,x.best.h);
-  $('hoje').scrollIntoView({behavior:'smooth',block:'start'});
+  if(MQ.matches)setTab('hoje');else $('hoje').scrollIntoView({behavior:'smooth',block:'start'});
 });
 
 /* ---------- Calendário ---------- */
@@ -2073,17 +2193,19 @@ function renderDiary(){
     const withCap=E.filter(e=>e.caps&&e.caps.length&&e.cond&&e.cond.mare), mm={};withCap.forEach(e=>mm[e.cond.mare]=(mm[e.cond.mare]||0)+1);
     const bm=Object.entries(mm).sort((a,b)=>b[1]-a[1])[0];
     const hard=E.filter(e=>e.obs&&e.obs.saida==='dificil').length;
+    const ac=E.filter(e=>e.obs&&e.obs.acerto), acS=ac.filter(e=>e.obs.acerto==='sim').length, acP=ac.filter(e=>e.obs.acerto==='parcial').length;
     return `<div class="scard"><b>${esc(s.n)}</b><span>${E.length} ${E.length===1?'saída':'saídas'}${E.some(e=>e.from)?' (com relatórios de amigos)':''}${vis.length?` · visibilidade média ${fmt(vis.reduce((a,b)=>a+b,0)/vis.length)} m (${vis.length})`:''}</span>
       ${top?`<span>Mais vistas: ${esc(top)}</span>`:'<span class="muted">Com 3 saídas ou mais, a app começa a dizer que espécies aparecem aqui.</span>'}
       ${bm&&withCap.length>=3?`<span>Capturas mais vezes na ${MAREN[bm[0]]} (${bm[1]} de ${withCap.length})</span>`:''}
-      ${hard?`<span style="color:var(--stop)">Saída da água difícil em ${hard} ${hard===1?'vez':'vezes'}</span>`:''}</div>`;
+      ${hard?`<span style="color:var(--stop)">Saída da água difícil em ${hard} ${hard===1?'vez':'vezes'}</span>`:''}
+      ${ac.length?`<span>A previsão da app acertou em ${acS} de ${ac.length}${acP?` (e mais ou menos em ${acP})`:''}</span>`:''}</div>`;
   }).join('');
   if(cards)h+=`<div class="sstats">${cards}</div>`;
   $('dstats').innerHTML=h;
   $('dlist').innerHTML=all.map(e=>{
     const s=entrySpot(e), L=e.from?{W:[],I:[]}:lawCheck(e), o=e.obs||{};
     const caps=(e.caps||[]).map(c=>`${esc(byK[c.sp]?.n||'Outra')}${c.kg?' '+fmt(c.kg,c.kg<1?2:1)+' kg':''}${c.cm?' ('+fmt(c.cm,c.cm%1?1:0)+' cm)':''}`).join(' · ');
-    const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':''].filter(Boolean).join(' · ');
+    const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':'',o.acerto==='sim'?'a app acertou':o.acerto==='parcial'?'a app acertou mais ou menos':o.acerto==='nao'?'a app errou':''].filter(Boolean).join(' · ');
     return `<div class="entry"><div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b> <span class="small muted">${dLabel(e.date)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span>
       ${e.from?`<div class="from small">Relatório de ${esc(e.from.nome)}</div>`:''}
       ${caps?`<div>${caps}</div>`:''}
@@ -2100,14 +2222,14 @@ $('dform').addEventListener('submit',ev=>{
   const sid=$('dSpot').value, s=P.spots.find(x=>x.id===sid);
   const caps=[...document.querySelectorAll('#dCaps .dcap')].map(r=>({sp:r.querySelector('select').value,kg:numOr(r.querySelectorAll('input')[0].value,200),cm:numOr(r.querySelectorAll('input')[1].value,400)})).filter(c=>c.sp);
   const e={id:rnd(),v:2,date:$('dDate').value,t0:$('dT0').value,t1:$('dT1').value,spot:s?s.id:null,ll:s?[s.lat,s.lon]:null,loc:s?s.n:$('dLoc').value.trim(),tec:$('dTec').value,
-    obs:{vis:numOr($('dVis').value,40),marH:$('dMarH').value===''?null:+$('dMarH').value,corr:$('dCorr').value,saida:$('dSaida').value},
+    obs:{vis:numOr($('dVis').value,40),marH:$('dMarH').value===''?null:+$('dMarH').value,corr:$('dCorr').value,saida:$('dSaida').value,acerto:$('dAcerto').value},
     vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim()};
   if(!e.date){$('dMsg').textContent='Indique a data.';return}
   D.push(e);
   if(!save(KD,D))alert('O navegador não deixou guardar. O registo fica só até fechar a página.');
   const L=lawCheck(e);
   $('dMsg').textContent=L.W.length?'Saída guardada, mas veja os avisos legais no registo.':'Saída guardada.'+(s?' A obter as condições previstas para essa hora…':'');
-  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dNotas').value='';$('dCaps').innerHTML='';
+  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';
   document.querySelectorAll('#dVistas input').forEach(i=>i.checked=false);
   renderDiary();if(s)fetchCond(e);
 });
@@ -2118,8 +2240,8 @@ $('dlist').addEventListener('click',ev=>{
 });
 $('dCsv').addEventListener('click',()=>{
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=[['data','entrada','saida','local','tecnica','visibilidade_m','mar_no_local_m','corrente','saida_da_agua','especies_vistas','capturas','kg_total','prev_ondulacao_m','prev_direcao','prev_periodo_s','prev_vento_nos','mare','tipo_mare','chuva_48h_mm','notas','relatorio_de'],
-    ...D.map(e=>{const s=entrySpot(e),o=e.obs||{},c=e.cond||{};return [e.date,e.t0,e.t1,s?s.n:e.loc,e.tec,o.vis,o.marH,o.corr,o.saida,(e.vistas||[]).map(k=>byK[k]?.n).join(', '),
+  const rows=[['data','entrada','saida','local','tecnica','visibilidade_m','mar_no_local_m','corrente','saida_da_agua','app_acertou','especies_vistas','capturas','kg_total','prev_ondulacao_m','prev_direcao','prev_periodo_s','prev_vento_nos','mare','tipo_mare','chuva_48h_mm','notas','relatorio_de'],
+    ...D.map(e=>{const s=entrySpot(e),o=e.obs||{},c=e.cond||{};return [e.date,e.t0,e.t1,s?s.n:e.loc,e.tec,o.vis,o.marH,o.corr,o.saida,o.acerto,(e.vistas||[]).map(k=>byK[k]?.n).join(', '),
       (e.caps||[]).map(x=>`${byK[x.sp]?.n||'Outra'}${x.kg?' '+x.kg+' kg':''}${x.cm?' '+x.cm+' cm':''}`).join(', '),(e.caps||[]).reduce((a,x)=>a+(+x.kg||0),0),
       c.med,c.swDir!=null?d16(c.swDir):'',c.tp,c.wind,c.mare?MAREN[c.mare]:'',c.cls,c.rain48,e.notas,e.from?e.from.nome:'']})];
   const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
@@ -2159,7 +2281,7 @@ function previewRel(obj){
     const t=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';
     return {id:String(r.id||rnd()).replace(/[^\w-]/g,'').slice(0,40),v:2,date:r.date,t0:t(r.t0),t1:t(r.t1),tec:String(r.tec||'').slice(0,30),
       spot:P.spots.some(s=>s.id===r.spot)?r.spot:(P.spots.find(s=>kmTo(s.lat,s.lon,lat,lon)<.15)||{}).id||null,ll:[lat,lon],loc:String(r.n||'').slice(0,40),
-      cond,obs:{vis:N(o.vis)==null?null:Math.min(40,Math.max(0,+o.vis)),marH:N(o.marH)==null?null:Math.min(5,Math.max(0,+o.marH)),corr:['nenhuma','fraca','forte'].includes(o.corr)?o.corr:'',saida:['facil','dificil'].includes(o.saida)?o.saida:''},
+      cond,obs:{vis:N(o.vis)==null?null:Math.min(40,Math.max(0,+o.vis)),marH:N(o.marH)==null?null:Math.min(5,Math.max(0,+o.marH)),corr:['nenhuma','fraca','forte'].includes(o.corr)?o.corr:'',saida:['facil','dificil'].includes(o.saida)?o.saida:'',acerto:['sim','parcial','nao'].includes(o.acerto)?o.acerto:''},
       vistas:Array.isArray(r.vistas)?r.vistas.filter(k=>byK[k]).slice(0,40):[],caps:[],notas:'',from:{nome:de}};
   }).filter(Boolean);
   if(!R.length)throw new Error('A partilha não traz relatórios válidos.');
@@ -2173,7 +2295,7 @@ function previewRel(obj){
     for(const i of idx){const r=R[i];if(D.some(e=>e.id===r.id&&e.from&&e.from.nome===de))continue;D.push(r);n++}
     save(KD,D);closeDlg();renderDiary();evaluateAndRender();
     $('dMsg').textContent=n?`${n} ${n===1?'relatório juntado':'relatórios juntados'} ao diário.`:'Nada juntado.';
-    $('diario').scrollIntoView({behavior:'smooth'});
+    if(MQ.matches)setTab('diario');else $('diario').scrollIntoView({behavior:'smooth'});
   };
 }
 // saídas com local mas ainda sem condições (por exemplo, guardadas sem ligação): tenta obtê-las, uma de cada vez
@@ -2185,11 +2307,27 @@ save(KD,D);
 /* ---------- Arranque ---------- */
 $('mPM').addEventListener('change',saveMares);$('mBM').addEventListener('change',saveMares);
 $('legend').innerHTML='Origem da informação: '+Object.keys(ST).map(t=>`<span class="srcp t-${t}" title="${esc(STD[t])}">${ST[t]}</span>`).join('');
-$('verif').textContent='confirmadas em '+VERIF;
+$('verif').textContent='confirmadas em '+VERIF+(VERIF_DAYS()>365?' — há mais de um ano: podem ter mudado':'');
 $('fontes').innerHTML=Object.values(SRC).filter(s=>s.u&&['lei','oficial','ciencia','modelo'].includes(s.t)).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)}</a> <span class="srcp t-${s.t}">${ST[s.t]}</span></li>`).join('');
 paintProfile();renderToday();paintInputs();paintMares();evaluateAndRender();renderCal();renderDiary();
 paintProfSel();
 if(!FC)useLastForecast(false);
+/* Telemóvel: separadores em baixo (no PC a página fica igual, com tudo à vista) */
+const MQ=matchMedia('(max-width:760px)');
+function setTab(t,scroll=true){
+  document.body.dataset.tab=t;
+  document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
+  try{sessionStorage.setItem('ml_tab',t)}catch(e){}
+  if(t==='locais')$('pbox').open=true;
+  if(scroll&&MQ.matches)window.scrollTo(0,0);
+}
+const applyMQ=()=>document.body.classList.toggle('m',MQ.matches);
+(MQ.addEventListener?MQ.addEventListener('change',applyMQ):MQ.addListener(applyMQ));applyMQ();
+let tab0='hoje';try{tab0=sessionStorage.getItem('ml_tab')||'hoje'}catch(e){}
+setTab(tab0,false);
+$('tabbar').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b)setTab(b.dataset.tab)});
+$('inTog').addEventListener('click',()=>{const c=document.querySelector('.condcard'),o=c.classList.toggle('open');$('inTog').setAttribute('aria-expanded',o);$('inTog').textContent=o?'Esconder os valores':'Ajustar os valores à mão'});
+checkBackup();
 /* App instalável e sem rede (só quando servida por http/https, não a partir de ficheiro) */
 let wantReload=false;
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){
