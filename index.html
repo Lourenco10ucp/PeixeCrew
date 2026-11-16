@@ -162,6 +162,11 @@ a.srcp:hover{border-color:var(--accent)}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:15px;max-width:calc(100vw - 32px)}
 .updbar .btn{padding:6px 14px;font-size:14px}
 .install{margin-bottom:18px}
+.amlist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.amlist .am{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:3px 6px 3px 12px;background:var(--surface);font-size:15px}
+.amlist .am button{all:unset;cursor:pointer;color:var(--stop);font-weight:700;padding:0 6px}
+.eacts{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:14px}
+.dform.editing{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
 /* Fotografias */
 .fotoprev,.thumbs{display:flex;flex-wrap:wrap;gap:6px}
 .fotoprev:empty{display:none}
@@ -443,6 +448,12 @@ footer ul{padding-left:20px}
         </form>
         <div class="msg" id="smsg" aria-live="polite"></div>
       </div>
+      <div class="amigos wide">
+        <div><span style="font-family:var(--f-display);font-size:20px;font-weight:600">Amigos</span>
+          <p class="small muted" style="margin:4px 0 0">Troque uma vez o «cartão de amigo» com os amigos da PeixeCrew. Depois escolhe-os em «Com quem» no diário e pode enviar-lhes as saídas que fizeram juntos, já preenchidas.</p></div>
+        <div class="amlist" id="amList"></div>
+        <div class="spotbar"><button type="button" class="btn ghost" id="amShare">Partilhar o meu cartão de amigo</button><button type="button" class="btn ghost" id="amRecv">Receber um cartão</button></div>
+      </div>
       <div class="saved wide" id="psaved"></div>
     </div>
   </details>
@@ -588,7 +599,8 @@ footer ul{padding-left:20px}
         <label class="f">Local<select id="dSpot"></select></label>
         <label class="f" id="dLocW" hidden>Nome do local<input type="text" id="dLoc" maxlength="60" list="dLocs" placeholder="Ex.: Pedra da Nau, Peniche"><datalist id="dLocs"></datalist></label>
         <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
-        <label class="f">Com quem <span class="small muted" style="font-weight:400">(opcional; separe os nomes por vírgulas)</span><input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Ex.: João, Rui" autocomplete="off"><datalist id="dComL"></datalist></label>
+        <div class="f"><span style="font-size:15px;font-weight:600">Com quem <span class="small muted" style="font-weight:400">(opcional)</span></span><div class="spchips" id="dAmigos"></div>
+          <input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Outras pessoas (separe por vírgulas)" autocomplete="off" aria-label="Outras pessoas"><datalist id="dComL"></datalist></div>
         <fieldset class="dfs"><legend>O que encontrou</legend>
           <div class="drow2">
             <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
@@ -601,7 +613,7 @@ footer ul{padding-left:20px}
         <div class="f"><span style="font-size:15px;font-weight:600">Fotografias</span><div class="fotoprev" id="dFotoPrev"></div><label class="btn ghost fotobtn">📷 Juntar fotografias<input type="file" id="dFotos" accept="image/*" multiple hidden></label></div>
         <div class="f"><span style="font-size:15px;font-weight:600">Capturas</span><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Juntar captura</button></div>
         <label class="f">Notas<textarea id="dNotas" maxlength="300" placeholder="Só para si: o que correu bem, o que mudaria…"></textarea></label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit">Guardar saída</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit" id="dSubmit">Guardar saída</button><button class="btn ghost" type="button" id="dCancel" hidden>Cancelar edição</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button></div>
         <p class="msg" id="dMsg" aria-live="polite"></p>
       </form>
       <div style="display:grid;gap:12px;min-width:0">
@@ -1165,6 +1177,9 @@ if(!PROFS||!Array.isArray(PROFS.list)||!PROFS.list.length){
 if(!PROFS.list.some(p=>p.id===PROFS.active))PROFS.active=PROFS.list[0].id;
 const KP='ml_perfil:'+PROFS.active, KD='ml_diario:'+PROFS.active;
 let P=Object.assign({nome:'',reg:'centro',nivel:'intermedio',prof:8,cats:['peixe','cefalopode','marisco','molusco'],spots:[],spot:''},load(KP,{}));
+// identificador do perfil (para os amigos o reconhecerem) e lista de amigos
+if(!P.uid){P.uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);save(KP,P)}
+if(!Array.isArray(P.amigos))P.amigos=[];
 if(!Array.isArray(P.spots))P.spots=[];
 
 /* ---------- Os meus locais ---------- */
@@ -1420,6 +1435,8 @@ function openReceive(pref){
 }
 function previewShare(obj){
   if(obj&&obj.app==='marlivre'&&obj.t==='relatorios')return previewRel(obj);
+  if(obj&&obj.app==='marlivre'&&obj.t==='amigo')return previewAmigo(obj);
+  if(obj&&obj.app==='marlivre'&&obj.t==='saida')return previewSaida(obj);
   if(!obj||obj.app!=='marlivre'||obj.t!=='locais'||!Array.isArray(obj.locais))throw new Error('Isto não é uma partilha de locais da app.');
   const de=String(obj.de||'Um amigo').slice(0,30);
   const L=obj.locais.slice(0,200).map(cleanSpot).filter(Boolean);
@@ -1516,7 +1533,7 @@ $('fileIn').addEventListener('change',async e=>{
   try{
     const obj=JSON.parse(await f.text());
     if(obj&&obj.t==='copia')await restoreBackup(obj);
-    else if(obj&&(obj.t==='locais'||obj.t==='relatorios')){if(!$('rvOut'))openReceive('');previewShare(obj)}
+    else if(obj&&['locais','relatorios','amigo','saida'].includes(obj.t)){if(!$('rvOut'))openReceive('');previewShare(obj)}
     else throw new Error('Este ficheiro não é da app.');
   }catch(err){alert(err.message||'Não consegui ler o ficheiro.')}
 });
@@ -2268,18 +2285,137 @@ function renderDiary(){
     const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':'',o.acerto==='sim'?'a app acertou':o.acerto==='parcial'?'a app acertou mais ou menos':o.acerto==='nao'?'a app errou':''].filter(Boolean).join(' · ');
     return `<div class="entry"><div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b> <span class="small muted">${dLabel(e.date)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span>
       ${e.from?`<div class="from small">Relatório de ${esc(e.from.nome)}</div>`:''}
-      ${e.com&&e.com.length?`<div class="small">👥 Com ${esc(e.com.join(', '))}</div>`:''}
+      ${entryPeople(e).length?`<div class="small">👥 Com ${esc(entryPeople(e).map(p=>p.n).join(', '))}</div>`:''}
       ${caps?`<div>${caps}</div>`:''}
       ${e.vistas&&e.vistas.length?`<div class="small">Viu: ${esc(e.vistas.map(k=>byK[k]?.n).filter(Boolean).join(', '))}</div>`:''}
       ${ob?`<div class="small">${esc(ob)}</div>`:''}
       <div class="cond">${condText(e)}</div>
       ${L.W.map(t=>`<div class="laww">⛔ ${esc(t)}</div>`).join('')}${L.I.map(t=>`<div class="lawi">⚠️ ${esc(t)}</div>`).join('')}
       ${e.notas?`<div class="small">${esc(e.notas)}</div>`:''}
+      ${e.from?'':`<div class="eacts"><button type="button" class="linkb" data-edite="${e.id}">Editar</button>${entryPeople(e).length?`<button type="button" class="linkb" data-sende="${e.id}">Enviar aos companheiros</button>`:''}</div>`}
       ${e.from?'':`<div class="thumbs" style="margin-top:6px">${(e.fotos||[]).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}<label class="addfoto">+ foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label></div>`}</div>
       <button data-id="${e.id}" aria-label="Apagar registo">Apagar</button></div>`;
   }).join('');
-  hydrateThumbs($('dlist'));paintCom();renderStats();
+  hydrateThumbs($('dlist'));paintCom();paintAmigos();renderStats();
 }
+/* ---- Amigos (cartão de amigo) ---- */
+const amName=id=>(P.amigos.find(a=>a.id===id)||{}).nome;
+const validId=x=>typeof x==='string'&&/^u[a-z0-9]{6,40}$/.test(x);
+function paintAmigos(){
+  $('amList').innerHTML=P.amigos.length?P.amigos.map(a=>`<span class="am">${esc(a.nome)}<button type="button" data-rmam="${a.id}" aria-label="Tirar ${esc(a.nome)} dos amigos">✕</button></span>`).join(''):'<span class="small muted">Ainda não tem amigos na app.</span>';
+  const keep=new Set([...document.querySelectorAll('#dAmigos input:checked')].map(i=>i.value));
+  $('dAmigos').innerHTML=P.amigos.map(a=>`<label><input type="checkbox" value="${a.id}"${keep.has(a.id)?' checked':''}>${esc(a.nome)}</label>`).join('');
+}
+$('amList').addEventListener('click',e=>{const b=e.target.closest('[data-rmam]');if(!b)return;const a=P.amigos.find(x=>x.id===b.dataset.rmam);
+  if(a&&confirm(`Tirar ${a.nome} da lista de amigos? As saídas já registadas com ele não mudam.`)){P.amigos=P.amigos.filter(x=>x!==a);commitProfile();paintAmigos()}});
+/* Janela com o código pronto a enviar (copiar, partilhar, ficheiro) */
+async function showCode(obj,titulo,intro,msgTopo,ficheiro){
+  const code=await packCode(obj);
+  const web=/^https?:/.test(location.protocol)?`${location.origin}${location.pathname}#partilha=${code}`:'';
+  const msg=`${msgTopo}\n`+(web?`Abre este link: ${web}\n\nOu, na app`:'Na app')+` PeixeCrew: «Locais» › «Receber locais» e cola este código:\n${code}`;
+  showDlg(`<h3>${esc(titulo)}</h3><p class="small muted" style="margin:-4px 0 0">${esc(intro)}</p><textarea class="codebox" id="shTxt" readonly></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<button class="btn ghost" id="shFile">Guardar como ficheiro</button><span class="small muted" id="shMsg"></span></div>`);
+  $('shTxt').value=msg;
+  $('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('shMsg').textContent='Copiado.'}catch(e){$('shTxt').select();$('shMsg').textContent='Selecionei o texto: copie com Ctrl+C.'}};
+  if(navigator.share)$('shNative').onclick=()=>navigator.share({title:titulo,text:msg}).catch(()=>{});
+  $('shFile').onclick=()=>downloadJSON(obj,ficheiro);
+}
+$('amShare').addEventListener('click',()=>{
+  if(!P.nome){alert('Ponha primeiro o seu nome ou alcunha no perfil: é o que os amigos vão ver.');$('pNome').focus();return}
+  showCode({app:'marlivre',t:'amigo',v:1,id:P.uid,nome:P.nome},'O meu cartão de amigo','Envie aos amigos da PeixeCrew. Quem o receber fica com o seu nome na lista de amigos.',`${P.nome} quer juntar-te aos amigos na app PeixeCrew.`,`amigo-${P.nome.replace(/[^\w-]+/g,'_')}.json`);
+});
+$('amRecv').addEventListener('click',()=>openReceive(''));
+function previewAmigo(obj){
+  if(!validId(obj.id))throw new Error('Cartão de amigo inválido.');
+  const nome=String(obj.nome||'Amigo').slice(0,30).trim()||'Amigo', ex=P.amigos.find(a=>a.id===obj.id);
+  const out=$('rvOut');
+  if(obj.id===P.uid){out.innerHTML='<p>Este cartão é o seu próprio.</p>';return}
+  out.innerHTML=`<p style="margin:12px 0 6px">${ex?`<b>${esc(nome)}</b> já é seu amigo${ex.nome!==nome?` (estava como «${esc(ex.nome)}»)`:''}.`:`Juntar <b>${esc(nome)}</b> aos seus amigos?`}</p><button class="btn" id="rvAdd">${ex?'Atualizar o nome':'Juntar aos amigos'}</button>`;
+  $('rvAdd').onclick=()=>{if(ex)ex.nome=nome;else P.amigos.push({id:obj.id,nome,em:iso(new Date())});commitProfile();paintAmigos();closeDlg();
+    $('smsg').textContent=`${nome} ${ex?'atualizado':'juntado aos amigos'}.`;if(MQ.matches)setTab('locais')};
+}
+
+/* ---- Saída partilhada com os companheiros ---- */
+function entryPeople(e){
+  const out=[],seen=new Set(),push=(key,n)=>{if(!seen.has(key)){seen.add(key);out.push({key,n})}};
+  (e.comIds||[]).forEach(id=>push('id:'+id,amName(id)||(e.comNames&&e.comNames[id])||'Amigo'));
+  (e.com||[]).forEach(n=>{const a=P.amigos.find(x=>x.nome.toLowerCase()===n.toLowerCase());a?push('id:'+a.id,a.nome):push('n:'+n.toLowerCase(),n)});
+  return out;
+}
+function cleanCond(c){
+  if(!c||typeof c!=='object')return null;const N=v=>v==null||!isFinite(+v)?null:+v;
+  return {h:N(c.h),hs:N(c.hs),med:N(c.med),mn:N(c.mn),mx:N(c.mx),n:N(c.n),swDir:N(c.swDir),tp:N(c.tp),wind:N(c.wind),wdDeg:N(c.wdDeg),gust:N(c.gust),rain48:N(c.rain48),hs48:N(c.hs48),visF:N(c.visF),
+    mare:MAREN[c.mare]?c.mare:null,cls:['vivas','mortas','intermédias'].includes(c.cls)?c.cls:null};
+}
+function sendSaida(id){
+  const e=D.find(x=>x.id===id);if(!e)return;
+  if(!e.gid){e.gid='g'+rnd();save(KD,D)}
+  const s=entrySpot(e), people=entryPeople(e);
+  const part=[{id:P.uid,n:P.nome||'Eu'},...people.map(p=>p.key.startsWith('id:')?{id:p.key.slice(3),n:p.n}:{n:p.n})];
+  const obj={app:'marlivre',t:'saida',v:1,de:P.nome||'Um amigo',deId:P.uid,em:iso(new Date()),
+    s:{gid:e.gid,date:e.date,t0:e.t0,t1:e.t1,tec:e.tec,local:s?{id:s.id,n:s.n,lat:s.lat,lon:s.lon,fundo:s.fundo,faceDeg:s.faceDeg,faceAuto:s.faceAuto,open:s.open}:{n:e.loc||'Local'},
+      cond:e.cond||null,obs:{vis:e.obs&&e.obs.vis,marH:e.obs&&e.obs.marH,corr:e.obs&&e.obs.corr},part}};
+  showCode(obj,'Enviar aos companheiros',`Vai: o dia, as horas, o local, as condições e quem foi. Não vão as suas capturas, fotografias nem notas. Cada um junta a saída ao seu diário e acrescenta o que apanhou.`,
+    `${obj.de} enviou-te a saída de ${dLabel(e.date)}${s?' em '+s.n:''} na app PeixeCrew.`,`saida-${e.date}.json`);
+}
+function previewSaida(obj){
+  const x=obj.s;if(!x||!/^\d{4}-\d{2}-\d{2}$/.test(x.date)||typeof x.gid!=='string'||!/^g[\w-]{2,40}$/.test(x.gid))throw new Error('Saída inválida.');
+  const de=String(obj.de||'Um amigo').slice(0,30), t=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';
+  const L=x.local&&isFinite(+x.local.lat)?cleanSpot(Object.assign({},x.local,{especies:[],notas:''})):null, nomeL=String((x.local&&x.local.n)||'Local').slice(0,40);
+  const mine=L&&(P.spots.find(s=>s.id===L.id)||P.spots.find(s=>kmTo(s.lat,s.lon,L.lat,L.lon)<.15));
+  const part=(Array.isArray(x.part)?x.part:[]).slice(0,12).map(p=>({id:validId(p&&p.id)?p.id:null,n:String((p&&p.n)||'').slice(0,30).trim()})).filter(p=>p.n);
+  const outros=part.filter(p=>p.id!==P.uid), novos=outros.filter(p=>p.id&&!P.amigos.some(a=>a.id===p.id));
+  const dup=D.find(e=>e.gid===x.gid);
+  const same=!dup&&mine&&D.find(e=>!e.from&&!e.gid&&e.date===x.date&&(e.spot===mine.id));
+  const out=$('rvOut');
+  out.innerHTML=`<p style="margin:12px 0 6px"><b>${esc(de)}</b> enviou a saída de <b>${dLabel(x.date)}</b>${t(x.t0)?' ('+t(x.t0)+(t(x.t1)?'–'+t(x.t1):'')+')':''} em <b>${esc(nomeL)}</b>, com ${esc(part.filter(p=>p.id!==P.uid).map(p=>p.n).join(', ')||'mais ninguém')}.</p>
+    ${dup?'<p class="st-same">Já tem esta saída no diário.</p>':`<div class="chk">
+      ${same?`<label><input type="checkbox" id="svLink" checked> Ligar à saída que já registou nesse dia em «${esc(mine.n)}» (em vez de criar outra)</label>`:''}
+      ${L&&!mine?`<label><input type="checkbox" id="svSpot" checked> Juntar também o local «${esc(nomeL)}» aos seus locais</label>`:''}
+      ${novos.length?`<label><input type="checkbox" id="svAm" checked> Juntar aos seus amigos: ${esc(novos.map(p=>p.n).join(', '))}</label>`:''}
+    </div>
+    <p class="small muted" style="margin:6px 0">Depois de juntar, o diário abre esta saída para acrescentar as suas capturas.</p>
+    <button class="btn" id="rvAdd">Juntar ao meu diário</button>`}`;
+  if(dup)return;
+  $('rvAdd').onclick=()=>{
+    if(novos.length&&$('svAm')&&$('svAm').checked)novos.forEach(p=>P.amigos.push({id:p.id,nome:p.n,em:iso(new Date())}));
+    let spot=mine;
+    if(!spot&&L&&$('svSpot')&&$('svSpot').checked){spot=Object.assign(L,{from:{nome:de,em:iso(new Date())}});if(P.spots.some(s=>s.id===spot.id))spot.id='s'+rnd();P.spots.push(spot)}
+    const comIds=outros.filter(p=>p.id&&P.amigos.some(a=>a.id===p.id)).map(p=>p.id), comNames=Object.fromEntries(outros.filter(p=>p.id).map(p=>[p.id,p.n]));
+    const com=outros.filter(p=>!p.id||!comIds.includes(p.id)).map(p=>p.n);
+    let e;
+    if(same&&$('svLink')&&$('svLink').checked){e=same;e.gid=x.gid;e.comIds=[...new Set([...(e.comIds||[]),...comIds])];e.comNames=Object.assign({},e.comNames,comNames);e.com=[...new Set([...(e.com||[]),...com])]}
+    else{const o=x.obs||{},N=v=>v==null||!isFinite(+v)?null:+v;
+      e={id:rnd(),v:2,gid:x.gid,date:x.date,t0:t(x.t0),t1:t(x.t1),tec:String(x.tec||'').slice(0,30),spot:spot?spot.id:null,ll:spot?[spot.lat,spot.lon]:(L?[L.lat,L.lon]:null),loc:spot?spot.n:nomeL,
+        obs:{vis:N(o.vis),marH:N(o.marH),corr:['nenhuma','fraca','forte'].includes(o.corr)?o.corr:'',saida:'',acerto:''},vistas:[],caps:[],notas:'',comIds,comNames,com,cond:cleanCond(x.cond)};
+      if(!e.cond)delete e.cond;D.push(e)}
+    save(KD,D);commitProfile();paintAmigos();closeDlg();renderDiary();
+    if(!e.cond&&entrySpot(e))fetchCond(e);
+    editEntry(e.id);$('dMsg').textContent='Acrescente as suas capturas e carregue em «Guardar alterações».';
+  };
+}
+
+/* ---- Editar uma saída já guardada ---- */
+let EDIT=null;
+function editEntry(id){
+  const e=D.find(x=>x.id===id);if(!e||e.from)return;
+  EDIT=e.id;const o=e.obs||{};
+  $('dDate').value=e.date;$('dT0').value=e.t0||'';$('dT1').value=e.t1||'';
+  paintDSpot();$('dSpot').value=e.spot&&P.spots.some(s=>s.id===e.spot)?e.spot:'';$('dLocW').hidden=$('dSpot').value!=='';$('dLoc').value=e.spot?'':(e.loc||'');
+  $('dTec').value=e.tec||'';$('dVis').value=o.vis??'';$('dMarH').value=o.marH==null?'':String(o.marH);$('dCorr').value=o.corr||'';$('dSaida').value=o.saida||'';$('dAcerto').value=o.acerto||'';
+  $('dNotas').value=e.notas||'';$('dCaps').innerHTML='';(e.caps||[]).forEach(c=>addCapRow(c.sp,c.kg??'',c.cm??''));
+  paintAmigos();document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=(e.comIds||[]).includes(i.value));
+  $('dCom').value=(e.com||[]).join(', ');
+  $('dSubmit').textContent='Guardar alterações';$('dCancel').hidden=false;$('dform').classList.add('editing');
+  if(MQ.matches)setTab('diario');$('dform').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function endEdit(){
+  EDIT=null;$('dSubmit').textContent='Guardar saída';$('dCancel').hidden=true;$('dform').classList.remove('editing');
+  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';$('dTec').value='';
+  document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);$('dDate').value=iso(new Date());
+}
+$('dCancel').addEventListener('click',()=>{endEdit();$('dMsg').textContent=''});
+
 /* ---- Fotografias das caçadas: guardadas no aparelho (IndexedDB), reduzidas para ocupar pouco ---- */
 const FDB=(()=>{let p=null;
   const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('peixecrew',1);r.onupgradeneeded=()=>r.result.createObjectStore('fotos',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
@@ -2345,19 +2481,35 @@ $('dform').addEventListener('submit',ev=>{
   const e={id:rnd(),v:2,date:$('dDate').value,t0:$('dT0').value,t1:$('dT1').value,spot:s?s.id:null,ll:s?[s.lat,s.lon]:null,loc:s?s.n:$('dLoc').value.trim(),tec:$('dTec').value,
     obs:{vis:numOr($('dVis').value,40),marH:$('dMarH').value===''?null:+$('dMarH').value,corr:$('dCorr').value,saida:$('dSaida').value,acerto:$('dAcerto').value},
     vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim(),
-    com:splitNames($('dCom').value)};
+    com:splitNames($('dCom').value),comIds:[...document.querySelectorAll('#dAmigos input:checked')].map(i=>i.value)};
+  e.comNames=Object.fromEntries(e.comIds.map(id=>[id,amName(id)]));
   if(!e.date){$('dMsg').textContent='Indique a data.';return}
+  if(EDIT){ // atualizar a saída existente
+    const old=D.find(x=>x.id===EDIT);
+    if(old){
+      const condOk=old.cond&&old.date===e.date&&old.spot===e.spot&&(old.t0||'').slice(0,2)===(e.t0||'').slice(0,2);
+      Object.assign(old,e,{id:old.id,gid:old.gid,fotos:old.fotos,vistas:old.vistas||[],from:old.from});if(!old.gid)delete old.gid;if(!old.fotos)delete old.fotos;if(!old.from)delete old.from;
+      if(condOk)old.cond=e.cond||old.cond;else{delete old.cond;delete old.condErr}
+      save(KD,D);const fot=PEND;PEND=[];paintPend();endEdit();renderDiary();
+      if(fot.length)storeFotos(old,fot).then(renderDiary).catch(()=>{});
+      if(!condOk&&entrySpot(old))fetchCond(old);
+      $('dMsg').textContent='Alterações guardadas.';return;
+    }
+    EDIT=null;
+  }
   D.push(e);
   if(!save(KD,D))alert('O navegador não deixou guardar. O registo fica só até fechar a página.');
   const L=lawCheck(e);
   $('dMsg').textContent=L.W.length?'Saída guardada, mas veja os avisos legais no registo.':'Saída guardada.'+(s?' A obter as condições previstas para essa hora…':'');
-  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';
+  $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);
   const fot=PEND;PEND=[];paintPend();
   renderDiary();if(fot.length)storeFotos(e,fot).then(renderDiary).catch(()=>alert('Não foi possível guardar as fotografias neste aparelho.'));if(s)fetchCond(e);
 });
 $('dlist').addEventListener('click',ev=>{
   const c=ev.target.closest('[data-cond]');if(c){const e=D.find(x=>x.id===c.dataset.cond);if(e){e.condErr=false;renderDiary();fetchCond(e)}return}
   const ft=ev.target.closest('[data-foto]');if(ft){openFoto(ft.dataset.foto,ft.dataset.entry);return}
+  const ed=ev.target.closest('[data-edite]');if(ed){editEntry(ed.dataset.edite);return}
+  const se=ev.target.closest('[data-sende]');if(se){sendSaida(se.dataset.sende);return}
   const b=ev.target.closest('button[data-id]');if(!b)return;if(!confirm('Apagar este registo e as suas fotografias?'))return;
   const gone=D.find(x=>x.id===b.dataset.id);(gone&&gone.fotos||[]).forEach(id=>FDB.del(id).catch(()=>{}));
   D=D.filter(x=>x.id!==b.dataset.id);save(KD,D);renderDiary();
@@ -2425,13 +2577,13 @@ function renderStats(){
   // por local
   if(Lr.length)h+=`<div><h3>Por local</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Local</th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">kg</th><th class="n">kg/saída</th><th>Mais apanhada</th></tr></thead><tbody>${Object.entries(L).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>{const t=Object.entries(o.sp).sort((a,b)=>b[1]-a[1])[0];return `<tr><td><b>${esc(k)}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td><td>${t?esc(spN(t[0]))+' ('+t[1]+')':'—'}</td></tr>`}).join('')}</tbody></table></div></div>`;
   // com quem (só as suas capturas em cada saída)
-  const W={};E.forEach(e=>{const ns=e.com&&e.com.length?e.com:['(sozinho ou sem indicação)'];ns.forEach(n=>{const o=W[n]||(W[n]={n:0,kg:0,cap:0,np:0});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++})});
+  const W={};E.forEach(e=>{const ps=entryPeople(e),ns=ps.length?ps.map(p=>p.n):['(sozinho ou sem indicação)'];ns.forEach(n=>{const o=W[n]||(W[n]={n:0,kg:0,cap:0,np:0});o.n++;o.kg+=kgE(e);o.np+=nE(e);if(nE(e))o.cap++})});
   const Wr=Object.entries(W);
   if(Wr.some(([k])=>k[0]!=='('))h+=`<div><h3>Com quem</h3><p class="small muted" style="margin:0 0 6px">Saídas com cada companheiro e o que <b>você</b> apanhou nelas.</p><div class="stwrap"><table class="sttable"><thead><tr><th>Com</th><th class="n">Saídas</th><th class="n">Com captura</th><th class="n">Capturas</th><th class="n">kg/saída</th></tr></thead><tbody>${Wr.sort((a,b)=>(a[0][0]==='(')-(b[0][0]==='(')||b[1].n-a[1].n).map(([k,o])=>`<tr><td><b>${esc(k)}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${o.np}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div></div>`;
   // análise: o que funciona melhor
   const dims=[['Maré',e=>e.cond&&e.cond.mare?MAREN[e.cond.mare]:null],['Tipo de maré',e=>e.cond&&e.cond.cls?'marés '+e.cond.cls:null],['Técnica',e=>e.tec||null],
     ['Visibilidade',e=>e.obs&&e.obs.vis!=null?(e.obs.vis<3?'menos de 3 m':e.obs.vis<6?'3 a 6 m':'6 m ou mais'):null],
-    ['Companhia',e=>e.com&&e.com.length?'com companhia':'sozinho ou sem indicação'],
+    ['Companhia',e=>entryPeople(e).length?'com companhia':'sozinho ou sem indicação'],
     ['Hora de entrada',e=>e.t0?(+e.t0.slice(0,2)<10?'antes das 10h':+e.t0.slice(0,2)<15?'10h às 15h':'depois das 15h'):null]];
   const an=dims.map(([lab,fn])=>{const G={};E.forEach(e=>{const k=fn(e);if(!k)return;const o=G[k]||(G[k]={n:0,kg:0,cap:0});o.n++;o.kg+=kgE(e);if(nE(e))o.cap++});
     const r=Object.entries(G);if(r.length<2)return '';
