@@ -1,8 +1,8 @@
 /* PeixeCrew: guarda a app no aparelho para funcionar sem rede.
    Mude VERSION a cada publicação: os aparelhos detetam a versão nova e mostram «Atualizar». */
-const VERSION='2026-11-17-7';
+const VERSION='2026-11-17-8';
 const CACHE='peixecrew-'+VERSION;
-const ASSETS=['./','./index.html','./manifest.webmanifest','./vendor/supabase.js','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
+const ASSETS=['./','./index.html','./manifest.webmanifest','./vendor/supabase.js','./vendor/leaflet.js','./vendor/leaflet.css','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
 // cache:'reload' obriga a ir ao servidor: o GitHub Pages deixa os navegadores guardar ficheiros 10 min, e sem isto a versão nova podia ficar com o index antigo
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'})))))});
 self.addEventListener('message',e=>{if(e.data==='skipWaiting')self.skipWaiting()});

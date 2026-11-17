@@ -7,6 +7,7 @@
 <meta name="description" content="Planeador de caça submarina e apanha: estado do mar, marés, espécies, os seus locais e o seu diário.">
 <meta name="theme-color" content="#045150">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="vendor/leaflet.css">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -150,6 +151,35 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .hdet>summary b{color:var(--accent);font-size:17px}
 .hdet>summary b::after{content:' ›';display:inline-block;transition:transform .2s}
 .hdet[open]>summary b::after{transform:rotate(90deg)}
+/* Mapa dos locais */
+.mapw{position:relative;margin-top:14px;border:2px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface2)}
+.map{height:min(58vh,470px);position:relative;z-index:0;background:#aad3df}
+.mapbar{position:absolute;top:10px;left:54px;right:10px;z-index:2;display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;pointer-events:none}
+.mbtn{pointer-events:auto;font:inherit;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:8px 14px;background:#fff;color:#0E5A6E;box-shadow:0 2px 8px rgba(0,0,0,.28);cursor:pointer;min-height:38px}
+.mbtn.pri{background:#C8501C;color:#fff}
+.mbtn:focus-visible{outline:3px solid var(--focus)}
+.maphint{position:absolute;left:10px;right:10px;bottom:10px;z-index:2;background:#13212B;color:#fff;border-radius:12px;padding:10px 12px;font-weight:600;font-size:15px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.maphint button{all:unset;cursor:pointer;color:#5EC2D2;font-weight:800;padding:4px}
+.mapleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+.mapleg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.mpinw{background:none!important;border:0!important}
+.mpin{position:absolute;left:0;top:0}
+.mpin i{position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.45);transform:translate(-50%,-50%);box-sizing:border-box}
+.mpin.on i{width:28px;height:28px;border-width:4px}
+.mpin.fr i{background:#fff;border:4px solid #6b4fc0}
+.mpin.new i{background:#C8501C;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.25)}}
+.mpin span{position:absolute;left:0;top:13px;transform:translateX(-50%);font:700 12px/1.3 var(--f-body);color:#13212B;background:rgba(255,255,255,.9);padding:1px 6px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mpin.on span{top:17px}
+.mpop{display:grid;gap:4px;font-family:var(--f-body);font-size:14px;min-width:180px}
+.mpop b{font-size:16px}
+.mpop .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.mpop .acts button,.mpop .acts a{all:unset;cursor:pointer;font-weight:700;font-size:13.5px;color:#fff;background:#0E5A6E;border-radius:999px;padding:5px 11px}
+.mpop .acts .gh{background:#eef3f4;color:#0E5A6E}
+.leaflet-container{font-family:var(--f-body)}
+.leaflet-tile-container img.leaflet-tile{width:256.6px!important;height:256.6px!important}
+body.m #locais > .lead{display:none}
+body.m #locais{padding-top:12px}
 /* Perfil (cabeçalho ao estilo das redes sociais) */
 .phead{background:var(--surface);border:2px solid var(--line);border-radius:18px;overflow:hidden;margin-top:18px}
 .pcover{height:118px;background:linear-gradient(135deg,#045150 0%,#0E5A6E 55%,#3a9db0 100%);position:relative}
@@ -651,7 +681,17 @@ footer ul{padding-left:20px}
   <!-- LOCAIS -->
   <section class="block" id="locais" data-t="locais">
     <h2>Os meus locais</h2>
-    <p class="lead">Junte as praias e pedras onde costuma ir. Para as coordenadas: no Google Maps, carregue no sítio com o botão direito (ou mantenha o dedo no telemóvel) e copie os números que aparecem, por exemplo <i>38.4123, -9.1012</i>. Também pode colar o link do Google Maps ou, se estiver no local, usar a sua localização.</p>
+    <p class="lead">Carregue em «＋ Novo local» e toque no sítio, no mapa. As cores dizem como está o mar em cada um no dia escolhido em «Hoje». Também pode colar coordenadas ou um link do Google Maps no formulário mais abaixo.</p>
+    <div class="mapw" id="mapW">
+      <div id="map" class="map" aria-label="Mapa dos seus locais"></div>
+      <div class="mapbar">
+        <button type="button" class="mbtn pri" id="mapAdd">＋ Novo local</button>
+        <button type="button" class="mbtn" id="mapLayer">Satélite</button>
+        <button type="button" class="mbtn" id="mapMe" aria-label="Mostrar onde estou" title="Onde estou">◎</button>
+      </div>
+      <div class="maphint" id="mapHint" hidden><span>Toque no mapa no sítio do novo local</span><button type="button" id="mapCancel">Cancelar</button></div>
+    </div>
+    <div class="mapleg" id="mapLeg"><span><i style="background:var(--go)"></i>Bom</span><span><i style="background:var(--warn)"></i>Com cuidado</span><span><i style="background:var(--stop)"></i>Melhor não ir</span><span><i style="background:#9aa5ab"></i>Sem previsão</span><span><i style="background:#fff;box-shadow:0 0 0 3px #6b4fc0"></i>Partilhado por amigos</span></div>
     <div class="spots">
       <div class="spotbar">
         <button type="button" class="btn ghost" id="shareBtn">Partilhar locais</button>
@@ -892,6 +932,7 @@ footer ul{padding-left:20px}
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 
 <script src="vendor/supabase.js" onerror="window.__noSB=1"></script>
+<script src="vendor/leaflet.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1444,7 +1485,7 @@ function renderSpots(){
   $('cLoc').innerHTML=`<option value="">Região: ${esc(r.n)}</option>`+P.spots.map(s=>`<option value="${s.id}">${esc(s.n)}</option>`).join('');
   $('cLoc').value=P.spots.some(s=>s.id===P.spot)?P.spot:'';
   $('dLocs').innerHTML=P.spots.map(s=>`<option value="${esc(s.n)}"></option>`).join('');
-  paintDSpot();
+  paintDSpot();paintMap();
 }
 function useLoc(id){
   P.spot=id;FC=null;$('days').hidden=true;DAYS=[];
@@ -2301,6 +2342,7 @@ function renderShelf(force){
     const main=E.R.find(r=>r.l==='stop')||E.R.find(r=>r.l==='warn');
     return `<button type="button" class="lcard${on}" data-i="${i}"><span class="bar" style="background:${VCOL[E.verdict]}"></span><span class="in"><b>${esc(x.s.n)}</b><span class="v" style="color:${VCOL[E.verdict]}">${VLAB[E.verdict]} · ${String(h).padStart(2,'0')}h</span><span class="m">🌊 ${fmt(E.hsLoc)} m${E.expo===0?' (abrigado)':''} · 💨 ${o.wind} nós${rel}</span>${main?`<span class="w">${main.l==='stop'?'⛔':'⚠️'} ${esc(main.t.length>70?main.t.slice(0,68)+'…':main.t)}</span>`:''}</span></button>`;
   }).join('');
+  paintMap();
 }
 $('shelf').addEventListener('click',e=>{
   if(e.target.closest('[data-shgo]')){if(MQ.matches)setTab('locais');else $('locais').scrollIntoView({behavior:'smooth'});return}
@@ -2309,6 +2351,87 @@ $('shelf').addEventListener('click',e=>{
   P.spot=x.s.id;save(KP,P);paintProfile();renderToday();renderCal();
   FC=x.fc;FCT=SPFC[x.s.id].t;buildDays(true);applyForecast(C.date,x.best.h);renderShelf(true);
   $('hCard').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ---------- Mapa dos locais (Leaflet; mapa OpenStreetMap ou imagens de satélite da Esri) ---------- */
+var MAP=null, MAPL=null, MAPT=null, MAPADD=false, MAPNEW=null, MAPME=null;
+const TILES={
+  mapa:['https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}],
+  sat:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagens © Esri, Maxar, Earthstar Geographics'}]};
+function ensureMap(){
+  if(!window.L){$('mapW').hidden=true;$('mapLeg').hidden=true;return}
+  if(MAP){setTimeout(()=>MAP.invalidateSize(),60);return}
+  MAP=L.map('map',{zoomControl:true});MAPL=L.layerGroup().addTo(MAP);
+  setLayer(load('ml_maplayer','mapa'));
+  MAP.on('click',e=>{if(MAPADD)placeNew(e.latlng)});
+  MAP.getContainer().addEventListener('click',mapPopClick);
+  paintMap(true);setTimeout(()=>MAP.invalidateSize(),60);
+}
+function setLayer(k){
+  if(!TILES[k])k='mapa';if(MAPT)MAP.removeLayer(MAPT);
+  MAPT=L.tileLayer(TILES[k][0],TILES[k][1]).addTo(MAP);save('ml_maplayer',k);
+  $('mapLayer').textContent=k==='sat'?'Mapa':'Satélite';$('mapLayer').dataset.k=k;
+}
+$('mapLayer').addEventListener('click',()=>{if(MAP)setLayer($('mapLayer').dataset.k==='sat'?'mapa':'sat')});
+function spotVerdicts(){
+  const m={};for(const x of ONDE)if(x.best)m[x.s.id]={v:x.best.E.verdict,h:x.best.h,hs:x.best.E.hsLoc};
+  return m;
+}
+const pinIcon=(cls,c,name)=>L.divIcon({className:'mpinw',iconSize:[0,0],html:`<div class="mpin ${cls}" style="--c:${c}"><i></i><span>${esc(name)}</span></div>`});
+function paintMap(fit){
+  if(!MAP)return;
+  MAPL.clearLayers();const V=spotVerdicts(), pts=[];
+  for(const s of P.spots){
+    const v=V[s.id], col=v?VCOL[v.v]:'#9aa5ab';pts.push([s.lat,s.lon]);
+    const pop=`<div class="mpop"><b>${esc(s.n)}</b>${v?`<span style="color:${col};font-weight:800">${VLAB[v.v]} · ${dayLbl(C.date)} às ${String(v.h).padStart(2,'0')}h</span><span>Ondulação no local ≈ ${fmt(v.hs)} m</span>`:'<span>Ainda sem previsão</span>'}
+      <div class="acts"><button type="button" data-mu="${s.id}">Ver previsão</button><button type="button" class="gh" data-me="${s.id}">Ficha</button><a class="gh" href="https://www.google.com/maps?q=${s.lat},${s.lon}" target="_blank" rel="noopener">Google Maps</a></div></div>`;
+    L.marker([s.lat,s.lon],{icon:pinIcon(s.id===P.spot?'on':'',col,s.n),keyboard:true,title:s.n,zIndexOffset:s.id===P.spot?1000:0}).bindPopup(pop).addTo(MAPL);
+  }
+  (SOC&&SOC.shared||[]).forEach((r,i)=>{const d=r.data||{};if(!isFinite(+d.lat)||!isFinite(+d.lon))return;
+    if(P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05))return;pts.push([+d.lat,+d.lon]);
+    L.marker([+d.lat,+d.lon],{icon:pinIcon('fr','#fff',d.n||'Local'),title:d.n||'Local'}).bindPopup(`<div class="mpop"><b>${esc(d.n||'Local')}</b><span>Partilhado por ${esc(pname(r.owner))}</span>${d.perigos?`<span>⚠️ ${esc(d.perigos)}</span>`:''}<div class="acts"><button type="button" data-mcp="${i}">Juntar aos meus locais</button><a class="gh" href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Google Maps</a></div></div>`).addTo(MAPL)});
+  if(MAPNEW)MAPNEW.addTo(MAPL);
+  if(fit){
+    if(pts.length>1)MAP.fitBounds(pts,{padding:[40,40],maxZoom:13});
+    else if(pts.length)MAP.setView(pts[0],13);
+    else{const r=REG[P.reg];MAP.setView([r.lat,r.lon],10)}
+  }
+}
+function mapPopClick(e){
+  const u=e.target.closest('[data-mu]'),m=e.target.closest('[data-me]'),c=e.target.closest('[data-mcp]');
+  if(u){MAP.closePopup();if(P.spot!==u.dataset.mu)useLoc(u.dataset.mu);if(MQ.matches)setTab('hoje');else $('hoje').scrollIntoView({behavior:'smooth'})}
+  else if(m){MAP.closePopup();openSpotEdit(m.dataset.me)}
+  else if(c){MAP.closePopup();const b=document.querySelector(`#sharedSpots [data-cpy="${c.dataset.mcp}"]`);if(b){b.click();toast('Local juntado aos seus locais.')}}
+}
+function setAdd(on){
+  MAPADD=on;$('mapHint').hidden=!on;$('mapAdd').hidden=on;
+  if(MAP)MAP.getContainer().style.cursor=on?'crosshair':'';
+  if(!on&&MAPNEW){MAPL.removeLayer(MAPNEW);MAPNEW=null}
+}
+$('mapAdd').addEventListener('click',()=>{ensureMap();setAdd(true)});
+$('mapCancel').addEventListener('click',()=>setAdd(false));
+function placeNew(ll){
+  if(MAPNEW)MAPL.removeLayer(MAPNEW);
+  MAPNEW=L.marker(ll,{icon:pinIcon('new','#C8501C','Novo local')}).addTo(MAPL);
+  MAPADD=false;$('mapHint').hidden=true;
+  showDlg(`<h3>Novo local</h3><p class="small muted" style="margin:-4px 0 0">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)} · a orientação da costa e as áreas protegidas são calculadas sozinhas.</p>
+    <form id="nlForm" style="display:grid;gap:12px"><label class="f">Nome do local<input type="text" id="nlN" maxlength="40" placeholder="Ex.: Pedra do Cavalo" required></label>
+    <label class="f">Fundo<select id="nlF"><option value="pedra">Pedra</option><option value="misto">Pedra e areia</option><option value="areia">Areia ou ria</option></select></label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn">Guardar local</button><button type="button" class="btn ghost" id="nlX">Cancelar</button></div></form>`);
+  setTimeout(()=>$('nlN').focus(),50);
+  $('nlX').onclick=()=>{closeDlg();setAdd(false)};
+  $('dlg').addEventListener('close',()=>{if(MAPNEW&&!P.spots.some(s=>s.lat===ll.lat&&s.lon===ll.lng))setAdd(false)},{once:true});
+  $('nlForm').onsubmit=e=>{e.preventDefault();
+    const sp={id:'s'+Date.now().toString(36),n:$('nlN').value.trim()||'Local',lat:+ll.lat.toFixed(5),lon:+ll.lng.toFixed(5),face:null,fundo:$('nlF').value};
+    P.spots.push(sp);MAPNEW=null;closeDlg();setAdd(false);useLoc(sp.id);fillCoast();toast(`«${sp.n}» guardado. A carregar a previsão…`);
+    compareSpots();
+  };
+}
+$('mapMe').addEventListener('click',()=>{
+  ensureMap();if(!navigator.geolocation){toast('Este aparelho não dá a localização.');return}
+  navigator.geolocation.getCurrentPosition(p=>{const ll=[p.coords.latitude,p.coords.longitude];
+    if(MAPME)MAP.removeLayer(MAPME);MAPME=L.circleMarker(ll,{radius:8,color:'#fff',weight:3,fillColor:'#1565D8',fillOpacity:1}).addTo(MAP);MAP.setView(ll,14)},
+    ()=>toast('Não foi possível obter a localização.'),{enableHighAccuracy:true,timeout:15000});
 });
 
 /* ---------- Cartão «Hoje»: a resposta em poucos segundos ---------- */
@@ -3299,13 +3422,14 @@ async function joinGroup(code){
 }
 function renderSharedSpots(){
   const el=$('sharedSpots');if(!el)return;
-  if(!ME||!SOC.shared.length){el.innerHTML='';return}
+  if(!ME||!SOC.shared.length){el.innerHTML='';paintMap();return}
   el.innerHTML=`<div class="sharedw"><h4>Partilhados comigo</h4>${SOC.shared.map((r,i)=>{const d=r.data||{},have=P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
     return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${avSpan(pname(r.owner),SOC.prof[r.owner]&&SOC.prof[r.owner].foto,20)}de ${esc(pname(r.owner))} · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
       <span class="acts">${have?'<span class="small muted">Já está nos seus locais</span>':`<button type="button" data-cpy="${i}">Juntar aos meus locais</button>`}${isFinite(+d.lat)?`<a href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Ver no mapa</a>`:''}</span></div>`}).join('')}</div>`;
   el.querySelectorAll('[data-cpy]').forEach(b=>b.onclick=()=>{const r=SOC.shared[+b.dataset.cpy];const s=cleanSpot(Object.assign({},r.data,{notas:''}));if(!s)return;
     if(P.spots.some(x=>x.id===s.id))s.id='s'+rnd();delete s.shareF;delete s.shareG;s.from={nome:pname(r.owner),em:iso(new Date())};
     P.spots.push(s);commitProfile();fillCoast();renderSharedSpots();$('smsg').textContent=`«${s.n}» juntado aos seus locais.`});
+  paintMap();
 }
 function paintInvites(){
   const el=$('invBox');if(!el)return;
@@ -3450,13 +3574,14 @@ function setTab(t,scroll=true){
   document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
   try{sessionStorage.setItem('ml_tab',t)}catch(e){}
   if(t==='perfil')paintPHead();
+  if(t==='locais')ensureMap();
   if(scroll&&MQ.matches)window.scrollTo(0,0);
 }
 const applyMQ=()=>document.body.classList.toggle('m',MQ.matches);
 (MQ.addEventListener?MQ.addEventListener('change',applyMQ):MQ.addListener(applyMQ));applyMQ();
 let tab0='hoje';try{tab0=sessionStorage.getItem('ml_tab')||'hoje'}catch(e){}
 if(tab0==='onde')tab0='hoje';
-if(!MQ.matches)$('hDet').open=true;
+if(!MQ.matches){$('hDet').open=true;ensureMap()}
 setTab(tab0,false);
 $('tabbar').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b)setTab(b.dataset.tab)});
 $('inTog').addEventListener('click',()=>{const c=document.querySelector('.condcard'),o=c.classList.toggle('open');$('inTog').setAttribute('aria-expanded',o);$('inTog').textContent=o?'Esconder os valores':'Ajustar os valores à mão'});
