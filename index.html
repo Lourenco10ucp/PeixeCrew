@@ -94,12 +94,42 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .tog button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .prof{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));margin-top:14px}
 .prof .wide{grid-column:1/-1}
-details.pbox{margin-top:18px}
-details.pbox > summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-details.pbox > summary::-webkit-details-marker{display:none}
-details.pbox > summary .edit{margin-left:auto;color:var(--accent);font-size:15px}
 .saved{font-size:14px;color:var(--go);min-height:1.2em}
-.spots{border-top:2px dashed var(--line);padding-top:16px;display:grid;gap:12px}
+/* Perfil (cabeçalho ao estilo das redes sociais) */
+.phead{background:var(--surface);border:2px solid var(--line);border-radius:18px;overflow:hidden;margin-top:18px}
+.pcover{height:118px;background:linear-gradient(135deg,#045150 0%,#0E5A6E 55%,#3a9db0 100%);position:relative}
+.pcover svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:46px}
+.pmain{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding:0 18px 14px}
+.pav{all:unset;cursor:pointer;width:116px;height:116px;border-radius:50%;border:4px solid var(--surface);background:var(--surface);position:relative;flex:none;margin-top:-58px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.pav:focus-visible{outline:3px solid var(--focus)}
+.pavcam{position:absolute;right:2px;bottom:2px;background:var(--surface);border:1.5px solid var(--line);border-radius:50%;width:32px;height:32px;display:grid;place-items:center;font-size:15px}
+.av{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;overflow:hidden;font-family:var(--f-display);font-weight:800;color:#fff;line-height:1;user-select:none}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.pid{flex:1 1 220px;min-width:0;padding-top:8px}
+.pid h2{font-size:clamp(28px,4vw,38px)}
+.pid p{margin:2px 0 6px;font-weight:600}
+.pacts{display:flex;flex-wrap:wrap;gap:8px}
+.pacts .btn{padding:7px 16px;font-size:15px;min-height:40px;border-radius:999px}
+.pcount{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1.5px solid var(--line)}
+.pcount button{all:unset;cursor:pointer;text-align:center;padding:12px 4px;display:grid;gap:1px}
+.pcount button+button{border-left:1.5px solid var(--line)}
+.pcount button:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.pcount b{font-family:var(--f-display);font-size:26px;line-height:1.1}
+.pcount span{font-size:13px;color:var(--muted);font-weight:700}
+.pgrid{display:grid;gap:16px;margin-top:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+.psec h3{font-size:22px;margin:0 0 8px}
+details.psec>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.psec>summary::-webkit-details-marker{display:none}
+details.psec>summary h3{margin:0}
+details.psec>summary::after{content:'';width:10px;height:10px;border-right:2.5px solid var(--accent);border-bottom:2.5px solid var(--accent);transform:rotate(45deg);margin:0 6px 4px 0;transition:transform .2s}
+details.psec[open]>summary::after{transform:rotate(-135deg);margin-bottom:-4px}
+.psec .lead2{color:var(--muted);font-size:14px;margin:0 0 10px}
+.topav{width:34px;height:34px;border-radius:50%;flex:none;border:2px solid rgba(255,255,255,.75);display:block;text-decoration:none}
+.topav .av{font-size:14px}
+.tabav{width:26px;height:26px;border-radius:50%;display:block;border:2px solid transparent}
+.tabav .av{font-size:11px}
+.snap{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface2);font-size:15px}
+.spots{display:grid;gap:12px;margin-top:14px}
 .spotform{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));align-items:end}
 .spotlist{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
 .spot{background:var(--surface2);border:2px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px;font-size:14px}
@@ -370,7 +400,7 @@ footer ul{padding-left:20px}
 @media (max-width:760px){
   body.m{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
   body.m .nav{display:none}
-  body.m .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  body.m .tabbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
   .tabbar button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted);padding:6px 2px;border-radius:10px;-webkit-tap-highlight-color:transparent}
   .tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tabbar button[aria-current="page"]{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
@@ -380,7 +410,7 @@ footer ul{padding-left:20px}
   body.m[data-tab="locais"] [data-t]:not([data-t~="locais"]),
   body.m[data-tab="diario"] [data-t]:not([data-t~="diario"]),
   body.m[data-tab="mais"] [data-t]:not([data-t~="mais"]),
-  body.m[data-tab="stats"] [data-t]:not([data-t~="stats"]){display:none!important}
+  body.m[data-tab="perfil"] [data-t]:not([data-t~="perfil"]){display:none!important}
   .tabbar button{font-size:11px}
   .sttable{font-size:13.5px}
   .sttable th,.sttable td{padding:6px 8px}
@@ -394,7 +424,15 @@ footer ul{padding-left:20px}
   body.m .mtog{display:block;width:100%;margin-top:12px}
   body.m .condcard:not(.open) .inputs{display:none}
   body.m .updbar{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
-  body.m .pbox{margin-top:14px}
+  body.m .topav{display:none}
+  .tabbar button[aria-current="page"] .tabav{border-color:var(--accent)}
+  body.m .phead{margin-top:6px}
+  .pav{width:96px;height:96px;margin-top:-48px}
+  .pcover{height:96px}
+  .pmain{padding:0 14px 12px}
+  .pcount b{font-size:22px}
+  .pcount span{font-size:12px}
+  body.m #perfil{padding-top:8px}
   body.m #hoje > .lead,body.m #diario > .lead{display:none}
   body.m .drow3{grid-template-columns:1fr 1fr}
   body.m .drow3 > label:first-child{grid-column:1/-1}
@@ -411,8 +449,9 @@ footer ul{padding-left:20px}
 <header class="top"><div class="wrap">
   <div class="logo"><img src="data:image/png;base64,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" alt="" width="32" height="32" style="border-radius:8px">PeixeCrew</div>
   <nav class="nav" aria-label="Secções">
-    <a href="#hoje">Hoje</a><a href="#calendario">Calendário</a><a href="#tecnicas">Técnicas</a><a href="#seguranca">Segurança</a><a href="#diario">Diário</a><a href="#stats">Estatísticas</a>
+    <a href="#hoje">Hoje</a><a href="#locais">Locais</a><a href="#calendario">Calendário</a><a href="#tecnicas">Técnicas</a><a href="#seguranca">Segurança</a><a href="#diario">Diário</a><a href="#stats">Estatísticas</a>
   </nav>
+  <a href="#perfil" class="topav" id="topAv" aria-label="O seu perfil" title="O seu perfil"></a>
 </div></header>
 
 <main class="wrap">
@@ -425,61 +464,6 @@ footer ul{padding-left:20px}
     <div class="today" id="todayBox" aria-live="polite"></div>
   </section>
 
-  <details class="pbox card" id="pbox" data-t="locais">
-    <summary><span style="font-family:var(--f-display);font-size:22px">O seu perfil</span><span class="chips" id="pchips"></span><span class="edit">Editar</span></summary>
-    <div class="prof">
-      <div class="f wide acct" id="acctBox"></div>
-      <div class="f wide profbar">
-        <label class="f" style="flex:1;min-width:180px">Perfil em uso<select id="pSel"></select></label>
-        <button type="button" class="btn ghost" id="pNew">Novo perfil</button>
-        <button type="button" class="btn ghost" id="pDel">Apagar este perfil</button>
-        <p class="small muted" style="margin:0;flex-basis:100%">Cada perfil tem os seus locais, diário e preferências, guardados neste aparelho. Útil se partilhar o computador; cada amigo pode também usar a app no seu telemóvel e trocar locais com «Partilhar».</p>
-      </div>
-      <label class="f">Nome ou alcunha<input type="text" id="pNome" maxlength="30" placeholder="Ex.: Zé" autocomplete="off"></label>
-      <label class="f">Região onde costuma ir
-        <select id="pReg"></select></label>
-      <label class="f">Nível
-        <select id="pNivel">
-          <option value="iniciante">Iniciante (menos de 1 ano, sem curso)</option>
-          <option value="intermedio">Intermédio (curso feito, vários anos)</option>
-          <option value="experiente">Experiente (domina a borda)</option>
-        </select></label>
-      <label class="f">Profundidade confortável <span class="v" id="pProfV"></span>
-        <input type="range" id="pProf" min="2" max="30" step="1"></label>
-      <div class="f wide"><span style="font-size:15px;font-weight:600">O que quer apanhar</span>
-        <div class="tog" id="pCats" role="group" aria-label="Categorias"></div></div>
-      <div class="spots wide">
-        <div><span style="font-family:var(--f-display);font-size:20px;font-weight:600">Os meus locais</span>
-          <p class="small muted" style="margin:4px 0 0">Junte as praias e pedras onde costuma ir. Para as coordenadas: no Google Maps, carregue no sítio com o botão direito (ou mantenha o dedo no telemóvel) e copie os números que aparecem, por exemplo <i>38.4123, -9.1012</i>. Também pode colar o link do Google Maps ou, se estiver no local, usar a sua localização.</p></div>
-        <div class="spotbar">
-          <button type="button" class="btn ghost" id="shareBtn">Partilhar locais</button>
-          <button type="button" class="btn ghost" id="recvBtn">Receber locais</button>
-          <button type="button" class="btn ghost" id="bkBtn">Cópia de segurança</button>
-          <button type="button" class="btn ghost" id="rsBtn">Repor uma cópia</button>
-          <input type="file" id="fileIn" accept=".json,application/json" hidden>
-        </div>
-        <div class="spotlist" id="spotlist"></div>
-        <div id="sharedSpots"></div>
-        <form class="spotform" id="spotform">
-          <label class="f">Nome do local<input type="text" id="sNome" maxlength="40" placeholder="Ex.: Pedra do Cavalo" required></label>
-          <label class="f">Coordenadas ou link<input type="text" id="sCoord" placeholder="38.4123, -9.1012" required autocomplete="off"></label>
-          <label class="f">A costa está virada para
-            <select id="sFace"><option value="">Calcular automaticamente</option><option value="0">Norte</option><option value="45">Nordeste</option><option value="90">Leste</option><option value="135">Sudeste</option><option value="180">Sul</option><option value="225">Sudoeste</option><option value="270">Oeste</option><option value="315">Noroeste</option></select></label>
-          <label class="f">Fundo
-            <select id="sFundo"><option value="pedra">Pedra</option><option value="misto">Pedra e areia</option><option value="areia">Areia ou ria</option></select></label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="submit">Juntar local</button><button class="btn ghost" type="button" id="sGeo">Estou aqui</button></div>
-        </form>
-        <div class="msg" id="smsg" aria-live="polite"></div>
-      </div>
-      <div class="amigos wide">
-        <div><span style="font-family:var(--f-display);font-size:20px;font-weight:600">Amigos</span>
-          <p class="small muted" style="margin:4px 0 0">Troque uma vez o «cartão de amigo» com os amigos da PeixeCrew. Depois escolhe-os em «Com quem» no diário e pode enviar-lhes as saídas que fizeram juntos, já preenchidas.</p></div>
-        <div class="amlist" id="amList"></div>
-        <div class="spotbar"><button type="button" class="btn ghost" id="amShare">Partilhar o meu cartão de amigo</button><button type="button" class="btn ghost" id="amRecv">Receber um cartão</button></div>
-      </div>
-      <div class="saved wide" id="psaved"></div>
-    </div>
-  </details>
 
   <!-- HOJE -->
   <section class="block" id="hoje" data-t="hoje onde">
@@ -535,6 +519,31 @@ footer ul{padding-left:20px}
       </div>
       <label class="ondeday">Dia a comparar <input type="date" id="ondeDate"></label>
       <div id="onde" aria-live="polite"></div>
+    </div>
+  </section>
+
+
+  <!-- LOCAIS -->
+  <section class="block" id="locais" data-t="locais">
+    <h2>Os meus locais</h2>
+    <p class="lead">Junte as praias e pedras onde costuma ir. Para as coordenadas: no Google Maps, carregue no sítio com o botão direito (ou mantenha o dedo no telemóvel) e copie os números que aparecem, por exemplo <i>38.4123, -9.1012</i>. Também pode colar o link do Google Maps ou, se estiver no local, usar a sua localização.</p>
+    <div class="spots">
+      <div class="spotbar">
+        <button type="button" class="btn ghost" id="shareBtn">Partilhar locais</button>
+        <button type="button" class="btn ghost" id="recvBtn">Receber locais</button>
+      </div>
+      <div class="spotlist" id="spotlist"></div>
+      <div id="sharedSpots"></div>
+      <form class="card spotform" id="spotform">
+        <label class="f">Nome do local<input type="text" id="sNome" maxlength="40" placeholder="Ex.: Pedra do Cavalo" required></label>
+        <label class="f">Coordenadas ou link<input type="text" id="sCoord" placeholder="38.4123, -9.1012" required autocomplete="off"></label>
+        <label class="f">A costa está virada para
+          <select id="sFace"><option value="">Calcular automaticamente</option><option value="0">Norte</option><option value="45">Nordeste</option><option value="90">Leste</option><option value="135">Sudeste</option><option value="180">Sul</option><option value="225">Sudoeste</option><option value="270">Oeste</option><option value="315">Noroeste</option></select></label>
+        <label class="f">Fundo
+          <select id="sFundo"><option value="pedra">Pedra</option><option value="misto">Pedra e areia</option><option value="areia">Areia ou ria</option></select></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="submit">Juntar local</button><button class="btn ghost" type="button" id="sGeo">Estou aqui</button></div>
+      </form>
+      <div class="msg" id="smsg" aria-live="polite"></div>
     </div>
   </section>
 
@@ -647,8 +656,74 @@ footer ul{padding-left:20px}
       </div>
     </div>
   </section>
-  <section class="block" id="stats" data-t="stats">
-    <h2>Estatísticas</h2>
+  <!-- PERFIL -->
+  <section class="block" id="perfil" data-t="perfil">
+    <div class="phead">
+      <div class="pcover" aria-hidden="true"><svg viewBox="0 0 600 46" preserveAspectRatio="none"><path d="M0 26 C60 10 120 10 180 24 S300 40 360 24 480 8 540 22 600 30 600 30 V46 H0Z" fill="rgba(255,255,255,.16)"/><path d="M0 34 C70 22 130 24 200 34 S330 46 400 34 520 22 600 34 V46 H0Z" fill="rgba(255,255,255,.22)"/></svg></div>
+      <div class="pmain">
+        <button type="button" class="pav" id="pAv" aria-label="Mudar a fotografia de perfil"><span class="av" id="pAvImg"></span><span class="pavcam" aria-hidden="true">📷</span></button>
+        <input type="file" id="pAvIn" accept="image/*" hidden>
+        <div class="pid"><h2 id="pTitle">O seu perfil</h2><p class="muted" id="pSub"></p><div class="chips" id="pchips"></div></div>
+        <div class="pacts"><button type="button" class="btn" id="pEditBtn">Editar perfil</button><button type="button" class="btn ghost" id="pAcctBtn">Conta</button></div>
+      </div>
+      <div class="pcount" id="pCount"></div>
+    </div>
+    <div class="pgrid">
+      <div class="card psec" id="socCard">
+        <h3>Amigos e grupos</h3>
+        <div id="socBox"></div>
+        <div class="amigos">
+          <p class="lead2" style="margin:10px 0 0" id="amLead">Na lista de «Com quem» do diário. Os amigos da app entram sozinhos; quem ainda não tem conta pode trocar consigo o «cartão de amigo».</p>
+          <div class="amlist" id="amList"></div>
+          <div class="spotbar"><button type="button" class="btn ghost" id="amShare">Partilhar o meu cartão de amigo</button><button type="button" class="btn ghost" id="amRecv">Receber um cartão</button></div>
+        </div>
+      </div>
+      <div class="pcol" style="display:grid;gap:16px;min-width:0">
+        <div class="acct" id="acctBox"></div>
+        <details class="card psec" id="pEdit">
+          <summary><h3>Editar perfil</h3></summary>
+          <div class="prof">
+            <label class="f">Nome ou alcunha<input type="text" id="pNome" maxlength="30" placeholder="Ex.: Zé" autocomplete="off"></label>
+            <label class="f">Região onde costuma ir
+              <select id="pReg"></select></label>
+            <label class="f">Nível
+              <select id="pNivel">
+                <option value="iniciante">Iniciante (menos de 1 ano, sem curso)</option>
+                <option value="intermedio">Intermédio (curso feito, vários anos)</option>
+                <option value="experiente">Experiente (domina a borda)</option>
+              </select></label>
+            <label class="f">Profundidade confortável <span class="v" id="pProfV"></span>
+              <input type="range" id="pProf" min="2" max="30" step="1"></label>
+            <div class="f wide"><span style="font-size:15px;font-weight:600">O que quer apanhar</span>
+              <div class="tog" id="pCats" role="group" aria-label="Categorias"></div></div>
+            <div class="f wide" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ghost" id="pAvRm" hidden>Tirar a fotografia de perfil</button></div>
+            <div class="saved wide" id="psaved"></div>
+          </div>
+        </details>
+        <details class="card psec" id="pSet">
+          <summary><h3>Dados deste aparelho</h3></summary>
+          <div style="display:grid;gap:12px;margin-top:12px">
+            <div class="profbar">
+              <label class="f" style="flex:1;min-width:180px">Perfil em uso<select id="pSel"></select></label>
+              <button type="button" class="btn ghost" id="pNew">Novo perfil</button>
+              <button type="button" class="btn ghost" id="pDel">Apagar este perfil</button>
+              <p class="small muted" style="margin:0;flex-basis:100%">Cada perfil tem os seus locais, diário e preferências. Útil se partilhar o aparelho; cada perfil pode ter a sua conta.</p>
+            </div>
+            <div class="spotbar" style="margin:0">
+              <button type="button" class="btn ghost" id="bkBtn">Cópia de segurança</button>
+              <button type="button" class="btn ghost" id="rsBtn">Repor uma cópia</button>
+              <button type="button" class="btn ghost" id="snapBtn">Recuperar dados antigos</button>
+              <input type="file" id="fileIn" accept=".json,application/json" hidden>
+            </div>
+            <p class="small muted" style="margin:0">«Repor uma cópia» junta os locais e as saídas da cópia aos que já estão aqui; não apaga nada. A app guarda também, sozinha, até 4 versões anteriores neste aparelho («Recuperar dados antigos»).</p>
+            <p class="msg" id="setMsg" aria-live="polite" style="color:var(--go)"></p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+  <section class="block" id="stats" data-t="perfil">
+    <h2>Recordes</h2>
     <p class="lead">Os seus recordes e as caçadas que se destacam. Conta só as suas saídas (não os relatórios de amigos).</p>
     <label class="f stctl">Período<select id="stYear"></select></label>
     <div id="statsBody" class="statsbody"></div>
@@ -661,7 +736,7 @@ footer ul{padding-left:20px}
   <button data-tab="onde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Onde ir</button>
   <button data-tab="locais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Locais</button>
   <button data-tab="diario"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10l3 3v15H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>Diário</button>
-  <button data-tab="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>Recordes</button>
+  <button data-tab="perfil"><span class="tabav" id="tabAv" aria-hidden="true"></span>Perfil</button>
   <button data-tab="mais"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mais</button>
 </nav>
 <div class="updbar" id="updBar" hidden role="status">Há uma versão nova da PeixeCrew. <button class="btn" id="updBtn">Atualizar</button></div>
@@ -669,11 +744,11 @@ footer ul{padding-left:20px}
   <div class="card install" id="installBox">
     <h3 style="font-size:20px">Instalar no telemóvel</h3>
     <p class="small" style="margin:6px 0 0"><b>Android (Chrome):</b> abra este endereço, toque em <b>⋮</b> e depois em <b>Instalar aplicação</b> (ou no botão abaixo, se aparecer). <b>iPhone (Safari):</b> toque em <b>Partilhar</b> e depois em <b>Adicionar ao ecrã principal</b>. Depois de instalada, a app abre em ecrã inteiro e funciona sem rede (as previsões precisam de rede; sem ela, mostra a última guardada).</p>
-    <p class="small" style="margin:6px 0 0"><b>Já usava a app noutro aparelho ou no ficheiro?</b> Os dados ficam em cada aparelho. No antigo: «O seu perfil» › <b>Cópia de segurança</b>. Envie o ficheiro para este aparelho e aqui: «O seu perfil» › <b>Repor uma cópia</b>.</p>
+    <p class="small" style="margin:6px 0 0"><b>Já usava a app noutro aparelho ou no ficheiro?</b> Os dados ficam em cada aparelho. A forma mais simples é ter conta: entre na mesma conta nos dois e tudo aparece. Sem conta: no antigo, «Perfil» › «Dados deste aparelho» › <b>Cópia de segurança</b>; envie o ficheiro para este aparelho e aqui use <b>Repor uma cópia</b>.</p>
     <button class="btn" id="instBtn" hidden style="margin-top:8px">Instalar a app</button>
   </div>
   <p><b>Aviso:</b> este planeador é uma ajuda e não substitui o seu juízo nem os avisos oficiais. Os limites de ondulação e vento por nível são critérios desta app, não oficiais. Tamanhos mínimos, defesos e limites mudam por portaria e despacho: confirme sempre na DGRM antes de sair. A visibilidade é uma estimativa da app a partir da ondulação dos dois dias anteriores, sem fonte científica.</p>
-  <p><b>Licença:</b> app gratuita e sem fins comerciais. Os esquemas de identificação do IPMA (recortes adaptados, CC BY-NC-SA 4.0) obrigam a que a app seja partilhada nos mesmos termos: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>. As fotografias da Ciência Viva (CC BY-NC-ND 4.0) são usadas sem alterações. Os seus dados (perfis, locais, diário) ficam só no seu aparelho: este site não os recebe.</p>
+  <p><b>Licença:</b> app gratuita e sem fins comerciais. Os esquemas de identificação do IPMA (recortes adaptados, CC BY-NC-SA 4.0) obrigam a que a app seja partilhada nos mesmos termos: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>. As fotografias da Ciência Viva (CC BY-NC-ND 4.0) são usadas sem alterações. Os seus dados (perfis, locais, diário) ficam no seu aparelho; só se tiver conta são guardados também na conta, onde apenas você (e quem escolher) os vê.</p>
   <p>Fontes oficiais usadas na app (<span id="verif"></span>):</p>
   <ul id="fontes"></ul>
   <p>Outras fontes:</p>
@@ -1261,7 +1336,7 @@ $('spotlist').addEventListener('click',e=>{
   if(ed)openSpotEdit(ed.dataset.edit);
   if(sh)openShare([sh.dataset.share]);
   if(d){const s=P.spots.find(x=>x.id===d.dataset.del);if(!s||!confirm(`Apagar «${s.n}»?`))return;
-    P.spots=P.spots.filter(x=>x.id!==s.id);markDel('S',s.id);if(P.spot===s.id)useLoc('');else commitProfile()}
+    snapNow('antes de apagar «'+s.n+'»');P.spots=P.spots.filter(x=>x.id!==s.id);markDel('S',s.id);if(P.spot===s.id)useLoc('');else commitProfile()}
 });
 $('sGeo').addEventListener('click',()=>{
   if(!navigator.geolocation){$('smsg').textContent='Este navegador não dá a localização. Cole as coordenadas à mão.';return}
@@ -1275,9 +1350,52 @@ function paintProfile(){
   $('pNome').value=P.nome;$('pReg').value=P.reg;$('pNivel').value=P.nivel;$('pProf').value=P.prof;$('pProfV').textContent=P.prof+' m';
   $('pCats').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" data-c="${k}" aria-pressed="${P.cats.includes(k)}">${v}</button>`).join('');
   renderSpots();
-  $('pchips').innerHTML=[LV[P.nivel],REG[P.reg].n.split(' (')[0],'até '+P.prof+' m',...(P.spots.length?[P.spots.length+(P.spots.length===1?' local':' locais')]:[])].map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  paintPHead();
   $('hello').innerHTML=P.nome?`${esc(P.nome)}, o mar certo <em>na altura certa.</em>`:'O mar certo, <em>na altura certa.</em>';
 }
+/* ---- Cabeçalho do perfil (fotografia, nome, contadores) ---- */
+const gv=f=>{try{return f()}catch(e){return undefined}}; // variáveis definidas mais abaixo (ainda podem não existir no arranque)
+const AVC=['#0E5A6E','#1B7443','#8F5B00','#B3261E','#5B3FA0','#045150','#C8501C','#2D6977'];
+function avHTML(){
+  if(P.foto)return `<img src="${P.foto}" alt="">`;
+  const mep=gv(()=>MEP), nome=(P.nome||(mep&&(mep.nome||mep.username))||'?').trim();
+  return esc(nome.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?');
+}
+function avBg(){if(P.foto)return 'var(--surface2)';const nome=(P.nome||'?');let h=0;for(const c of nome)h=(h*31+c.charCodeAt(0))|0;return AVC[Math.abs(h)%AVC.length]}
+function paintAv(el,size){if(!el)return;el.innerHTML=`<span class="av" style="background:${avBg()};font-size:${size}px">${avHTML()}</span>`}
+function paintPHead(){
+  if(!$('pTitle'))return;
+  const me=gv(()=>ME), mep=gv(()=>MEP), soc=gv(()=>SOC);
+  $('pAvImg').outerHTML=`<span class="av" id="pAvImg" style="background:${avBg()};font-size:42px">${avHTML()}</span>`;
+  paintAv($('tabAv'),11);paintAv($('topAv'),14);
+  $('pTitle').textContent=P.nome||(mep&&mep.nome)||'O seu perfil';
+  $('pSub').textContent=me?(mep?'@'+mep.username:'…')+' · conta PeixeCrew':'Sem conta: os dados ficam só neste aparelho';
+  $('pchips').innerHTML=[LV[P.nivel],REG[P.reg].n.split(' (')[0],'até '+P.prof+' m'].map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  $('pAcctBtn').textContent=me?'Conta':'Entrar ou criar conta';
+  $('pAvRm').hidden=!P.foto;
+  const DD=gv(()=>D)||[], mine=DD.filter(e=>!e.from);
+  const nCap=mine.reduce((a,e)=>a+(e.caps||[]).filter(c=>c.sp).reduce((x,c)=>x+Math.max(1,Math.round(+c.n||1)),0),0);
+  const nAm=me&&soc?soc.friends.length:P.amigos.length;
+  const T=[['saidas',mine.length,mine.length===1?'saída':'saídas'],['caps',nCap,nCap===1?'captura':'capturas'],['locais',P.spots.length,P.spots.length===1?'local':'locais'],['amigos',nAm,nAm===1?'amigo':'amigos']];
+  $('pCount').innerHTML=T.map(([k,n,l])=>`<button type="button" data-pc="${k}"><b>${n}</b><span>${l}</span></button>`).join('');
+}
+function goSec(tab,id){if(typeof MQ!=='undefined'&&MQ.matches){setTab(tab);if(id&&tab==='perfil')setTimeout(()=>$(id).scrollIntoView({behavior:'smooth',block:'start'}),30)}else $(id).scrollIntoView({behavior:'smooth',block:'start'})}
+$('pCount').addEventListener('click',e=>{const b=e.target.closest('[data-pc]');if(!b)return;
+  ({saidas:()=>goSec('diario','diario'),caps:()=>goSec('perfil','stats'),locais:()=>goSec('locais','locais'),amigos:()=>goSec('perfil','socCard')})[b.dataset.pc]()});
+$('pEditBtn').addEventListener('click',()=>{$('pEdit').open=true;$('pEdit').scrollIntoView({behavior:'smooth',block:'start'})});
+$('pAcctBtn').addEventListener('click',()=>$('acctBox').scrollIntoView({behavior:'smooth',block:'start'}));
+$('pAv').addEventListener('click',()=>$('pAvIn').click());
+$('pAvIn').addEventListener('change',async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{
+    const bmp=await createImageBitmap(f), S=256, c=document.createElement('canvas');c.width=c.height=S;
+    const k=Math.min(bmp.width,bmp.height), x=(bmp.width-k)/2, y=(bmp.height-k)/2;
+    c.getContext('2d').drawImage(bmp,x,y,k,k,0,0,S,S);
+    P.foto=c.toDataURL('image/jpeg',.82);commitProfile();
+  }catch(err){alert('Não consegui abrir esta fotografia.')}
+});
+$('pAvRm').addEventListener('click',()=>{delete P.foto;commitProfile()});
+
 let savedT;
 function commitProfile(){
   const ok=save(KP,P);paintProfile();renderToday();evaluateAndRender();renderCal();
@@ -1291,7 +1409,7 @@ $('pNivel').addEventListener('change',e=>{P.nivel=e.target.value;commitProfile()
 $('pProf').addEventListener('input',e=>{P.prof=+e.target.value;commitProfile()});
 $('pCats').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;
   P.cats=P.cats.includes(c)?P.cats.filter(x=>x!==c):[...P.cats,c];if(!P.cats.length)P.cats=[c];CALCATS=null;commitProfile()});
-if(!hadProfile)$('pbox').open=true;
+if(!hadProfile)$('pEdit').open=true;
 
 /* ================= Fase 3: locais, perfis, partilha e cópia de segurança ================= */
 const LVORD={iniciante:0,intermedio:1,experiente:2};
@@ -1437,7 +1555,7 @@ function openShare(ids){
     const obj=shareObj(chosen,$('shNot').checked), code=await packCode(obj);
     const web=/^https?:/.test(location.protocol)?`${location.origin}${location.pathname}#partilha=${code}`:'';
     const nomes=obj.locais.map(s=>s.n).join(', ');
-    const msg=`${obj.de} partilhou ${obj.locais.length===1?'um local':obj.locais.length+' locais'} de caça submarina contigo (${nomes}).\n`+(web?`Abre este link: ${web}\n\nOu, na app`:'Na app')+` PeixeCrew: «O seu perfil» › «Receber locais» e cola este código:\n${code}`;
+    const msg=`${obj.de} partilhou ${obj.locais.length===1?'um local':obj.locais.length+' locais'} de caça submarina contigo (${nomes}).\n`+(web?`Abre este link: ${web}\n\nOu, na app`:'Na app')+` PeixeCrew: «Locais» › «Receber locais» e cola este código:\n${code}`;
     $('shOut').innerHTML=`<p class="small" style="margin:8px 0 4px">Mensagem pronta a enviar (WhatsApp, e-mail…):</p><textarea class="codebox" id="shTxt" readonly></textarea>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<button class="btn ghost" id="shFile">Guardar como ficheiro</button><span class="small muted" id="shMsg"></span></div>`;
     $('shTxt').value=msg;
@@ -1490,7 +1608,7 @@ function previewShare(obj){
     }
     closeDlg();commitProfile();fillCoast();
     $('smsg').textContent=`${nNew?nNew+(nNew===1?' local novo':' locais novos'):''}${nNew&&nUpd?' e ':''}${nUpd?nUpd+(nUpd===1?' local atualizado':' locais atualizados'):''}${!nNew&&!nUpd?'Nada juntado.':'.'}`;
-    $('pbox').open=true;if(MQ.matches)setTab('locais');
+    if(MQ.matches)setTab('locais');
   };
 }
 
@@ -1500,26 +1618,69 @@ function backupObj(){
   for(const p of PROFS.list)dados[p.id]={perfil:load('ml_perfil:'+p.id,{}),diario:load('ml_diario:'+p.id,[])};
   return {app:'marlivre',t:'copia',v:1,em:new Date().toISOString(),perfis:PROFS,dados,mares:MR};
 }
+/* Junta locais, saídas e amigos de outra versão aos de um perfil, sem apagar nem alterar o que já lá está */
+const sameOut=(a,b)=>a.date===b.date&&(a.loc||'')===(b.loc||'')&&(a.t0||'')===(b.t0||'')&&(a.notas||'')===(b.notas||'');
+function mergeInto(tgt,tD,spots,diario,amigos){
+  let nS=0,nO=0;tgt.spots=Array.isArray(tgt.spots)?tgt.spots:[];tgt.amigos=Array.isArray(tgt.amigos)?tgt.amigos:[];
+  for(const x of spots||[]){const s=cleanSpot(x);if(!s)continue;if(x.notas)s.notas=String(x.notas).slice(0,600);if(!x.from)delete s.from;
+    if(!tgt.spots.some(y=>y.id===s.id)){tgt.spots.push(s);nS++}}
+  for(const e of diario||[]){if(!e||typeof e!=='object'||!e.date)continue;
+    if(e.id?tD.some(y=>y.id===e.id):tD.some(y=>sameOut(y,e)))continue;tD.push(Object.assign({},e,{id:e.id||rnd()}));nO++}
+  for(const a of amigos||[])if(a&&a.id&&a.nome&&!tgt.amigos.some(y=>y.id===a.id))tgt.amigos.push(a);
+  return [nS,nO];
+}
+/* Versões anteriores automáticas (só neste aparelho): uma por dia, e antes de entrar na conta, de repor uma cópia
+   ou de apagar o que foi apagado noutro aparelho. Servem para recuperar dados se alguma coisa correr mal. */
+const KSN='ml_snap:'+PROFS.active;
+function snapNow(why){
+  try{
+    const DD=gv(()=>D)||[];if(!P.spots.length&&!DD.length)return;
+    const L=load(KSN,[]), t=Date.now();if(!why&&L.length&&t-L[0].t<864e5)return;
+    L.unshift({t,why:why||'',spots:P.spots,D:DD.map(e=>{const o=Object.assign({},e);delete o.cond;delete o.condErr;return o}),amigos:P.amigos});
+    while(L.length>4)L.pop();
+    for(;;){try{localStorage.setItem(KSN,JSON.stringify(L));break}catch(e){if(L.length<=1)break;L.pop()}}
+  }catch(e){}
+}
+const nL=n=>n+(n===1?' local':' locais'), nO=n=>n+(n===1?' saída':' saídas');
+function openSnaps(){
+  const L=load(KSN,[]);
+  const miss=v=>[(v.spots||[]).filter(s=>!P.spots.some(x=>x.id===s.id)).length,(v.D||[]).filter(e=>!(e.id?D.some(x=>x.id===e.id):D.some(x=>sameOut(x,e)))).length];
+  showDlg(`<h3>Recuperar dados antigos</h3><p class="small muted" style="margin:-4px 0 0">A app guarda sozinha até 4 versões anteriores deste perfil, neste aparelho. «Juntar o que falta» traz de volta os locais e as saídas que não estão aqui agora; não apaga nada.</p>
+    ${L.length?L.map((v,i)=>{const [a,b]=miss(v);return `<div class="snap"><span><b>${new Date(v.t).toLocaleString('pt-PT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</b>${v.why?' <span class="muted small">('+esc(v.why)+')</span>':''}<br><span class="small">${nL((v.spots||[]).length)} · ${nO((v.D||[]).length)}${a||b?` · <b>faltam aqui ${nL(a)} e ${nO(b)}</b>`:' · nada em falta'}</span></span>${a||b?`<button class="btn" data-snap="${i}">Juntar o que falta</button>`:''}</div>`}).join(''):'<p>Ainda não há versões guardadas.</p>'}<p class="msg" id="snapMsg"></p>`);
+  document.querySelectorAll('[data-snap]').forEach(b=>b.onclick=()=>{const v=L[+b.dataset.snap];const [nS,nO_]=mergeInto(P,D,v.spots,v.D,v.amigos);
+    save(KD,D);commitProfile();renderDiary();fillCoast();closeDlg();$('setMsg').textContent=`Recuperados: ${nL(nS)} e ${nO(nO_)}.`+(ME?' Vão também para a sua conta.':'')});
+}
 async function restoreBackup(obj){
   if(!obj||!obj.perfis||!Array.isArray(obj.perfis.list)||!obj.dados)throw new Error('Cópia inválida.');
-  const n=obj.perfis.list.length, quando=String(obj.em||'').slice(0,10);
-  if(!confirm(`Repor a cópia de ${quando} (${n} ${n===1?'perfil':'perfis'})? Os perfis, locais e diários deste aparelho são substituídos pelos da cópia.`))return;
   const list=obj.perfis.list.filter(p=>p&&/^[A-Za-z0-9_-]{1,40}$/.test(p.id)).map(p=>({id:p.id,nome:String(p.nome||'Perfil').slice(0,30)}));
   if(!list.length)throw new Error('A cópia não tem perfis.');
+  const quando=String(obj.em||'').slice(0,10), one=list.length===1;
+  if(!confirm(one?`Juntar a cópia de ${quando} ao perfil «${P.nome||'atual'}»? Os locais e as saídas da cópia que ainda não estão aqui são juntados. Nada do que já está aqui é apagado.`
+    :`Juntar a cópia de ${quando} (${list.length} perfis)? Cada perfil da cópia junta-se ao perfil com o mesmo nome deste aparelho (ou fica como perfil novo). Nada do que já está aqui é apagado.`))return;
+  snapNow('antes de repor uma cópia');
+  let nS=0,nO=0;const map={};
   for(const p of list){
     const d=obj.dados[p.id]||{}, pf=d.perfil&&typeof d.perfil==='object'?d.perfil:{};
-    pf.spots=(Array.isArray(pf.spots)?pf.spots:[]).map(x=>{const s=cleanSpot(x);if(s&&x.notas)s.notas=String(x.notas).slice(0,600);if(s&&!x.from)delete s.from;return s}).filter(Boolean);
-    save('ml_perfil:'+p.id,pf);save('ml_diario:'+p.id,Array.isArray(d.diario)?d.diario:[]);
+    let tid=one?PROFS.active:(PROFS.list.find(x=>x.id===p.id)||PROFS.list.find(x=>x.nome.toLowerCase()===p.nome.toLowerCase())||{}).id;
+    if(!tid){tid=PROFS.list.some(x=>x.id===p.id)?'p'+rnd():p.id;PROFS.list.push({id:tid,nome:p.nome})}
+    map[p.id]=tid;
+    const act=tid===PROFS.active, tgt=act?P:load('ml_perfil:'+tid,null)||{}, tD=act?D:load('ml_diario:'+tid,[]);
+    const empty=!(tgt.spots||[]).length&&!tD.length;
+    for(const k of ['nome','reg','nivel','prof','cats','foto'])if(pf[k]!=null&&((empty&&k!=='foto')||tgt[k]==null))tgt[k]=pf[k];
+    const [a,b]=mergeInto(tgt,tD,pf.spots,Array.isArray(d.diario)?d.diario:[],pf.amigos);nS+=a;nO+=b;
+    if(!tgt.spot&&pf.spot&&tgt.spots.some(x=>x.id===pf.spot))tgt.spot=pf.spot;
+    save('ml_perfil:'+tid,tgt);save('ml_diario:'+tid,tD);
   }
-  save('ml_perfis',{active:list.some(p=>p.id===obj.perfis.active)?obj.perfis.active:list[0].id,list});
+  save('ml_perfis',PROFS);
   if(obj.mares&&typeof obj.mares==='object')save('ml_mares',Object.assign(load('ml_mares',{}),obj.mares));
   if(obj.fotos&&typeof obj.fotos==='object'){
     const toBlob=d=>fetch(d).then(r=>r.blob());
     for(const [id,x] of Object.entries(obj.fotos)){
       if(!/^f[\w-]{1,40}$/.test(id)||!x||!/^data:image\//.test(x.full||'')||!/^data:image\//.test(x.thumb||''))continue;
-      try{await FDB.put({id,prof:String(x.prof||''),entry:String(x.entry||''),full:await toBlob(x.full),thumb:await toBlob(x.thumb),t:Date.now()})}catch(e){}
+      try{await FDB.put({id,prof:map[x.prof]||String(x.prof||''),entry:String(x.entry||''),full:await toBlob(x.full),thumb:await toBlob(x.thumb),t:Date.now()})}catch(e){}
     }
   }
+  alert(`Juntei ${nS} ${nS===1?'local':'locais'} e ${nO} ${nO===1?'saída':'saídas'}.`+(ME?' Com a conta, vão também para o servidor e aparecem nos seus outros aparelhos.':''));
   location.reload();
 }
 $('shareBtn').addEventListener('click',()=>openShare([]));
@@ -1543,7 +1704,7 @@ async function backupNow(){
   }catch(e){if(e&&e.name==='AbortError')return false}
   if(!ok){downloadJSON(obj,name);ok=true}
   save('ml_lastbk',Date.now());$('bkBar').hidden=true;
-  $('smsg').textContent='Cópia feita. Guarde o ficheiro num sítio seguro; para repor, use «Repor uma cópia».';
+  $('setMsg').textContent='Cópia feita. Guarde o ficheiro num sítio seguro; para repor, use «Repor uma cópia».';
   return true;
 }
 $('bkBtn').addEventListener('click',backupNow);
@@ -1551,12 +1712,14 @@ function checkBackup(){
   const has=P.spots.length||(typeof D!=='undefined'&&D.length), last=load('ml_lastbk',0), snooze=load('ml_bksnooze',0);
   const days=last?Math.floor((Date.now()-last)/864e5):null;
   if(!has||(last&&days<30)||Date.now()<snooze){$('bkBar').hidden=true;return}
-  $('bkBar').innerHTML=`<span>${last?`A última cópia de segurança foi há ${days} dias.`:'Ainda não fez nenhuma cópia de segurança.'} Os seus locais e o diário estão só neste aparelho.</span><span style="display:flex;gap:8px"><button class="btn" id="bkNow">Fazer cópia agora</button><button class="btn ghost" id="bkLater">Mais tarde</button></span>`;
+  if(P.acct){$('bkBar').hidden=true;return}
+  $('bkBar').innerHTML=`<span>${last?`A última cópia de segurança foi há ${days} dias.`:'Ainda não fez nenhuma cópia de segurança.'} Os seus locais e o diário estão só neste aparelho (ou crie uma conta em «Perfil»: fica tudo guardado nela).</span><span style="display:flex;gap:8px"><button class="btn" id="bkNow">Fazer cópia agora</button><button class="btn ghost" id="bkLater">Mais tarde</button></span>`;
   $('bkBar').hidden=false;
   $('bkNow').onclick=backupNow;
   $('bkLater').onclick=()=>{save('ml_bksnooze',Date.now()+7*864e5);$('bkBar').hidden=true};
 }
 $('rsBtn').addEventListener('click',()=>$('fileIn').click());
+$('snapBtn').addEventListener('click',openSnaps);
 $('fileIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
   try{
@@ -1951,7 +2114,7 @@ function bestHour(d,fc,loc){
 }
 async function compareSpots(){
   const btn=$('ondeBtn'), spots=[...P.spots], d=C.date;
-  if(!spots.length){$('onde').innerHTML='<p class="small muted">Junte locais em «O seu perfil» para os poder comparar.</p>';return}
+  if(!spots.length){$('onde').innerHTML='<p class="small muted">Junte locais em «Locais» para os poder comparar.</p>';return}
   btn.disabled=true;ONDE=[];
   const dia=new Date(d+'T12:00').toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
   for(let i=0;i<spots.length;i++){
@@ -2293,7 +2456,7 @@ function condText(e){
   return `${c.hist?'Reconstrução histórica':'Previsto'} às ${String(c.h).padStart(2,'0')}h: ondulação ${fmt(c.med)} m${c.n>1?` (${fmt(c.mn)}–${fmt(c.mx)})`:''}${c.swDir!=null?' de '+d16(c.swDir):''}, ${c.tp} s · vento ${c.wind} nós · ${c.mare?MAREN[c.mare]:''}${c.cls?` (marés ${c.cls})`:''}${c.rain48>=5?` · chuva 48 h: ${c.rain48} mm`:''}${c.hist?' <span class="srcp t-modelo" title="Para datas antigas: reanálise ERA5 e arquivo da Météo-France (Open-Meteo), não a previsão desse dia">🌊 Histórico</span>':''}`;
 }
 function renderDiary(){
-  paintDSpot();
+  paintDSpot();paintPHead();
   const all=D.slice().sort((a,b)=>(b.date+(b.t0||'')).localeCompare(a.date+(a.t0||'')));
   const mine=D.filter(e=>!e.from), kg=mine.reduce((a,e)=>a+(e.caps||[]).reduce((x,c)=>x+(+c.kg||0),0),0);
   const byM={};mine.forEach(e=>{const m=+e.date.slice(5,7)-1;byM[m]=(byM[m]||0)+1});
@@ -2566,7 +2729,7 @@ $('dlist').addEventListener('click',ev=>{
   const se=ev.target.closest('[data-sende]');if(se){sendSaida(se.dataset.sende);return}
   const b=ev.target.closest('button[data-id]');if(!b)return;if(!confirm('Apagar este registo e as suas fotografias?'))return;
   const gone=D.find(x=>x.id===b.dataset.id);(gone&&gone.fotos||[]).forEach(id=>FDB.del(id).catch(()=>{}));
-  D=D.filter(x=>x.id!==b.dataset.id);markDel('O',b.dataset.id);save(KD,D);renderDiary();
+  snapNow('antes de apagar uma saída');D=D.filter(x=>x.id!==b.dataset.id);markDel('O',b.dataset.id);save(KD,D);renderDiary();
 });
 $('dlist').addEventListener('change',async ev=>{
   const inp=ev.target.closest('[data-addfoto]');if(!inp)return;
@@ -2661,7 +2824,7 @@ $('dShare').addEventListener('click',()=>{
     const obj={app:'marlivre',t:'relatorios',v:1,de:P.nome||'Um amigo',em:iso(new Date()),
       rel:D.filter(e=>ids.has(e.id)).map(e=>{const s=entrySpot(e);return {id:e.id,date:e.date,t0:e.t0,t1:e.t1,tec:e.tec,spot:s.id,n:s.n,ll:[s.lat,s.lon],cond:e.cond||null,obs:e.obs||{},vistas:e.vistas||[]}})};
     const code=await packCode(obj);
-    const msg=`${obj.de} partilhou ${obj.rel.length===1?'um relatório':obj.rel.length+' relatórios'} de saída contigo.\nNa app PeixeCrew: «O seu perfil» › «Receber locais» e cola este código:\n${code}`;
+    const msg=`${obj.de} partilhou ${obj.rel.length===1?'um relatório':obj.rel.length+' relatórios'} de saída contigo.\nNa app PeixeCrew: «Locais» › «Receber locais» e cola este código:\n${code}`;
     $('shOut').innerHTML=`<textarea class="codebox" id="shTxt" readonly></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<button class="btn ghost" id="shFile">Guardar como ficheiro</button><span class="small muted" id="shMsg"></span></div>`;
     $('shTxt').value=msg;
     $('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('shMsg').textContent='Copiado.'}catch(e){$('shTxt').select();$('shMsg').textContent='Selecionei o texto: copie com Ctrl+C.'}};
@@ -2700,7 +2863,7 @@ function previewRel(obj){
 async function fillConds(){
   for(const e of D.filter(e=>!e.from&&!e.cond&&!e.condErr&&entrySpot(e))){await fetchCond(e);await sleep(400)}
 }
-save(KD,D);
+save(KD,D);snapNow();
 
 /* ================= Contas (Supabase) e sincronização =================
  A app continua a funcionar sem conta e sem rede. Com conta, cada perfil deste aparelho liga-se a uma conta
@@ -2740,6 +2903,7 @@ async function syncNow(manual){
     for(const r of [rs,ro,rn])if(r.error)throw r.error;
     const notes={};(rn.data||[]).forEach(n=>notes[n.kind+':'+n.id]=n.notas);
     let changedP=false,changedD=false;
+    if(rs.data.some(r=>r.deleted&&P.spots.some(s=>s.id===r.id))||ro.data.some(r=>r.deleted&&D.some(e=>e.id===r.id)))snapNow('antes de apagar o que foi apagado noutro aparelho');
     // receber: o que mudou noutro aparelho (se aqui não mudou desde a última sincronização)
     for(const r of rs.data){
       const loc=P.spots.find(s=>s.id===r.id), localChanged=loc&&hashS(loc)!==SYNC.sh[r.id], remoteChanged=SYNC.st[r.id]!==r.updated_at;
@@ -2815,7 +2979,7 @@ async function refreshSocial(){
       if(!a){P.amigos.push({id:lid,nome,acct:id,em:iso(new Date())});ch=true}else if(a.nome!==nome||a.acct!==id){a.nome=nome;a.acct=id;ch=true}}
     if(ch){save(KP,P);paintAmigos()}
   }catch(e){socMsg='Não foi possível atualizar amigos e grupos: '+(e&&e.message||e);socErr=true}
-  paintSocial();renderSharedSpots();paintInvites();renderGrpStats();paintDShare();
+  paintSocial();renderSharedSpots();paintInvites();renderGrpStats();paintDShare();paintPHead();
 }
 function shareFieldsHTML(id,f,g,nota){
   return `<div class="f wide"><span style="font-size:15px;font-weight:600">Partilhar na app</span><div class="spchips" id="${id}"><label><input type="checkbox" data-sf${f?' checked':''}>Amigos</label>${SOC.groups.map(x=>`<label><input type="checkbox" value="${x.id}"${(g||[]).includes(x.id)?' checked':''}>${esc(x.nome)}</label>`).join('')}</div><span class="small muted">${esc(nota)}</span></div>`;
@@ -2865,7 +3029,7 @@ function paintSocial(){
   $('gNew').onsubmit=async e=>{e.preventDefault();const {error}=await sb.rpc('create_group',{nome:$('gNome').value.trim()});if(error){setSoc(trErr(error),true);return}setSoc('Grupo criado. Use «Convidar» para mandar o link aos amigos.');refreshSocial()};
   $('gJoin').onsubmit=async e=>{e.preventDefault();await joinGroup($('gCode').value)};
   box.querySelectorAll('[data-ginv]').forEach(b=>b.onclick=()=>{const g=SOC.groups.find(x=>x.id===b.dataset.ginv);if(!g)return;
-    const link=`${location.origin}${location.pathname}#grupo=${g.invite_code}`, msg=`Entra no grupo «${g.nome}» na app PeixeCrew: ${link}\n(ou, na app, «Locais» › «Entrar no grupo» com o código ${g.invite_code})`;
+    const link=`${location.origin}${location.pathname}#grupo=${g.invite_code}`, msg=`Entra no grupo «${g.nome}» na app PeixeCrew: ${link}\n(ou, na app, «Perfil» › «Entrar no grupo» com o código ${g.invite_code})`;
     showDlg(`<h3>Convidar para «${esc(g.nome)}»</h3><p class="small muted" style="margin:-4px 0 0">Quem abrir o link e tiver conta entra no grupo. Mande só a quem quer no grupo.</p><textarea class="codebox" id="shTxt" readonly></textarea><div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<span class="small muted" id="shMsg"></span></div>`);
     $('shTxt').value=msg;$('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('shMsg').textContent='Copiado.'}catch(e){$('shTxt').select()}};
     if(navigator.share)$('shNative').onclick=()=>navigator.share({title:'Grupo PeixeCrew',text:msg}).catch(()=>{});});
@@ -2925,6 +3089,7 @@ async function renderGrpStats(){
 let acctMode='entrar', acctMsg='', acctErr=false, recovery=false;
 function paintAcct(){
   const box=$('acctBox');if(!box)return;
+  if(!ME){const sb0=$('socBox');if(sb0)sb0.innerHTML='<p class="small muted" style="margin:0">Com conta, junta amigos pelo nome de utilizador (@…), cria grupos e vê os recordes do grupo. Entre ou crie a conta mais abaixo.</p>';try{paintPHead()}catch(e){}}
   const sb=sbc();
   if(!sb){box.innerHTML=`<h4>Conta PeixeCrew</h4><p class="small muted" style="margin:0">${/^https?:/.test(location.protocol)?(window.__noSB?'Sem rede ao abrir a app: as contas ficam disponíveis quando voltar a haver ligação.':'A carregar…'):'As contas só funcionam na app online: <a href="https://lourenco10ucp.github.io/PeixeCrew/" target="_blank" rel="noopener">lourenco10ucp.github.io/PeixeCrew</a>.'}</p>`;return}
   const msg=acctMsg?`<p class="${acctErr?'err':'ok'}" style="margin:0">${esc(acctMsg)}</p>`:'';
@@ -2938,8 +3103,8 @@ function paintAcct(){
     box.innerHTML=`<h4>Conta PeixeCrew</h4>
       <p style="margin:0">Sessão iniciada como <b>@${esc(MEP?MEP.username:'…')}</b>${MEP&&MEP.nome?' ('+esc(MEP.nome)+')':''} · <span class="muted">${esc(ME.email||'')}</span></p>
       <p class="small muted" style="margin:0">${esc(lastSyncMsg||'Os locais, as saídas e as notas deste perfil sincronizam com a conta. As fotografias ficam só neste aparelho.')}</p>
-      <div class="row"><button class="btn ghost" id="acSync">Sincronizar agora</button><button class="btn ghost" id="acOut">Terminar sessão</button><button class="btn ghost" id="acDel" style="color:var(--stop);border-color:var(--stop)">Apagar conta</button></div>${msg}<div id="socBox"></div>`;
-    paintSocial();
+      <div class="row"><button class="btn ghost" id="acSync">Sincronizar agora</button><button class="btn ghost" id="acOut">Terminar sessão</button><button class="btn ghost" id="acDel" style="color:var(--stop);border-color:var(--stop)">Apagar conta</button></div>${msg}`;
+    paintSocial();paintPHead();
     $('acSync').onclick=async()=>{await syncNow(true);refreshSocial()};
     $('acOut').onclick=async()=>{await sb.auth.signOut();SOC={friends:[],incoming:[],outgoing:[],prof:{},groups:[],members:{},shared:[],invites:[]};renderSharedSpots();paintInvites();renderGrpStats();paintDShare();setAcctMsg('Sessão terminada. Os dados continuam neste aparelho.')};
     $('acDel').onclick=async()=>{
@@ -2999,7 +3164,7 @@ async function onSession(session){
       setAcctMsg('Este perfil do aparelho já está ligado a outra conta. Para usar esta conta, crie um perfil novo neste aparelho (botão «Novo perfil») e entre lá.',true);
       await sb.auth.signOut();return;
     }
-    if(!P.acct){P.acct=ME.id;save(KP,P)}
+    if(!P.acct){snapNow('antes de entrar na conta');P.acct=ME.id;save(KP,P)}
     const {data}=await sb.from('profiles').select('id,username,nome').eq('id',ME.id).maybeSingle();MEP=data||null;
     if(MEP&&MEP.nome&&!P.nome){P.nome=MEP.nome;save(KP,P);paintProfile()}
     else if(MEP&&!MEP.nome&&P.nome){const r=await sb.from('profiles').update({nome:P.nome.slice(0,40)}).eq('id',ME.id);if(!r.error)MEP.nome=P.nome}
@@ -3032,7 +3197,7 @@ function setTab(t,scroll=true){
   document.body.dataset.tab=t;
   document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
   try{sessionStorage.setItem('ml_tab',t)}catch(e){}
-  if(t==='locais')$('pbox').open=true;
+  if(t==='perfil')paintPHead();
   if(scroll&&MQ.matches)window.scrollTo(0,0);
 }
 const applyMQ=()=>document.body.classList.toggle('m',MQ.matches);
