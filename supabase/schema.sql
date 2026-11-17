@@ -19,6 +19,7 @@ create table public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   username   text not null unique check (username ~ '^[a-z0-9_.]{3,20}$'),
   nome       text not null default '' check (char_length(nome) <= 40),
+  foto       text check (foto is null or (char_length(foto) <= 60000 and foto ~ '^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')),
   created_at timestamptz not null default now()
 );
 

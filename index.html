@@ -128,6 +128,9 @@ details.psec[open]>summary::after{transform:rotate(-135deg);margin-bottom:-4px}
 .topav .av{font-size:14px}
 .tabav{width:26px;height:26px;border-radius:50%;display:block;border:2px solid transparent}
 .tabav .av{font-size:11px}
+.amlist .am.amf{padding-left:3px}
+.gmem{display:flex;flex-wrap:wrap;gap:4px 12px}
+.gmem>span{display:inline-flex;align-items:center;gap:5px}
 .snap{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface2);font-size:15px}
 .spots{display:grid;gap:12px;margin-top:14px}
 .spotform{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));align-items:end}
@@ -1356,12 +1359,15 @@ function paintProfile(){
 /* ---- Cabeçalho do perfil (fotografia, nome, contadores) ---- */
 const gv=f=>{try{return f()}catch(e){return undefined}}; // variáveis definidas mais abaixo (ainda podem não existir no arranque)
 const AVC=['#0E5A6E','#1B7443','#8F5B00','#B3261E','#5B3FA0','#045150','#C8501C','#2D6977'];
-function avHTML(){
-  if(P.foto)return `<img src="${P.foto}" alt="">`;
-  const mep=gv(()=>MEP), nome=(P.nome||(mep&&(mep.nome||mep.username))||'?').trim();
-  return esc(nome.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?');
-}
-function avBg(){if(P.foto)return 'var(--surface2)';const nome=(P.nome||'?');let h=0;for(const c of nome)h=(h*31+c.charCodeAt(0))|0;return AVC[Math.abs(h)%AVC.length]}
+// só fotografias JPEG em base64 (as dos amigos vêm do servidor: nada mais entra no atributo src)
+const FOTO_RE=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/;
+const iniOf=n=>String(n||'?').trim().split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
+const bgOf=n=>{let h=0;for(const c of String(n||'?'))h=(h*31+c.charCodeAt(0))|0;return AVC[Math.abs(h)%AVC.length]};
+function avSpan(nome,foto,size){const ok=!!foto&&FOTO_RE.test(foto);
+  return `<span class="av" style="width:${size}px;height:${size}px;flex:none;font-size:${Math.round(size*.42)}px;background:${ok?'var(--surface2)':bgOf(nome)}">${ok?`<img src="${foto}" alt="">`:esc(iniOf(nome))}</span>`}
+const myName=()=>{const mep=gv(()=>MEP);return P.nome||(mep&&(mep.nome||mep.username))||'?'};
+function avHTML(){return P.foto&&FOTO_RE.test(P.foto)?`<img src="${P.foto}" alt="">`:esc(iniOf(myName()))}
+function avBg(){return P.foto?'var(--surface2)':bgOf(myName())}
 function paintAv(el,size){if(!el)return;el.innerHTML=`<span class="av" style="background:${avBg()};font-size:${size}px">${avHTML()}</span>`}
 function paintPHead(){
   if(!$('pTitle'))return;
@@ -1388,13 +1394,13 @@ $('pAv').addEventListener('click',()=>$('pAvIn').click());
 $('pAvIn').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
   try{
-    const bmp=await createImageBitmap(f), S=256, c=document.createElement('canvas');c.width=c.height=S;
+    const bmp=await createImageBitmap(f), S=192, c=document.createElement('canvas');c.width=c.height=S;
     const k=Math.min(bmp.width,bmp.height), x=(bmp.width-k)/2, y=(bmp.height-k)/2;
     c.getContext('2d').drawImage(bmp,x,y,k,k,0,0,S,S);
-    P.foto=c.toDataURL('image/jpeg',.82);commitProfile();
+    P.foto=c.toDataURL('image/jpeg',.8);commitProfile();syncFoto();
   }catch(err){alert('Não consegui abrir esta fotografia.')}
 });
-$('pAvRm').addEventListener('click',()=>{delete P.foto;commitProfile()});
+$('pAvRm').addEventListener('click',()=>{delete P.foto;commitProfile();syncFoto()});
 
 let savedT;
 function commitProfile(){
@@ -2871,7 +2877,25 @@ save(KD,D);snapNow();
  Regras de acesso no servidor: supabase/schema.sql (cada um só vê o que é seu e o que lhe partilharam). */
 const SB_URL='https://ddoxfuuxooxoxxmqhmgx.supabase.co', SB_KEY='sb_publishable_dT6QbKf9LPrRLuu_gcKGlw_D5XjVC6c';
 const KS='ml_sync:'+PROFS.active;
-let SB=null, ME=null, MEP=null, SYNCING=false, syncT=null, lastSyncMsg='';
+let SB=null, ME=null, MEP=null, SYNCING=false, syncT=null, lastSyncMsg='', HASFOTO=true;
+/* perfis com fotografia; se o servidor ainda não tiver a coluna «foto», lê sem ela */
+async function selProfiles(q){
+  let r=HASFOTO?await q('id,username,nome,foto'):null;
+  if(!r||(r.error&&/foto/i.test(r.error.message||''))){HASFOTO=false;r=await q('id,username,nome')}
+  return r;
+}
+/* a fotografia de perfil vai para a conta: ganha a que mudou por último neste aparelho; senão, a da conta */
+async function syncFoto(){
+  const sb=sbc();if(!sb||!ME||!MEP||!HASFOTO)return;
+  const loc=P.foto||'', rem=MEP.foto||'', h=loc?hstr(loc):'';
+  if(P.fotoUp===undefined&&!loc&&rem){P.foto=rem;P.fotoUp=hstr(rem);save(KP,P);paintPHead();return}
+  if(h!==(P.fotoUp||'')){
+    const r=await sb.from('profiles').update({foto:loc||null}).eq('id',ME.id);
+    if(r.error){if(/foto/i.test(r.error.message||''))HASFOTO=false;return}
+    MEP.foto=loc||null;P.fotoUp=h;save(KP,P);return;
+  }
+  if(rem!==loc){if(rem)P.foto=rem;else delete P.foto;P.fotoUp=rem?hstr(rem):'';save(KP,P);paintPHead()}
+}
 let SYNC=Object.assign({sh:{},st:{},oh:{},ot:{},dS:[],dO:[],last:0},load(KS,{}));
 const saveSync=()=>{try{localStorage.setItem(KS,JSON.stringify(SYNC))}catch(e){}};
 function sbc(){
@@ -2972,7 +2996,7 @@ async function refreshSocial(){
     SOC.groups=gr.data;SOC.members={};mm.data.forEach(m=>(SOC.members[m.group_id]=SOC.members[m.group_id]||[]).push(m));
     SOC.shared=sh.data;SOC.invites=iv.data;
     const ids=[...new Set([...SOC.friends,...SOC.incoming,...SOC.outgoing,...mm.data.map(m=>m.user_id),...sh.data.map(s=>s.owner),...iv.data.map(i=>i.from_user)])];
-    if(ids.length){const pr=await sb.from('profiles').select('id,username,nome').in('id',ids);if(!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
+    if(ids.length){const pr=await selProfiles(c=>sb.from('profiles').select(c).in('id',ids));if(!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
     // os amigos da conta aparecem em «Com quem»
     let ch=false;
     for(const id of SOC.friends){const p=SOC.prof[id];if(!p)continue;const lid=accUid(id),nome=p.nome||p.username,a=P.amigos.find(x=>x.id===lid);
@@ -3002,12 +3026,12 @@ function paintSocial(){
   box.innerHTML=`<div class="soc">
     <h4>Amigos na app</h4>
     <form id="frForm" class="row"><input id="frU" placeholder="@nome de utilizador" autocapitalize="none" autocomplete="off" required><button class="btn">Enviar pedido</button></form>
-    ${SOC.incoming.map(id=>`<div class="row"><span><b>${esc(pname(id))}</b> <span class="muted small">${esc(puser(id))}</span> quer ser seu amigo</span><button type="button" class="btn" data-fra="${id}">Aceitar</button><button type="button" class="btn ghost" data-frd="${id}">Recusar</button></div>`).join('')}
-    ${SOC.friends.length?`<div class="amlist">${SOC.friends.map(id=>`<span class="am">${esc(pname(id))} <span class="muted small">${esc(puser(id))}</span><button type="button" data-frd="${id}" aria-label="Remover amigo">✕</button></span>`).join('')}</div>`:'<p class="small muted" style="margin:0">Ainda sem amigos na app.</p>'}
+    ${SOC.incoming.map(id=>`<div class="row">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,34)}<span><b>${esc(pname(id))}</b> <span class="muted small">${esc(puser(id))}</span> quer ser seu amigo</span><button type="button" class="btn" data-fra="${id}">Aceitar</button><button type="button" class="btn ghost" data-frd="${id}">Recusar</button></div>`).join('')}
+    ${SOC.friends.length?`<div class="amlist">${SOC.friends.map(id=>`<span class="am amf">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,26)}${esc(pname(id))} <span class="muted small">${esc(puser(id))}</span><button type="button" data-frd="${id}" aria-label="Remover amigo">✕</button></span>`).join('')}</div>`:'<p class="small muted" style="margin:0">Ainda sem amigos na app.</p>'}
     ${SOC.outgoing.length?`<p class="small muted" style="margin:0">À espera de resposta: ${SOC.outgoing.map(id=>esc(puser(id)||'…')).join(', ')}</p>`:''}
     <h4 style="margin-top:6px">Grupos</h4>
     ${SOC.groups.map(g=>`<div class="grp"><div><b>${esc(g.nome)}</b> <span class="muted small">${(SOC.members[g.id]||[]).length} ${(SOC.members[g.id]||[]).length===1?'membro':'membros'}${isAdm(g)?' · é administrador':''}</span></div>
-      <div class="small muted">${(SOC.members[g.id]||[]).map(m=>esc(pname(m.user_id))+(m.role==='admin'?' (admin)':'')).join(', ')}</div>
+      <div class="small muted gmem">${(SOC.members[g.id]||[]).map(m=>`<span>${avSpan(pname(m.user_id),m.user_id===ME.id?P.foto:SOC.prof[m.user_id]&&SOC.prof[m.user_id].foto,22)}${esc(m.user_id===ME.id?'Você':pname(m.user_id))}${m.role==='admin'?' (admin)':''}</span>`).join('')}</div>
       <div class="row"><button type="button" class="btn ghost" data-ginv="${g.id}">Convidar</button><button type="button" class="btn ghost" data-gleave="${g.id}">Sair do grupo</button></div></div>`).join('')||'<p class="small muted" style="margin:0">Ainda não está em nenhum grupo.</p>'}
     <form id="gNew" class="row"><input id="gNome" placeholder="Nome do grupo (ex.: PeixeCrew)" required minlength="2" maxlength="40"><button class="btn ghost">Criar grupo</button></form>
     <form id="gJoin" class="row"><input id="gCode" placeholder="Código de convite" required autocomplete="off"><button class="btn ghost">Entrar no grupo</button></form>
@@ -3049,7 +3073,7 @@ function renderSharedSpots(){
   const el=$('sharedSpots');if(!el)return;
   if(!ME||!SOC.shared.length){el.innerHTML='';return}
   el.innerHTML=`<div class="sharedw"><h4>Partilhados comigo</h4>${SOC.shared.map((r,i)=>{const d=r.data||{},have=P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
-    return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted">de ${esc(pname(r.owner))} · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
+    return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${avSpan(pname(r.owner),SOC.prof[r.owner]&&SOC.prof[r.owner].foto,20)}de ${esc(pname(r.owner))} · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
       <span class="acts">${have?'<span class="small muted">Já está nos seus locais</span>':`<button type="button" data-cpy="${i}">Juntar aos meus locais</button>`}${isFinite(+d.lat)?`<a href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Ver no mapa</a>`:''}</span></div>`}).join('')}</div>`;
   el.querySelectorAll('[data-cpy]').forEach(b=>b.onclick=()=>{const r=SOC.shared[+b.dataset.cpy];const s=cleanSpot(Object.assign({},r.data,{notas:''}));if(!s)return;
     if(P.spots.some(x=>x.id===s.id))s.id='s'+rnd();delete s.shareF;delete s.shareG;s.from={nome:pname(r.owner),em:iso(new Date())};
@@ -3080,7 +3104,7 @@ async function renderGrpStats(){
   const big={};rows.forEach(r=>(r.data.caps||[]).forEach(c=>{if(qn(c)===1&&c.kg&&byK[c.sp]&&(!big[c.sp]||c.kg>big[c.sp].kg))big[c.sp]={kg:c.kg,cm:c.cm,who:r.owner,date:r.date}}));
   const top=[...rows].filter(r=>kg(r.data)).sort((a,b)=>kg(b.data)-kg(a.data)).slice(0,5);
   $('grpBody').innerHTML=`<p class="small muted" style="margin:0 0 6px">Contam as saídas que cada membro partilhou com o grupo (${rows.length}).</p>
-    <div class="stwrap"><table class="sttable"><thead><tr><th>Quem</th><th class="n">Saídas</th><th class="n">Capturas</th><th class="n">kg</th><th class="n">kg/saída</th></tr></thead><tbody>${Object.entries(Pm).sort((a,b)=>b[1].kg-a[1].kg).map(([id,o])=>`<tr><td><b>${esc(id===ME.id?'Você':pname(id))}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="stwrap"><table class="sttable"><thead><tr><th>Quem</th><th class="n">Saídas</th><th class="n">Capturas</th><th class="n">kg</th><th class="n">kg/saída</th></tr></thead><tbody>${Object.entries(Pm).sort((a,b)=>b[1].kg-a[1].kg).map(([id,o])=>`<tr><td><span style="display:inline-flex;align-items:center;gap:6px">${avSpan(id===ME.id?myName():pname(id),id===ME.id?P.foto:SOC.prof[id]&&SOC.prof[id].foto,24)}<b>${esc(id===ME.id?'Você':pname(id))}</b></span></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div>
     ${Object.keys(big).length?`<h3 style="margin-top:10px">Maior peixe de cada espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th>Quem</th><th class="n">kg</th><th class="n">cm</th><th>Dia</th></tr></thead><tbody>${Object.entries(big).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>`<tr><td><b>${esc(byK[k].n)}</b></td><td>${esc(o.who===ME.id?'Você':pname(o.who))}</td><td class="n">${kgT(o.kg)}</td><td class="n">${o.cm?fmt(o.cm,o.cm%1?1:0):'—'}</td><td>${dLabel(o.date)}</td></tr>`).join('')}</tbody></table></div>`:''}
     ${top.length?`<h3 style="margin-top:10px">As melhores caçadas do grupo</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Quem</th><th>Local</th><th class="n">kg</th></tr></thead><tbody>${top.map(r=>`<tr><td>${dLabel(r.date)}</td><td>${esc(r.owner===ME.id?'Você':pname(r.owner))}</td><td>${esc(r.data.loc||'')}</td><td class="n"><b>${kgT(kg(r.data))}</b></td></tr>`).join('')}</tbody></table></div>`:''}`;
 }
@@ -3165,10 +3189,10 @@ async function onSession(session){
       await sb.auth.signOut();return;
     }
     if(!P.acct){snapNow('antes de entrar na conta');P.acct=ME.id;save(KP,P)}
-    const {data}=await sb.from('profiles').select('id,username,nome').eq('id',ME.id).maybeSingle();MEP=data||null;
+    const {data}=await selProfiles(c=>sb.from('profiles').select(c).eq('id',ME.id).maybeSingle());MEP=data||null;
     if(MEP&&MEP.nome&&!P.nome){P.nome=MEP.nome;save(KP,P);paintProfile()}
     else if(MEP&&!MEP.nome&&P.nome){const r=await sb.from('profiles').update({nome:P.nome.slice(0,40)}).eq('id',ME.id);if(!r.error)MEP.nome=P.nome}
-    paintAcct();await syncNow();await refreshSocial();
+    paintAcct();await syncFoto();await syncNow();await refreshSocial();
     let jc=null;try{jc=sessionStorage.getItem('ml_join')}catch(e){}
     if(jc){try{sessionStorage.removeItem('ml_join')}catch(e){}if(confirm('Abriu um convite para um grupo da PeixeCrew. Entrar no grupo?')){await joinGroup(jc);setTab('locais')}}
   }else{paintAcct();let jc=null;try{jc=sessionStorage.getItem('ml_join')}catch(e){}if(jc)setAcctMsg('Recebeu um convite para um grupo: entre na sua conta (ou crie uma) para entrar no grupo.')}
@@ -3180,7 +3204,7 @@ function initAcct(){
     if(ev==='SIGNED_IN'||ev==='INITIAL_SESSION'||ev==='SIGNED_OUT'||ev==='USER_UPDATED')setTimeout(()=>onSession(session),0);
   });
   window.addEventListener('online',()=>syncNow());
-  setInterval(async()=>{if(ME&&document.visibilityState==='visible'){await syncNow();refreshSocial()}},5*60*1000);
+  setInterval(async()=>{if(ME&&document.visibilityState==='visible'){const sb=sbc();const r=await selProfiles(c=>sb.from('profiles').select(c).eq('id',ME.id).maybeSingle());if(r&&r.data&&MEP)MEP.foto=r.data.foto;await syncFoto();await syncNow();refreshSocial()}},5*60*1000);
 }
 
 /* ---------- Arranque ---------- */
