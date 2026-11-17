@@ -95,6 +95,61 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .prof{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));margin-top:14px}
 .prof .wide{grid-column:1/-1}
 .saved{font-size:14px;color:var(--go);min-height:1.2em}
+/* Hoje: cartão com a resposta, dias, números e locais */
+.hcard{margin-top:18px;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:16px 18px;display:grid;gap:12px;min-width:0}
+.hctop{display:flex;align-items:center;gap:6px 12px;justify-content:space-between;flex-wrap:wrap;min-width:0}
+.hloc{position:relative;display:flex;align-items:center;gap:6px;min-width:0;flex:1 1 200px}
+.hloc .hname{font-family:var(--f-display);font-size:26px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hloc .hsel{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:16px}
+.hloc:focus-within{outline:3px solid var(--focus);outline-offset:4px;border-radius:8px}
+.hloc .chev{pointer-events:none;flex:none;width:9px;height:9px;border-right:2.5px solid var(--accent);border-bottom:2.5px solid var(--accent);transform:rotate(45deg);margin:-6px 0 0 4px}
+.hloc .pin{font-size:20px}
+.hwhen{font-size:14px;font-weight:700;color:var(--muted)}
+.hdays{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.hdays::-webkit-scrollbar{display:none}
+.hd{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;background:var(--surface)}
+.hd i{width:9px;height:9px;border-radius:50%;flex:none}
+.hd[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.hd:focus-visible{outline:3px solid var(--focus)}
+.hv{border-radius:16px;padding:14px 16px;border:2px solid;display:flex;align-items:center;gap:14px}
+.hv .ic{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff;font-weight:800;font-size:24px}
+.hv b{display:block;font-family:var(--f-display);font-size:32px;line-height:1.05}
+.hv .sub{font-weight:700;font-size:15px}
+.v-go .ic{background:var(--go)} .v-warn .ic{background:var(--warn)} .v-stop .ic{background:var(--stop)}
+.v-go b{color:var(--go)} .v-warn b{color:var(--warn)} .v-stop b{color:var(--stop)}
+.hnums{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,100px),1fr));gap:8px}
+.hn{background:var(--surface2);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;display:grid;gap:0;min-width:0}
+.hn small{color:var(--muted);font-size:12.5px;font-weight:700}
+.hn b{font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hn span{font-size:12.5px;color:var(--muted)}
+.hcard .reasons{margin:0}
+.hfoot{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.hfoot .small{flex:1 1 200px}
+.hload{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:600}
+.spin{width:18px;height:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.shelf{margin-top:18px;min-width:0}
+.shelfh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.shelfh h3{font-size:22px}
+.shelfrow{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:8px 2px 10px;scrollbar-width:thin}
+.scard{all:unset;box-sizing:border-box;cursor:pointer;scroll-snap-align:start;flex:0 0 min(62%,230px);background:var(--surface);border:2px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.scard .bar{height:8px;flex:none}
+.scard .in{padding:10px 12px 12px;display:grid;gap:3px}
+.scard b{font-size:17px;line-height:1.2}
+.scard .v{font-weight:800;font-size:14px}
+.scard .m{font-size:13.5px;color:var(--muted)}
+.scard .w{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.scard:focus-visible{outline:3px solid var(--focus)}
+.scard.add{align-items:center;justify-content:center;padding:16px;text-align:center;font-weight:700;color:var(--accent);border-style:dashed}
+.hdet{margin-top:18px}
+.hdet>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:12px 16px;border:2px solid var(--line);border-radius:14px;background:var(--surface)}
+.hdet>summary::-webkit-details-marker{display:none}
+.hdet>summary b{color:var(--accent);font-size:17px}
+.hdet>summary b::after{content:' ›';display:inline-block;transition:transform .2s}
+.hdet[open]>summary b::after{transform:rotate(90deg)}
 /* Perfil (cabeçalho ao estilo das redes sociais) */
 .phead{background:var(--surface);border:2px solid var(--line);border-radius:18px;overflow:hidden;margin-top:18px}
 .pcover{height:118px;background:linear-gradient(135deg,#045150 0%,#0E5A6E 55%,#3a9db0 100%);position:relative}
@@ -407,7 +462,7 @@ footer ul{padding-left:20px}
 @media (max-width:760px){
   body.m{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
   body.m .nav{display:none}
-  body.m .tabbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  body.m .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:2px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
   .tabbar button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--muted);padding:6px 2px;border-radius:10px;-webkit-tap-highlight-color:transparent}
   .tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tabbar button[aria-current="page"]{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
@@ -432,6 +487,11 @@ footer ul{padding-left:20px}
   body.m .condcard:not(.open) .inputs{display:none}
   body.m .updbar{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
   body.m .topav{display:none}
+  body.m .hcard{margin-top:6px;padding:14px}
+  body.m .hero{display:none}
+  .hn b{font-size:17px}
+  .hv b{font-size:28px}
+  .hloc .hname{font-size:23px}
   .tabbar button[aria-current="page"] .tabav{border-color:var(--accent)}
   body.m .phead{margin-top:6px}
   .pav{width:96px;height:96px;margin-top:-48px}
@@ -473,14 +533,19 @@ footer ul{padding-left:20px}
 
 
   <!-- HOJE -->
-  <section class="block" id="hoje" data-t="hoje onde">
-    <h2 data-t="hoje">Vale a pena ir ao mar?</h2>
-    <p class="lead" data-t="hoje">Carregue a previsão da sua região ou ajuste os valores à mão. O veredicto tem em conta o seu nível: o mesmo mar pode ser bom para um experiente e perigoso para um iniciante.</p>
-    <div class="cond" data-t="hoje">
+  <section class="block" id="hoje" data-t="hoje">
+    <div class="hcard" id="hCard" aria-live="polite"></div>
+    <div class="shelf">
+      <div class="shelfh"><h3 id="shelfT">Os seus locais</h3><span class="small muted" id="shelfS"></span></div>
+      <div class="shelfrow" id="shelf"></div>
+    </div>
+    <details class="hdet" id="hDet">
+      <summary><b>Ver detalhes</b><span class="small muted">previsão de 7 dias, marés, todas as razões, técnica, espécies e material</span></summary>
+    <div class="cond">
       <div class="card condcard">
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
           <h3 style="font-size:22px">Condições</h3>
-          <button class="btn" id="loadFc">Carregar previsão de 7 dias</button>
+          <button class="btn ghost" id="loadFc">Atualizar previsão</button>
         </div>
         <label class="f" style="margin-top:12px">Local<select id="cLoc"></select></label>
         <div class="days" id="days" style="margin-top:12px" hidden></div>
@@ -519,14 +584,8 @@ footer ul{padding-left:20px}
         <div class="card"><h3 style="font-size:22px">Leve consigo</h3><ul class="kit" id="kit"></ul></div>
       </div>
     </div>
-    <div class="card onde" id="ondeBox" data-t="onde">
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
-        <div><h3 style="font-size:22px">Onde ir</h3><p class="small muted" style="margin:4px 0 0" id="ondeLead">Compara todos os seus locais no dia escolhido em «Condições», com a melhor hora de cada um.</p></div>
-        <button class="btn" id="ondeBtn">Comparar os meus locais</button>
-      </div>
-      <label class="ondeday">Dia a comparar <input type="date" id="ondeDate"></label>
-      <div id="onde" aria-live="polite"></div>
-    </div>
+    <p class="small muted" style="margin:12px 2px 0">O veredicto tem em conta o seu nível: o mesmo mar pode ser bom para um experiente e perigoso para um iniciante.</p>
+    </details>
   </section>
 
 
@@ -740,7 +799,6 @@ footer ul{padding-left:20px}
 
 <nav class="tabbar" id="tabbar" aria-label="Separadores">
   <button data-tab="hoje"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c2 0 2-1.6 4-1.6S9 14 11 14s2-1.6 4-1.6 2 1.6 4 1.6M3 19c2 0 2-1.6 4-1.6S9 19 11 19s2-1.6 4-1.6 2 1.6 4 1.6"/><circle cx="12" cy="6.5" r="3"/></svg>Hoje</button>
-  <button data-tab="onde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Onde ir</button>
   <button data-tab="locais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Locais</button>
   <button data-tab="diario"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10l3 3v15H6z"/><path d="M9 10h7M9 14h7M9 18h4"/></svg>Diário</button>
   <button data-tab="perfil"><span class="tabav" id="tabAv" aria-hidden="true"></span>Perfil</button>
@@ -1321,9 +1379,9 @@ function renderSpots(){
   paintDSpot();
 }
 function useLoc(id){
-  P.spot=id;FC=null;$('days').hidden=true;
-  setSrc(`Local: ${currentLoc().n}. Carregue a previsão para este sítio.`);
-  commitProfile();
+  P.spot=id;FC=null;$('days').hidden=true;DAYS=[];
+  setSrc(`Local: ${currentLoc().n}. A carregar a previsão para este sítio…`);
+  commitProfile();loadForecast();
 }
 $('spotform').addEventListener('submit',e=>{
   e.preventDefault();
@@ -1924,7 +1982,6 @@ function evaluate(c,loc){
 
 const TECHLBL={buraco:'Ao buraco',borda:'Borda',indio:'À índio',espera:'Espera',apanha:'Apanha à mão'};
 function evaluateAndRender(){
-  if(typeof syncOnde==='function')try{syncOnde()}catch(e){}
   const mOf=mareOficial(C.date,C.hora);
   if(mOf){C.mare=mOf;$('cMare').value=mOf;mareSrc='ih'}
   else if(mareBase==='voce')mareSrc='voce';
@@ -1932,7 +1989,7 @@ function evaluateAndRender(){
     if(st){C.mare=st;$('cMare').value=st;mareSrc='ticon'}else mareSrc='voce'}
   paintTides();
   const E=evaluate(C);
-  const V={go:['Bom para ir','v-go'],warn:['Com cuidado','v-warn'],stop:['Hoje não','v-stop']}[E.verdict];
+  const V={go:['Bom para ir','v-go'],warn:['Com cuidado','v-warn'],stop:['Melhor não ir','v-stop']}[E.verdict];
   const head=E.verdict==='stop'?'Com estas condições, o manual diria: na dúvida, desista.':E.verdict==='warn'?'Pode ir, mas escolha bem o sítio e não facilite.':'Condições dentro do seu nível. Bom mar!';
   $('verdict').className='verdict '+V[1];
   $('verdict').innerHTML=`<h3>${V[0]}</h3><p style="margin:4px 0 0">${head} <span class="muted small">${MAREN[C.mare]}, ${LUZ[E.L.luz]}, ${E.mo.name.toLowerCase()}.</span></p><ul class="reasons">${E.R.map(r=>`<li><i class="i-${r.l}"></i><span>${esc(r.t)} ${pills(...r.s)}</span></li>`).join('')}</ul>`;
@@ -1951,6 +2008,7 @@ function evaluateAndRender(){
   const CAT=sc=>sc>=70?['Boa','c-boa']:sc>=45?['Possível','c-pos']:['Fraca','c-fra'];
   $('picks').innerHTML=top.map(x=>`<button class="pick" data-sp="${x.s.k}"><span class="t"><b>${x.s.n}</b><span class="cat ${CAT(x.sc)[1]}" title="Indicação pela época e pelas condições, não uma probabilidade">${CAT(x.sc)[0]}</span></span><span class="small muted">${x.s.tech.map(t=>T[t]).join(' · ')} · ${x.s.d[0]}–${x.s.d[1]} m</span><span class="tags">${x.why.slice(0,4).map(w=>`<span class="tag ${w.ok?'ok':'bad'}">${esc(w.t)}</span>`).join('')}</span></button>`).join('')||'<p class="muted">Escolha pelo menos uma categoria no perfil.</p>';
   renderKit(E,best);
+  renderHCard(E);
   return E;
 }
 $('picks').addEventListener('click',e=>{const b=e.target.closest('[data-sp]');if(b)openSp(b.dataset.sp)});
@@ -1973,20 +2031,26 @@ function renderKit(E,best){
 }
 
 /* ---------- Previsão (Open-Meteo) ---------- */
-$('loadFc').addEventListener('click',loadForecast);
-async function loadForecast(){
-  const r=currentLoc(), btn=$('loadFc');btn.disabled=true;btn.textContent='A carregar…';
+$('loadFc').addEventListener('click',()=>loadForecast(true));
+let FCLOAD=false, FCT=0, FCERR=false, DAYS=[];
+/* Carrega a previsão do local em uso (usa a da última hora, se houver, a não ser que se peça para atualizar) */
+async function loadForecast(force){
+  const r=currentLoc(), k=r.id||'reg:'+P.reg, btn=$('loadFc');
+  const c=SPFC[k]&&Date.now()-SPFC[k].t<36e5?SPFC[k]:null;
+  if(c&&force!==true){FC=c.fc;FCT=c.t;FCERR=false;buildDays();renderShelf(true);return}
+  if(FCLOAD)return;
+  FCLOAD=true;FCERR=false;btn.disabled=true;btn.textContent='A carregar…';renderHCard();
   loadIPMA();
-  try{FC=await fetchForecast(r);if(r.id)SPFC[r.id]={t:Date.now(),fc:FC};save('ml_lastfc',{t:Date.now(),id:r.id||'reg:'+P.reg,fc:FC});buildDays()}
-  catch(e){if(!useLastForecast(true))setSrc('Não foi possível obter a previsão (sem ligação ou serviço indisponível). Ajuste os valores à mão.')}
-  finally{btn.disabled=false;btn.textContent='Atualizar previsão'}
+  try{const fc=await fetchForecast(r);if(k!==(currentLoc().id||'reg:'+P.reg))return;FC=fc;FCT=Date.now();SPFC[k]={t:FCT,fc:FC};save('ml_lastfc',{t:FCT,id:k,fc:FC});FCLOAD=false;buildDays()}
+  catch(e){FCLOAD=false;FCERR=true;if(!useLastForecast(true))setSrc('Não foi possível obter a previsão (sem ligação ou serviço indisponível). Ajuste os valores à mão.')}
+  finally{FCLOAD=false;btn.disabled=false;btn.textContent='Atualizar previsão';evaluateAndRender();renderShelf(true)}
 }
 const SPFC={}; // previsões por local, guardadas durante uma hora
 /* Sem rede: usa a última previsão carregada para este local (até 48 h) e diz de quando é */
 function useLastForecast(offline){
   const lf=load('ml_lastfc',null), r=currentLoc();
   if(!lf||!lf.fc||Date.now()-lf.t>48*36e5||lf.id!==(r.id||'reg:'+P.reg))return false;
-  FC=lf.fc;buildDays();
+  FC=lf.fc;FCT=lf.t;buildDays();
   const mins=Math.round((Date.now()-lf.t)/6e4), quando=mins<60?(mins<2?'agora mesmo':`há ${mins} min`):`há ${Math.round(mins/60)} h`;
   setSrc(`${offline?'Sem ligação: a':'A'} mostrar a última previsão guardada para ${FC.name}, carregada ${quando}. ${offline?'':'Carregue de novo para a atualizar.'}`);
   return true;
@@ -2080,39 +2144,50 @@ function applyForecast(d,h){
   paintInputs();paintMares();evaluateAndRender();
   document.querySelectorAll('.day').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===d));
 }
+/* horas de luz de um dia; hoje, só as que ainda faltam */
+function dayHours(d,fc){
+  const sun=fc.SUN[d]||sunApprox(new Date(d+'T12:00'));let h0=Math.ceil(sun.sr);const h1=Math.floor(sun.ss);
+  if(d===iso(new Date()))h0=Math.max(h0,new Date().getHours());
+  const r=[];for(let h=h0;h<=h1;h++)r.push(h);return r;
+}
+/* janela à volta da melhor hora: horas seguidas com o mesmo veredicto e técnica quase tão boa */
+function hourWindow(hs,best){
+  const ok=x=>x&&x.rank===best.rank&&x.tb>=best.tb-15, at=h=>hs.find(x=>x.h===h);
+  let a=best.h,b=best.h;while(ok(at(a-1)))a--;while(ok(at(b+1)))b++;return [a,b];
+}
 function buildDays(keep){
   const out=[];
   for(let i=0;i<7;i++){
     const dt=new Date();dt.setDate(dt.getDate()+i);const d=iso(dt);
-    let best=null;
-    const sun=FC.SUN[d]||sunApprox(dt);
-    for(let h=Math.ceil(sun.sr);h<=Math.floor(sun.ss);h++){
+    let best=null;const hs=[];
+    for(const h of dayHours(d,FC)){
       const o=readHour(d,h);if(!o)continue;
       const c=Object.assign({},C,o);if(!o.tide)c.mare=C.mare;
       const mOf=mareOficial(d,h);if(mOf)c.mare=mOf;
       const E=evaluate(c);const rank={go:2,warn:1,stop:0}[E.verdict];
       const tb=Math.max(...Object.entries(E.tech).filter(([k])=>!E.locked[k]).map(([,v])=>v));
-      const sc=rank*1000+tb;
-      if(!best||sc>best.sc)best={sc,h,o,v:E.verdict};
+      const sc=rank*1000+tb;hs.push({h,rank,tb});
+      if(!best||sc>best.sc)best={sc,h,o,v:E.verdict,rank,tb};
     }
-    if(best)out.push({d,dt,...best});
+    if(best){const [w0,w1]=hourWindow(hs,best);out.push({d,dt,...best,w0,w1})}
   }
+  DAYS=out;
   if(!out.length){setSrc('A previsão não trouxe dados de ondulação para esta zona. Ajuste à mão.');return}
   const col={go:'var(--go)',warn:'var(--warn)',stop:'var(--stop)'}, lab={go:'bom',warn:'cuidado',stop:'não'};
   $('days').hidden=false;
   $('days').innerHTML=out.map(x=>`<button class="day" data-d="${x.d}" data-h="${x.h}" aria-pressed="false" aria-label="${DIA[x.dt.getDay()]} ${x.dt.getDate()}: ${lab[x.v]}, melhor às ${x.h} horas"><b>${DIA[x.dt.getDay()]} ${x.dt.getDate()}</b><span>${fmt(x.o.hs)} m · ${x.o.wind} nós</span><span class="muted">melhor ${String(x.h).padStart(2,'0')}h</span><span class="tl">${(()=>{const T=tideDay(FC.loc||currentLoc(),x.d);return T?'marés '+T.cls:''})()}${x.o.fc.hs.a==='baixa'?' · incerto':x.o.fc.lead>=4?' · tendência':''}</span><span class="dot" style="background:${col[x.v]}"></span></button>`).join('');
   if(keep){document.querySelectorAll('.day').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===C.date));evaluateAndRender();return}
-  const first=out.find(x=>x.v!=='stop')||out[0];
-  applyForecast(first.d,first.h);
+  const keepD=out.find(x=>x.d===C.date)||out[0];
+  applyForecast(keepD.d,keepD.h);
 }
 $('days').addEventListener('click',e=>{const b=e.target.closest('.day');if(b)applyForecast(b.dataset.d,+b.dataset.h)});
 
 /* ---------- Onde ir: compara todos os locais do perfil no dia escolhido ---------- */
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-let ONDE=[];
+let ONDE=[], ONDELOAD=false, SHELFK='';
 function bestHour(d,fc,loc){
-  const sun=fc.SUN[d]||sunApprox(new Date(d+'T12:00'));let best=null;
-  for(let h=Math.ceil(sun.sr);h<=Math.floor(sun.ss);h++){
+  let best=null;
+  for(const h of dayHours(d,fc)){
     const o=readHour(d,h,fc);if(!o)continue;
     const c=Object.assign({},C,o);const mOf=mareOficial(d,h);if(mOf)c.mare=mOf;
     const E=evaluate(c,loc), rank={go:2,warn:1,stop:0}[E.verdict];
@@ -2122,43 +2197,80 @@ function bestHour(d,fc,loc){
   }
   return best;
 }
+/* carrega a previsão de todos os locais (uma de cada vez; ficam guardadas uma hora) */
 async function compareSpots(){
-  const btn=$('ondeBtn'), spots=[...P.spots], d=C.date;
-  if(!spots.length){$('onde').innerHTML='<p class="small muted">Junte locais em «Locais» para os poder comparar.</p>';return}
-  btn.disabled=true;ONDE=[];
-  const dia=new Date(d+'T12:00').toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
-  for(let i=0;i<spots.length;i++){
-    const s=spots[i], loc=spotLoc(s);
-    $('onde').innerHTML=`<p class="small muted">A carregar a previsão de «${esc(s.n)}» (${i+1} de ${spots.length})…</p>`;
-    let fc=SPFC[s.id]&&Date.now()-SPFC[s.id].t<36e5?SPFC[s.id].fc:null;
-    if(!fc){try{fc=await fetchForecast(loc);SPFC[s.id]={t:Date.now(),fc}}catch(e){ONDE.push({s,err:true});continue}await sleep(350)}
-    ONDE.push({s,fc,loc,best:bestHour(d,fc,loc)});
+  if(ONDELOAD||!P.spots.length){renderShelf(true);return}
+  ONDELOAD=true;
+  for(const s of [...P.spots]){
+    if(SPFC[s.id]&&Date.now()-SPFC[s.id].t<36e5)continue;
+    renderShelf(true);
+    try{const fc=await fetchForecast(spotLoc(s));SPFC[s.id]={t:Date.now(),fc}}catch(e){SPFC[s.id]={t:Date.now()-30e5,err:true}}
+    await sleep(300);
   }
-  btn.disabled=false;btn.textContent='Comparar de novo';
+  ONDELOAD=false;renderShelf(true);
+}
+const VLAB={go:'Bom para ir',warn:'Com cuidado',stop:'Melhor não ir'}, VCOL={go:'var(--go)',warn:'var(--warn)',stop:'var(--stop)'};
+function dayLbl(d,long){
+  const t=new Date();t.setHours(12,0,0,0);const x=new Date(d+'T12:00'), n=Math.round((x-t)/864e5);
+  if(n===0)return 'Hoje';if(n===1)return 'Amanhã';
+  return long?x.toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'short'}):DIA[x.getDay()]+' '+x.getDate();
+}
+function renderShelf(force){
+  const el=$('shelf');if(!el)return;
+  const d=C.date, k=d+'|'+P.spot+'|'+P.spots.map(s=>s.id+(SPFC[s.id]?SPFC[s.id].t:'')).join(',');
+  if(!force&&k===SHELFK)return;SHELFK=k;
+  $('shelfT').textContent='Os seus locais · '+dayLbl(d).toLowerCase().replace(/^./,c=>c.toUpperCase());
+  if(!P.spots.length){$('shelfS').textContent='';el.innerHTML='<button type="button" class="scard add" data-shgo="locais">＋ Junte os sítios onde costuma ir e a app diz qual está melhor</button>';return}
+  ONDE=P.spots.map(s=>{const c=SPFC[s.id];if(!c)return {s,load:true};if(c.err||!c.fc)return {s,err:true};const loc=spotLoc(s);return {s,fc:c.fc,loc,best:bestHour(d,c.fc,loc)}});
   ONDE.sort((a,b)=>(b.best?b.best.sc:-1e9)-(a.best?a.best.sc:-1e9));
-  const col={go:'var(--go)',warn:'var(--warn)',stop:'var(--stop)'}, lab={go:'Bom para ir',warn:'Com cuidado',stop:'Hoje não'};
-  $('ondeLead').textContent=`${dia[0].toUpperCase()+dia.slice(1)}: os seus locais do melhor para o pior, cada um na sua melhor hora. Toque num local para ver o detalhe.`;
-  $('onde').innerHTML=ONDE.map((x,i)=>{
-    if(x.err)return `<div class="orow" style="cursor:default"><i style="background:var(--line)"></i><b>${esc(x.s.n)}</b><span class="v muted">sem previsão</span><span class="why">Não foi possível carregar a previsão (sem ligação ou serviço ocupado). Tente de novo.</span></div>`;
-    if(!x.best)return `<div class="orow" style="cursor:default"><i style="background:var(--line)"></i><b>${esc(x.s.n)}</b><span class="v muted">sem dados</span><span class="why">A previsão não chega a este dia (só há 7 dias).</span></div>`;
-    const {E,o,h}=x.best, w=o.fc.wdDeg;
-    const rel=x.loc.off==null||w==null?'':angDiff(w,x.loc.off)<=60?' de terra':angDiff(w,x.loc.off)>=120?' do mar':' de lado';
-    const sp=E.sp.filter(z=>!z.ban).slice(0,3).map(z=>z.s.n).join(', ');
+  const nl=ONDE.filter(x=>x.load).length;
+  $('shelfS').textContent=nl?`a carregar ${nl}…`:'do melhor para o pior · toque para ver';
+  el.innerHTML=ONDE.map((x,i)=>{
+    const on=x.s.id===P.spot?' on':'';
+    if(x.load)return `<div class="scard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">a carregar…</span></span></div>`;
+    if(x.err||!x.best)return `<div class="scard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">${x.err?'sem previsão (sem ligação?)':'sem horas de luz com previsão'}</span></span></div>`;
+    const {E,o,h}=x.best, w=o.fc.wdDeg, rel=x.loc.off==null||w==null?'':angDiff(w,x.loc.off)<=60?' de terra':angDiff(w,x.loc.off)>=120?' do mar':'';
     const main=E.R.find(r=>r.l==='stop')||E.R.find(r=>r.l==='warn');
-    return `<button class="orow" data-i="${i}"><i style="background:${col[E.verdict]}"></i><b>${esc(x.s.n)}</b><span class="v" style="color:${col[E.verdict]}">${lab[E.verdict]}</span>
-      <span class="why">Melhor às ${String(h).padStart(2,'0')}h · ondulação no local ${E.hsLoc<o.hs?'≈ ':''}${fmt(E.hsLoc)} m${E.expo===0?' (abrigado)':E.expo===.5?' (meio abrigado)':''} · vento ${o.wind} nós${rel} · ${MAREN[o.mare]||''}${sp?' · '+esc(sp):''}${main?'<br>'+(main.l==='stop'?'⛔ ':'⚠️ ')+esc(main.t):''}</span></button>`;
+    return `<button type="button" class="scard${on}" data-i="${i}"><span class="bar" style="background:${VCOL[E.verdict]}"></span><span class="in"><b>${esc(x.s.n)}</b><span class="v" style="color:${VCOL[E.verdict]}">${VLAB[E.verdict]} · ${String(h).padStart(2,'0')}h</span><span class="m">🌊 ${fmt(E.hsLoc)} m${E.expo===0?' (abrigado)':''} · 💨 ${o.wind} nós${rel}</span>${main?`<span class="w">${main.l==='stop'?'⛔':'⚠️'} ${esc(main.t.length>70?main.t.slice(0,68)+'…':main.t)}</span>`:''}</span></button>`;
   }).join('');
 }
-$('ondeBtn').addEventListener('click',compareSpots);
-// o dia de «Onde ir» é o mesmo de «Condições»: mudar um muda o outro
-$('ondeDate').addEventListener('change',e=>{if(!e.target.value)return;$('cDate').value=e.target.value;$('cDate').dispatchEvent(new Event('input'))});
-const syncOnde=()=>{if($('ondeDate').value!==C.date)$('ondeDate').value=C.date};
-$('onde').addEventListener('click',e=>{
-  const b=e.target.closest('.orow[data-i]');if(!b)return;
+$('shelf').addEventListener('click',e=>{
+  if(e.target.closest('[data-shgo]')){if(MQ.matches)setTab('locais');else $('locais').scrollIntoView({behavior:'smooth'});return}
+  const b=e.target.closest('.scard[data-i]');if(!b)return;
   const x=ONDE[+b.dataset.i];if(!x||!x.best)return;
   P.spot=x.s.id;save(KP,P);paintProfile();renderToday();renderCal();
-  FC=x.fc;buildDays(true);applyForecast(C.date,x.best.h);
-  if(MQ.matches)setTab('hoje');else $('hoje').scrollIntoView({behavior:'smooth',block:'start'});
+  FC=x.fc;FCT=SPFC[x.s.id].t;buildDays(true);applyForecast(C.date,x.best.h);renderShelf(true);
+  $('hCard').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ---------- Cartão «Hoje»: a resposta em poucos segundos ---------- */
+function renderHCard(E){
+  const el=$('hCard');if(!el)return;
+  const r=REG[P.reg], loc=currentLoc();
+  const opts=`<option value="">${esc(r.n.split(' (')[0])} (região)</option>`+P.spots.map(s=>`<option value="${s.id}"${s.id===P.spot?' selected':''}>${esc(s.n)}</option>`).join('');
+  const top=`<div class="hctop"><label class="hloc"><span class="pin" aria-hidden="true">📍</span><span class="hname">${esc(P.spots.some(s=>s.id===P.spot)?loc.n:r.n.split(' (')[0])}</span><span class="chev" aria-hidden="true"></span><select id="hLoc" class="hsel" aria-label="Escolher o local">${opts}</select></label><span class="hwhen">${FC?esc(dayLbl(C.date,true))+' · '+hh(C.hora):''}</span></div>`;
+  const days=DAYS.length&&FC?`<div class="hdays" role="group" aria-label="Dia">${DAYS.map(x=>`<button type="button" class="hd" data-hd="${x.d}" data-hh="${x.h}" aria-pressed="${x.d===C.date}"><i style="background:${VCOL[x.v]}"></i>${dayLbl(x.d)}</button>`).join('')}</div>`:'';
+  if(!FC&&FCLOAD){el.innerHTML=top+'<div class="hload"><span class="spin" aria-hidden="true"></span>A carregar a previsão…</div>';return}
+  if(!E)E=evaluate(C);
+  const V=E.verdict, ic={go:'✓',warn:'!',stop:'✕'}[V];
+  const dd=DAYS.find(x=>x.d===C.date), win=FC&&dd?(dd.w0===dd.w1?`melhor às ${String(dd.w0).padStart(2,'0')}h`:`melhor das ${String(dd.w0).padStart(2,'0')}h às ${String(dd.w1+1).padStart(2,'0')}h`):'';
+  const sub=!FC?'Sem previsão: valores de exemplo':dd&&dd.v==='stop'?'Nenhuma hora boa neste dia para o seu nível':V==='stop'&&dd?'Nesta hora não. Veja a melhor hora nos detalhes':(win||'');
+  const w=FC&&C.fc?C.fc.wdDeg:C.wdir, rel=loc.off==null||w==null?'':angDiff(w,loc.off)<=60?'de terra':angDiff(w,loc.off)>=120?'do mar':'de lado';
+  const n=(t,b,x)=>`<div class="hn"><small>${t}</small><b>${b}</b>${x?`<span>${x}</span>`:''}</div>`;
+  const nums=`<div class="hnums">${n('🌊 Onda',fmt(E.hsLoc)+' m',(E.hsLoc<C.hs-.05?'ao largo '+fmt(C.hs)+' m · ':'')+C.tp+' s')}${n('💨 Vento',C.wind+' nós',[rel,'rajadas '+C.gust].filter(Boolean).join(' · '))}${n('🌗 Maré',MAREN[C.mare].replace(/^./,c=>c.toUpperCase()),E.mo.name.toLowerCase())}${n('🌡️ Água',fmt(C.sst)+' °C','')}${n('👁️ Visib.','≈ '+C.vis+' m',C.visN?'pelos seus registos':'estimativa')}</div>`;
+  const ord={stop:0,warn:1,go:2}, rs=E.R.filter(x=>x.l!=='info').sort((a,b)=>ord[a.l]-ord[b.l]), shown=rs.slice(0,3), more=E.R.length-shown.length;
+  const reasons=shown.length?`<ul class="reasons">${shown.map(x=>`<li><i class="i-${x.l}"></i><span>${esc(x.t)}</span></li>`).join('')}</ul>`:'';
+  const age=FCT?Math.round((Date.now()-FCT)/6e4):null, ageT=age==null?'':age<2?'agora mesmo':age<60?`há ${age} min`:`há ${Math.round(age/60)} h`;
+  const foot=FC?`Previsão de ${C.fc&&C.fc.models?C.fc.models.split('/')[0]:'vários'} modelos de ondulação, comparados entre si${ageT?' · '+ageT:''}${FCLOAD?' · a atualizar…':''}`:FCLOAD?'A carregar a previsão…':FCERR?'Sem ligação: não foi possível obter a previsão.':'Ainda sem previsão para este local.';
+  el.innerHTML=top+days+`<div class="hv v-${V}"><span class="ic" aria-hidden="true">${ic}</span><span><b>${VLAB[V]}</b><span class="sub">${esc(sub)}</span></span></div>`+nums+reasons+
+    `<div class="hfoot"><span class="small muted">${esc(foot)}</span>${FC?`<button type="button" class="btn ghost" data-hmore>Ver detalhes${more>0?` (+${more})`:''}</button>`:`<button type="button" class="btn" data-hretry>${FCLOAD?'A carregar…':'Carregar previsão'}</button>`}</div>`;
+  renderShelf();
+}
+$('hCard').addEventListener('change',e=>{if(e.target.id==='hLoc')useLoc(e.target.value)});
+$('hCard').addEventListener('click',e=>{
+  const d=e.target.closest('[data-hd]');if(d){applyForecast(d.dataset.hd,+d.dataset.hh);return}
+  if(e.target.closest('[data-hmore]')){$('hDet').open=true;$('hDet').scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(e.target.closest('[data-hretry]'))loadForecast(true);
 });
 
 /* ---------- Calendário ---------- */
@@ -3233,6 +3345,8 @@ function setTab(t,scroll=true){
 const applyMQ=()=>document.body.classList.toggle('m',MQ.matches);
 (MQ.addEventListener?MQ.addEventListener('change',applyMQ):MQ.addListener(applyMQ));applyMQ();
 let tab0='hoje';try{tab0=sessionStorage.getItem('ml_tab')||'hoje'}catch(e){}
+if(tab0==='onde')tab0='hoje';
+if(!MQ.matches)$('hDet').open=true;
 setTab(tab0,false);
 $('tabbar').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b)setTab(b.dataset.tab)});
 $('inTog').addEventListener('click',()=>{const c=document.querySelector('.condcard'),o=c.classList.toggle('open');$('inTog').setAttribute('aria-expanded',o);$('inTog').textContent=o?'Esconder os valores':'Ajustar os valores à mão'});
@@ -3255,6 +3369,8 @@ $('instBtn').addEventListener('click',async()=>{if(!instEv)return;instEv.prompt(
 window.addEventListener('appinstalled',()=>{$('instBtn').hidden=true});
 try{const m=(location.hash||'').match(/grupo=([0-9a-f]{12})/i);if(m){sessionStorage.setItem('ml_join',m[1].toLowerCase());history.replaceState(null,'',location.pathname+location.search);setTab('locais')}}catch(e){}
 loadIPMA();fillCoast();fillConds();initAcct();
+/* previsão do local em uso e depois a dos outros locais, sem ser preciso carregar em nada */
+if(navigator.onLine)loadForecast().then(()=>compareSpots());else{renderHCard();renderShelf(true)}
 // aberta por um link de partilha (#partilha=MLV1…): mostra os locais recebidos
 try{const hs=decodeURIComponent(location.hash||'');if(/MLV1[AZ]/.test(hs)){history.replaceState(null,'',location.pathname+location.search);openReceive(hs)}}catch(e){}
 })();
