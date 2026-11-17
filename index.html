@@ -971,7 +971,7 @@ footer ul{padding-left:20px}
       <div class="f"><span class="flab">O que apanhou</span><div class="qsp" id="dQuick"></div><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Outra espécie</button><span class="small muted">Quantidade · peso total (kg) · tamanho (cm, só com 1 peixe). Pode deixar o peso em branco.</span></div>
       <div class="f"><span class="flab">Com quem</span><div class="spchips" id="dAmigos"></div>
         <input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Outras pessoas (separe por vírgulas)" autocomplete="off" aria-label="Outras pessoas"><datalist id="dComL"></datalist></div>
-      <div class="f" id="dShareW" hidden><span class="flab">Partilhar na app <span class="small muted" style="font-weight:400">(sem notas nem fotografias)</span></span><div class="spchips" id="dShareC"></div></div>
+      <div class="f" id="dShareW" hidden><span class="flab">Partilhar na app <span class="small muted" style="font-weight:400">(as notas nunca saem daqui)</span></span><div class="spchips" id="dShareC"></div><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="dShareFo" checked style="width:18px;height:18px;accent-color:var(--accent)"> Incluir as fotografias (até 6)</label></div>
       <details class="dmore" id="dMore"><summary>Mais detalhes <span class="small muted" style="font-weight:400">(técnica, visibilidade, mar, corrente, notas)</span></summary><div>
         <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
         <div class="drow2">
@@ -3128,7 +3128,7 @@ function editEntry(id){
   $('dNotas').value=e.notas||'';$('dCaps').innerHTML='';(e.caps||[]).forEach(c=>addCapRow(c.sp,c.kg??'',c.cm??'',qn(c)));
   paintAmigos();document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=(e.comIds||[]).includes(i.value));
   $('dCom').value=(e.com||[]).join(', ');
-  paintDShare(!!e.shareF,e.shareG||[]);
+  paintDShare(!!e.shareF,e.shareG||[]);$('dShareFo').checked=e.shareFotos!==false;
   $('dSubmit').textContent='Guardar alterações';$('dCancel').hidden=false;$('dform').classList.add('editing');
   $('dMore').open=!!(e.tec||o.vis!=null||o.marH!=null||o.corr||o.saida||o.acerto||e.notas);openSheet();
 }
@@ -3136,7 +3136,7 @@ function endEdit(){
   EDIT=null;$('dSubmit').textContent='Guardar saída';$('dform').classList.remove('editing');
   $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';$('dTec').value='';
   document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);$('dDate').value=iso(new Date());
-  paintDShare(false,SOC.groups.map(x=>x.id));
+  paintDShare(false,SOC.groups.map(x=>x.id));$('dShareFo').checked=true;
 }
 $('dCancel').addEventListener('click',()=>{endEdit();PEND.forEach(p=>URL.revokeObjectURL(p.url));PEND=[];paintPend();$('dMsg').textContent='';closeSheet()});
 
@@ -3215,7 +3215,7 @@ $('dform').addEventListener('submit',ev=>{
     vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim(),
     com:splitNames($('dCom').value),comIds:[...document.querySelectorAll('#dAmigos input:checked')].map(i=>i.value)};
   e.comNames=Object.fromEntries(e.comIds.map(id=>[id,amName(id)]));
-  const shr=readShare('dShareC');if(shr){e.shareF=shr.f;e.shareG=shr.g}
+  const shr=readShare('dShareC');if(shr){e.shareF=shr.f;e.shareG=shr.g;e.shareFotos=$('dShareFo').checked}
   if(!e.date){$('dMsg').textContent='Indique a data.';return}
   if(EDIT){ // atualizar a saída existente
     const old=D.find(x=>x.id===EDIT);
@@ -3422,10 +3422,31 @@ function markDel(kind,id){
 function onLocalSave(k){if(ME&&!SYNCING&&(k===KP||k===KD)){clearTimeout(syncT);syncT=setTimeout(()=>syncNow(),4000)}}
 const hstr=s=>{let x=5381;for(let i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return (x>>>0).toString(36)};
 const spotData=s=>{const o=Object.assign({},s);delete o.notas;delete o.shareF;delete o.shareG;return o};
-const outData=e=>{const o=Object.assign({},e);delete o.notas;delete o.fotos;delete o.shareF;delete o.shareG;delete o.condErr;return o};
+/* fotografias que vão para a conta: só as de saídas partilhadas (até 6), e só se «Incluir as fotografias» */
+const pfOf=e=>{if(e.from||e.shareFotos===false||!(e.shareF||(e.shareG||[]).length))return null;const L=e.fotos&&e.fotos.length?e.fotos.slice(0,6):(e.pf||[]);return L.length?L:null};
+const outData=e=>{const o=Object.assign({},e);delete o.notas;delete o.fotos;delete o.shareF;delete o.shareG;delete o.condErr;delete o.pf;const pf=pfOf(e);if(pf)o.pf=pf;return o};
 const hashS=s=>hstr(JSON.stringify([spotData(s),!!s.shareF,s.shareG||[],s.notas||'']));
 const hashO=e=>hstr(JSON.stringify([outData(e),!!e.shareF,e.shareG||[],e.notas||'']));
 
+/* Envia para o espaço de ficheiros as fotografias das saídas partilhadas e tira as que deixaram de o ser */
+var HASSTO=true;
+async function syncFotos(){
+  const sb=sbc();if(!sb||!ME||!HASSTO||!sb.storage)return;
+  try{
+    SYNC.fu=SYNC.fu||{};const want={};
+    for(const e of D){const pf=pfOf(e);if(pf&&e.fotos&&e.fotos.length)for(const fid of pf)want[fid]=`${ME.id}/${e.id}/${fid}.jpg`}
+    for(const [fid,path] of Object.entries(want)){
+      if(SYNC.fu[fid]===path)continue;
+      const r=await FDB.get(fid).catch(()=>null);if(!r||!r.full)continue;
+      const blob=await shrink(r.full,1200,.72);if(!blob)continue;
+      const up=await sb.storage.from('fotos').upload(path,blob,{contentType:'image/jpeg',upsert:false});
+      if(up.error&&!/exist|duplicate/i.test(up.error.message||'')){if(/bucket/i.test(up.error.message||''))HASSTO=false;break}
+      SYNC.fu[fid]=path;saveSync();
+    }
+    const gone=Object.entries(SYNC.fu).filter(([fid,p])=>want[fid]!==p);
+    if(gone.length){const r=await sb.storage.from('fotos').remove(gone.map(([,p])=>p));if(!r.error){gone.forEach(([fid])=>delete SYNC.fu[fid]);saveSync()}}
+  }catch(e){}
+}
 async function syncNow(manual){
   const sb=sbc();if(!sb||!ME||SYNCING)return;
   if(!navigator.onLine){lastSyncMsg='Sem rede: sincroniza quando voltar a haver ligação.';paintAcct();return}
@@ -3466,6 +3487,7 @@ async function syncNow(manual){
       r.data.forEach(x=>SYNC.st[x.id]=x.updated_at);upS.forEach(s=>SYNC.sh[s.id]=hashS(s))}
     if(upO.length){const r=await sb.from('outings').upsert(upO.map(e=>({owner:ME.id,id:e.id,gid:e.gid||null,date:e.date,data:outData(e),share_friends:!!e.shareF,share_groups:e.shareG||[],deleted:false})),{onConflict:'owner,id'}).select('id,updated_at');if(r.error)throw r.error;
       r.data.forEach(x=>SYNC.ot[x.id]=x.updated_at);upO.forEach(e=>SYNC.oh[e.id]=hashO(e))}
+    await syncFotos();
     const upN=[...upS.map(s=>({kind:'spot',id:s.id,notas:s.notas||''})),...upO.map(e=>({kind:'outing',id:e.id,notas:e.notas||''}))].filter(n=>n.notas||notes[n.kind+':'+n.id]);
     if(upN.length){const r=await sb.from('private_notes').upsert(upN.map(n=>Object.assign({owner:ME.id},n)),{onConflict:'owner,kind,id'});if(r.error)throw r.error}
     // apagados aqui
@@ -3601,7 +3623,7 @@ function paintInvites(){
   el.querySelectorAll('[data-invno]').forEach(b=>b.onclick=async()=>{await sbc().from('outing_invites').delete().eq('id',b.dataset.invno);refreshSocial()});
 }
 /* ---- Crew: feed das saídas partilhadas e reações ---- */
-var FEED=[], REAC=[], MYREAC=[], HASREAC=true, FEEDT=0, FEEDLOAD=false;
+var PURL={}, FEED=[], REAC=[], MYREAC=[], HASREAC=true, FEEDT=0, FEEDLOAD=false;
 const EMO=['👍','🐟','🔥','💪'];
 async function loadFeed(force){
   const sb=sbc();if(!sb||!ME||FEEDLOAD)return;
@@ -3613,6 +3635,10 @@ async function loadFeed(force){
     FEED=r.data.filter(x=>x.owner!==ME.id||x.share_friends||(x.share_groups||[]).length).slice(0,50);FEEDT=Date.now();
     const miss=[...new Set(FEED.map(x=>x.owner))].filter(id=>id!==ME.id&&!SOC.prof[id]);
     if(miss.length){const pr=await selProfiles(c=>sb.from('profiles').select(c).in('id',miss));if(pr&&!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
+    // fotografias: ligações temporárias (1 hora) para os ficheiros que cada um partilhou
+    const paths=[];FEED.forEach(x=>((x.data&&x.data.pf)||[]).forEach(f=>{const p=`${x.owner}/${x.id}/${f}.jpg`;if(!PURL[p]||PURL[p].t<Date.now()-3e6)paths.push(p)}));
+    if(HASSTO&&paths.length&&sb.storage){const su=await sb.storage.from('fotos').createSignedUrls(paths,3600);
+      if(su.error){if(/bucket/i.test(su.error.message||''))HASSTO=false}else(su.data||[]).forEach(z=>{if(z&&z.signedUrl&&!z.error)PURL[z.path]={u:z.signedUrl,t:Date.now()}})}
     if(HASREAC&&FEED.length){
       const rr=await sb.from('reactions').select('outing_owner,outing_id,user_id,emoji').in('outing_id',FEED.map(x=>x.id));
       if(rr.error){if(/reactions|relation|does not exist|schema cache/i.test(rr.error.message||''))HASREAC=false}else REAC=rr.data;
@@ -3649,12 +3675,17 @@ function renderFeed(){
     const rs=REAC.filter(r=>r.outing_owner===x.owner&&r.outing_id===x.id);
     const btns=HASREAC?`<div class="reacts">${EMO.map(e=>{const who=rs.filter(r=>r.emoji===e), me=who.some(r=>r.user_id===ME.id);
       return `<button type="button" data-rx="${i}" data-em="${e}" aria-pressed="${me}" title="${esc(who.map(r=>r.user_id===ME.id?'Você':pname(r.user_id)).join(', '))}">${e}${who.length?' '+who.length:''}</button>`}).join('')}</div>`:'';
+    const fp=((d.pf||[]).map(f=>PURL[`${x.owner}/${x.id}/${f}.jpg`]).filter(Boolean));
     return `<article class="entry post">
       <div class="phd">${avSpan(mine?myName():nome,foto,38)}<div><b>${esc(nome)}${d.loc?` <span style="font-weight:400">em</span> ${esc(d.loc)}`:''}</b><span class="small muted">${esc(dia)}${d.t0?' · '+esc(d.t0)+(d.t1?'–'+esc(d.t1):''):''}</span></div>${grp?`<span class="fgrp">${esc(grp)}</span>`:''}</div>
+      ${fp.length?`<button type="button" class="pcover" data-fg="${i}" aria-label="Ver fotografias"><img src="${esc(fp[0].u)}" alt="Fotografia da saída" loading="lazy">${fp.length>1?`<span class="pmore">+${fp.length-1}</span>`:''}</button>`:''}
       <div class="pbody">${caps?`<div class="pcaps">${caps}</div>`:'<div class="small muted">Sem capturas</div>'}${ob?`<div class="small">${esc(ob)}</div>`:''}${cond?`<div class="cond small muted">${esc(cond)}</div>`:''}${btns}</div></article>`;
   }).join('')+(HASREAC?'':'<p class="small muted">As reações ficam disponíveis depois de correr o SQL das reações no Supabase.</p>');
 }
 $('feed').addEventListener('click',async e=>{
+  const g=e.target.closest('[data-fg]');if(g){const x=FEED[+g.dataset.fg];if(!x)return;
+    const fp=((x.data.pf||[]).map(f=>PURL[`${x.owner}/${x.id}/${f}.jpg`]).filter(Boolean));
+    showDlg(`<h3>${esc(x.owner===ME.id?'Você':pname(x.owner))}${x.data.loc?' em '+esc(x.data.loc):''}</h3><p class="small muted" style="margin:-4px 0 0">${dLabel(x.date)}</p>${fp.map(p=>`<img class="fotobig" src="${esc(p.u)}" alt="Fotografia da saída">`).join('')}`);return}
   const b=e.target.closest('[data-rx]');if(!b||!ME)return;
   const x=FEED[+b.dataset.rx], em=b.dataset.em;if(!x)return;
   const sb=sbc(), ex=REAC.find(r=>r.outing_owner===x.owner&&r.outing_id===x.id&&r.user_id===ME.id&&r.emoji===em);
@@ -3708,7 +3739,7 @@ function paintAcct(){
   if(ME){
     box.innerHTML=`<h4>Conta PeixeCrew</h4>
       <p style="margin:0">Sessão iniciada como <b>@${esc(MEP?MEP.username:'…')}</b>${MEP&&MEP.nome?' ('+esc(MEP.nome)+')':''} · <span class="muted">${esc(ME.email||'')}</span></p>
-      <p class="small muted" style="margin:0">${esc(lastSyncMsg||'Os locais, as saídas e as notas deste perfil sincronizam com a conta. As fotografias ficam só neste aparelho.')}</p>
+      <p class="small muted" style="margin:0">${esc(lastSyncMsg||'Os locais, as saídas e as notas deste perfil sincronizam com a conta. As fotografias só saem deste aparelho nas saídas que partilhar com «Incluir as fotografias».')}</p>
       <div class="row"><button class="btn ghost" id="acSync">Sincronizar agora</button><button class="btn ghost" id="acOut">Terminar sessão</button><button class="btn ghost" id="acDel" style="color:var(--stop);border-color:var(--stop)">Apagar conta</button></div>${msg}`;
     paintSocial();paintPHead();
     $('acSync').onclick=async()=>{await syncNow(true);refreshSocial()};
@@ -3716,6 +3747,7 @@ function paintAcct(){
     $('acDel').onclick=async()=>{
       if(!confirm('Apagar a conta e todos os dados guardados na conta (locais, saídas, notas, amizades, grupos)? Os dados deste aparelho ficam. Não dá para desfazer.'))return;
       if(prompt('Para confirmar, escreva APAGAR')!=='APAGAR')return;
+      try{const L=Object.values(SYNC.fu||{});if(L.length&&sb.storage)await sb.storage.from('fotos').remove(L)}catch(e){}
       const {error}=await sb.rpc('delete_my_account');if(error){setAcctMsg(trErr(error),true);return}
       await sb.auth.signOut();delete P.acct;save(KP,P);SYNC={sh:{},st:{},oh:{},ot:{},dS:[],dO:[],last:0};saveSync();setAcctMsg('Conta apagada.');
     };

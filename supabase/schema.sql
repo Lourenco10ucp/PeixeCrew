@@ -320,3 +320,17 @@ create policy re_insert on public.reactions for insert to authenticated with che
   user_id = auth.uid() and exists (select 1 from public.outings o where o.owner = reactions.outing_owner and o.id = reactions.outing_id and not o.deleted));
 create policy re_delete on public.reactions for delete to authenticated using (user_id = auth.uid());
 grant select, insert, delete on public.reactions to authenticated;
+
+-- fotografias (também em 2026-11-18-fotos.sql)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('fotos', 'fotos', false, 1048576, array['image/jpeg'])
+on conflict (id) do nothing;
+create policy fotos_insert on storage.objects for insert to authenticated with check (
+  bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy fotos_delete on storage.objects for delete to authenticated using (
+  bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy fotos_select on storage.objects for select to authenticated using (
+  bucket_id = 'fotos' and (
+    (storage.foldername(name))[1] = auth.uid()::text
+    or exists (select 1 from public.outings o
+               where o.owner::text = (storage.foldername(name))[1] and o.id = (storage.foldername(name))[2])));
