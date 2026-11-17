@@ -151,6 +151,22 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .hdet>summary b{color:var(--accent);font-size:17px}
 .hdet>summary b::after{content:' ›';display:inline-block;transition:transform .2s}
 .hdet[open]>summary b::after{transform:rotate(90deg)}
+/* Diário: «O meu diário» / «Crew» */
+.seg{display:inline-flex;background:var(--surface2);border:1.5px solid var(--line);border-radius:999px;padding:3px;margin-top:12px;gap:2px}
+.seg button{all:unset;cursor:pointer;padding:7px 16px;border-radius:999px;font-weight:700;font-size:15px;color:var(--muted);position:relative}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.seg button:focus-visible{outline:3px solid var(--focus)}
+.seg .badge{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:var(--signal);color:#fff;font-size:12px;margin-left:6px;padding:0 5px}
+#diario.crew .dtools,#diario.crew .diary,#diario.crew > .lead,#diario.crew #invBox{display:none}
+#diario:not(.crew) #feedW{display:none}
+#feedW{max-width:720px;margin-top:14px;display:grid;gap:12px}
+.feedh{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.post .fgrp{font-size:12.5px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px;padding:2px 9px;white-space:nowrap;max-width:40%;overflow:hidden;text-overflow:ellipsis}
+.reacts{display:flex;flex-wrap:wrap;gap:6px;border-top:1.5px solid var(--line);padding-top:8px;margin-top:2px}
+.post .reacts button{all:unset;color:var(--ink);font-weight:600;cursor:pointer;border:1.5px solid var(--line);border-radius:999px;padding:4px 11px;font-size:15px;background:var(--surface);font-variant-numeric:tabular-nums}
+.post .reacts button[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));font-weight:700}
+.post .reacts button:focus-visible{outline:3px solid var(--focus)}
+.myreac{font-size:14px}
 /* Mapa dos locais */
 .mapw{position:relative;margin-top:14px;border:2px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface2)}
 .map{height:min(58vh,470px);position:relative;z-index:0;background:#aad3df}
@@ -785,6 +801,11 @@ footer ul{padding-left:20px}
   <!-- DIÁRIO -->
   <section class="block" id="diario" data-t="diario">
     <h2>O seu diário de mar</h2>
+    <div class="seg" id="dSeg" role="group" aria-label="Ver" hidden><button type="button" data-seg="eu" aria-pressed="true">O meu diário</button><button type="button" data-seg="crew" aria-pressed="false">Crew<span class="badge" id="feedBadge" hidden></span></button></div>
+    <div id="feedW">
+      <div class="feedh"><span class="small muted" id="feedS">As saídas que os seus amigos e grupos partilharam consigo (e as suas que partilhou).</span><button type="button" class="btn ghost" id="feedRef" style="padding:6px 12px;font-size:14px;min-height:38px">Atualizar</button></div>
+      <div id="feed" class="dlist"></div>
+    </div>
     <div id="invBox" class="invbox"></div>
     <p class="lead">Registe cada saída com o ＋. A app junta sozinha as condições previstas para essa hora e, com o tempo, aprende como se comporta cada um dos seus locais. Só sai daqui o que escolher partilhar.</p>
     <div class="dtools"><button type="button" class="btn" id="dNew">＋ Registar saída</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button></div>
@@ -2813,6 +2834,7 @@ function renderDiary(){
       ${L.W.map(t=>`<div class="laww">⛔ ${esc(t)}</div>`).join('')}${L.I.map(t=>`<div class="lawi">⚠️ ${esc(t)}</div>`).join('')}
       ${e.notas?`<div class="small">📝 ${esc(e.notas)}</div>`:''}
       ${fot.length>1?`<div class="thumbs">${fot.slice(1).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}</div>`:''}
+      ${(()=>{const l=MYREAC.filter(r=>r.outing_id===e.id);return l.length?`<div class="myreac">${reacSummary(l)}</div>`:''})()}
       ${e.from?'':`<div class="eacts"><button type="button" class="linkb" data-edite="${e.id}">✏️ Editar</button><label class="linkb addfoto">📷 Foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label>${ppl.length?`<button type="button" class="linkb" data-sende="${e.id}">📤 Enviar aos companheiros</button>`:''}</div>`}
       </div></article>`;
   }).join('');
@@ -3355,6 +3377,7 @@ async function refreshSocial(){
     if(ch){save(KP,P);paintAmigos()}
   }catch(e){socMsg='Não foi possível atualizar amigos e grupos: '+(e&&e.message||e);socErr=true}
   paintSocial();renderSharedSpots();paintInvites();renderGrpStats();paintDShare();paintPHead();
+  $('dSeg').hidden=!ME;loadFeed(true);loadMyReacts();
 }
 function shareFieldsHTML(id,f,g,nota){
   return `<div class="f wide"><span style="font-size:15px;font-weight:600">Partilhar na app</span><div class="spchips" id="${id}"><label><input type="checkbox" data-sf${f?' checked':''}>Amigos</label>${SOC.groups.map(x=>`<label><input type="checkbox" value="${x.id}"${(g||[]).includes(x.id)?' checked':''}>${esc(x.nome)}</label>`).join('')}</div><span class="small muted">${esc(nota)}</span></div>`;
@@ -3439,6 +3462,75 @@ function paintInvites(){
     openReceive('');try{previewSaida({app:'marlivre',t:'saida',v:1,de:pname(v.from_user),deId:accUid(v.from_user),s:v.payload,inv:v.id})}catch(e){$('rvOut').innerHTML=`<p class="msg">${esc(e.message||'Convite inválido.')}</p>`}});
   el.querySelectorAll('[data-invno]').forEach(b=>b.onclick=async()=>{await sbc().from('outing_invites').delete().eq('id',b.dataset.invno);refreshSocial()});
 }
+/* ---- Crew: feed das saídas partilhadas e reações ---- */
+var FEED=[], REAC=[], MYREAC=[], HASREAC=true, FEEDT=0, FEEDLOAD=false;
+const EMO=['👍','🐟','🔥','💪'];
+async function loadFeed(force){
+  const sb=sbc();if(!sb||!ME||FEEDLOAD)return;
+  if(!force&&Date.now()-FEEDT<12e4){renderFeed();return}
+  FEEDLOAD=true;if($('diario').classList.contains('crew')&&!FEED.length)$('feed').innerHTML='<div class="hload"><span class="spin" aria-hidden="true"></span>A carregar…</div>';
+  try{
+    const r=await sb.from('outings').select('owner,id,date,data,share_friends,share_groups,updated_at').eq('deleted',false).order('date',{ascending:false}).order('updated_at',{ascending:false}).limit(80);
+    if(r.error)throw r.error;
+    FEED=r.data.filter(x=>x.owner!==ME.id||x.share_friends||(x.share_groups||[]).length).slice(0,50);FEEDT=Date.now();
+    const miss=[...new Set(FEED.map(x=>x.owner))].filter(id=>id!==ME.id&&!SOC.prof[id]);
+    if(miss.length){const pr=await selProfiles(c=>sb.from('profiles').select(c).in('id',miss));if(pr&&!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
+    if(HASREAC&&FEED.length){
+      const rr=await sb.from('reactions').select('outing_owner,outing_id,user_id,emoji').in('outing_id',FEED.map(x=>x.id));
+      if(rr.error){if(/reactions|relation|does not exist|schema cache/i.test(rr.error.message||''))HASREAC=false}else REAC=rr.data;
+    }
+    const seen=load('ml_feedseen:'+PROFS.active,0), nNew=FEED.filter(x=>x.owner!==ME.id&&new Date(x.updated_at).getTime()>seen).length;
+    $('feedBadge').hidden=!nNew||$('diario').classList.contains('crew');$('feedBadge').textContent=nNew>9?'9+':nNew;
+  }catch(e){$('feed').innerHTML=`<p class="err">Não foi possível carregar: ${esc(trErr(e))}</p>`;FEEDLOAD=false;return}
+  FEEDLOAD=false;renderFeed();
+}
+async function loadMyReacts(){
+  const sb=sbc();if(!sb||!ME||!HASREAC)return;
+  const r=await sb.from('reactions').select('outing_id,user_id,emoji').eq('outing_owner',ME.id);
+  if(r.error){if(/reactions|relation|does not exist|schema cache/i.test(r.error.message||''))HASREAC=false;return}
+  MYREAC=r.data.filter(x=>x.user_id!==ME.id);
+  const ids=[...new Set(MYREAC.map(x=>x.user_id))].filter(id=>!SOC.prof[id]);
+  if(ids.length){const pr=await selProfiles(c=>sb.from('profiles').select(c).in('id',ids));if(pr&&!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
+  renderDiary();
+}
+function reacSummary(list){
+  const by={};list.forEach(x=>(by[x.emoji]=by[x.emoji]||[]).push(x.user_id));
+  return EMO.filter(e=>by[e]).map(e=>`${e} ${by[e].length}`).join(' · ')+` <span class="muted">(${esc([...new Set(list.map(x=>pname(x.user_id)))].join(', '))})</span>`;
+}
+function renderFeed(){
+  const el=$('feed');if(!el||!ME)return;
+  if(!FEED.length){el.innerHTML=`<div class="dempty"><b>Ainda nada partilhado</b>${SOC.groups.length||SOC.friends.length?'Quando um amigo ou alguém do grupo registar uma saída e a partilhar, aparece aqui.':'Junte amigos ou entre num grupo em «Perfil» para ver as saídas deles.'}</div>`;return}
+  const gname=id=>(SOC.groups.find(g=>g.id===id)||{}).nome;
+  el.innerHTML=FEED.map((x,i)=>{
+    const d=x.data||{}, mine=x.owner===ME.id, nome=mine?'Você':pname(x.owner), foto=mine?P.foto:SOC.prof[x.owner]&&SOC.prof[x.owner].foto;
+    const dt=new Date(x.date+'T12:00'), dia=dt.toLocaleDateString('pt-PT',{weekday:'short',day:'numeric',month:'short',year:dt.getFullYear()===new Date().getFullYear()?undefined:'numeric'});
+    const grp=(x.share_groups||[]).map(gname).filter(Boolean)[0]||(x.share_friends?'Amigos':'');
+    const caps=(d.caps||[]).filter(c=>c&&c.sp).map(c=>`<span class="pcap">🐟 ${qn(c)>1?qn(c)+' × ':''}${esc(byK[c.sp]?.n||'Outra')}${c.kg?' · '+fmt(c.kg,c.kg<1?2:1)+' kg':''}${c.cm?' · '+fmt(c.cm,c.cm%1?1:0)+' cm':''}</span>`).join('');
+    const c=d.cond, cond=c&&c.med!=null?`${c.hist?'Reconstrução':'Previsto'}: ondulação ${fmt(c.med)} m${c.tp?', '+c.tp+' s':''} · vento ${c.wind} nós${c.mare?' · '+MAREN[c.mare]:''}`:'';
+    const o=d.obs||{}, ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m`:'',d.tec||''].filter(Boolean).join(' · ');
+    const rs=REAC.filter(r=>r.outing_owner===x.owner&&r.outing_id===x.id);
+    const btns=HASREAC?`<div class="reacts">${EMO.map(e=>{const who=rs.filter(r=>r.emoji===e), me=who.some(r=>r.user_id===ME.id);
+      return `<button type="button" data-rx="${i}" data-em="${e}" aria-pressed="${me}" title="${esc(who.map(r=>r.user_id===ME.id?'Você':pname(r.user_id)).join(', '))}">${e}${who.length?' '+who.length:''}</button>`}).join('')}</div>`:'';
+    return `<article class="entry post">
+      <div class="phd">${avSpan(mine?myName():nome,foto,38)}<div><b>${esc(nome)}${d.loc?` <span style="font-weight:400">em</span> ${esc(d.loc)}`:''}</b><span class="small muted">${esc(dia)}${d.t0?' · '+esc(d.t0)+(d.t1?'–'+esc(d.t1):''):''}</span></div>${grp?`<span class="fgrp">${esc(grp)}</span>`:''}</div>
+      <div class="pbody">${caps?`<div class="pcaps">${caps}</div>`:'<div class="small muted">Sem capturas</div>'}${ob?`<div class="small">${esc(ob)}</div>`:''}${cond?`<div class="cond small muted">${esc(cond)}</div>`:''}${btns}</div></article>`;
+  }).join('')+(HASREAC?'':'<p class="small muted">As reações ficam disponíveis depois de correr o SQL das reações no Supabase.</p>');
+}
+$('feed').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-rx]');if(!b||!ME)return;
+  const x=FEED[+b.dataset.rx], em=b.dataset.em;if(!x)return;
+  const sb=sbc(), ex=REAC.find(r=>r.outing_owner===x.owner&&r.outing_id===x.id&&r.user_id===ME.id&&r.emoji===em);
+  if(ex){REAC=REAC.filter(r=>r!==ex);renderFeed();const r=await sb.from('reactions').delete().match({outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em});if(r.error){REAC.push(ex);renderFeed();toast(trErr(r.error))}}
+  else{const n={outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em};REAC.push(n);renderFeed();const r=await sb.from('reactions').insert({outing_owner:x.owner,outing_id:x.id,emoji:em});if(r.error&&String(r.error.code)!=='23505'){REAC=REAC.filter(q=>q!==n);renderFeed();toast(trErr(r.error))}}
+});
+function setSeg(v){
+  const crew=v==='crew'&&!!ME;$('diario').classList.toggle('crew',crew);
+  document.querySelectorAll('#dSeg [data-seg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.seg===(crew?'crew':'eu')));
+  if(crew){save('ml_feedseen:'+PROFS.active,Date.now());$('feedBadge').hidden=true;loadFeed()}
+}
+$('dSeg').addEventListener('click',e=>{const b=e.target.closest('[data-seg]');if(b)setSeg(b.dataset.seg)});
+$('feedRef').addEventListener('click',()=>loadFeed(true));
+
 /* Recordes do grupo: contam as saídas que cada membro partilhou com o grupo */
 let GRPC={};
 async function renderGrpStats(){
@@ -3482,7 +3574,7 @@ function paintAcct(){
       <div class="row"><button class="btn ghost" id="acSync">Sincronizar agora</button><button class="btn ghost" id="acOut">Terminar sessão</button><button class="btn ghost" id="acDel" style="color:var(--stop);border-color:var(--stop)">Apagar conta</button></div>${msg}`;
     paintSocial();paintPHead();
     $('acSync').onclick=async()=>{await syncNow(true);refreshSocial()};
-    $('acOut').onclick=async()=>{await sb.auth.signOut();SOC={friends:[],incoming:[],outgoing:[],prof:{},groups:[],members:{},shared:[],invites:[]};renderSharedSpots();paintInvites();renderGrpStats();paintDShare();setAcctMsg('Sessão terminada. Os dados continuam neste aparelho.')};
+    $('acOut').onclick=async()=>{await sb.auth.signOut();$('dSeg').hidden=true;setSeg('eu');FEED=[];MYREAC=[];SOC={friends:[],incoming:[],outgoing:[],prof:{},groups:[],members:{},shared:[],invites:[]};renderSharedSpots();paintInvites();renderGrpStats();paintDShare();setAcctMsg('Sessão terminada. Os dados continuam neste aparelho.')};
     $('acDel').onclick=async()=>{
       if(!confirm('Apagar a conta e todos os dados guardados na conta (locais, saídas, notas, amizades, grupos)? Os dados deste aparelho ficam. Não dá para desfazer.'))return;
       if(prompt('Para confirmar, escreva APAGAR')!=='APAGAR')return;
