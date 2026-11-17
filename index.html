@@ -442,6 +442,10 @@ body.noscroll{overflow:hidden}
 .sheet .dform{gap:14px}
 .sheet div.f{display:grid;gap:8px}
 .dtools .btn.ghost{font-size:14px;padding:6px 12px;min-height:38px}
+body.m #dNew{display:none}
+.sheet>.sbody{overflow-x:hidden}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;display:block}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left}
 .flab{font-size:15px;font-weight:600}
 .qsp{display:flex;flex-wrap:wrap;gap:6px}
 .qsp button{all:unset;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:700;color:var(--accent)}
@@ -978,6 +982,9 @@ const SP=[
   where:'Bancos de areia nas rias e estuários',tip:'Fica mesmo à superfície da areia. A maré vazia viva descobre os melhores bancos.',legal:'Só em zonas de produção classificadas e abertas. Veja o boletim do IPMA antes de ir.'}
 ];
 const byK=Object.fromEntries(SP.map(s=>[s.k,s]));
+/* espécies só para registar capturas (sem ficha, época nem regras na app: não entram nas recomendações) */
+const EXTRA_SP=[{k:'peixeporco',n:'Peixe-porco',cat:'peixe',extra:true},{k:'bruxa',n:'Bruxa',cat:'peixe',extra:true}];
+EXTRA_SP.forEach(s=>byK[s.k]=s);
 const SANDY=['choco','salmonete','dourada','ameijoa','berbigao','lula'];
 
 /* ================= Regras oficiais e fontes =================
@@ -2540,7 +2547,7 @@ let D=load(KD,[]);
 D=D.map(e=>e&&e.v===2?e:{id:e.id||rnd(),v:2,date:e.date,t0:'',t1:'',spot:null,ll:null,loc:e.loc||'',tec:e.tec||'',obs:{},vistas:[],
   caps:(e.sp&&e.sp!=='outro')||e.kg?[{sp:e.sp||'outro',kg:+e.kg||0,cm:null}]:[],notas:e.notas||''});
 const qn=c=>Math.max(1,Math.round(+(c&&c.n)||1));
-const capOpts='<option value="">Espécie</option>'+Object.entries(CATS).map(([c,l])=>`<optgroup label="${l}">${SP.filter(s=>s.cat===c).map(s=>`<option value="${s.k}">${s.n}</option>`).join('')}</optgroup>`).join('')+'<option value="outro">Outra</option>';
+const capOpts='<option value="">Espécie</option>'+Object.entries(CATS).map(([c,l])=>`<optgroup label="${l}">${[...SP,...EXTRA_SP].filter(s=>s.cat===c).map(s=>`<option value="${s.k}">${s.n}</option>`).join('')}</optgroup>`).join('')+'<option value="outro">Outra</option>';
 $('dDate').value=iso(today);
 function paintDSpot(){
   const el=$('dSpot');if(!el)return;const cur=el.value;
@@ -2805,9 +2812,10 @@ let toastT;
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3500)}
 function paintQuick(){
   const cnt={};D.filter(e=>!e.from).forEach(e=>(e.caps||[]).forEach(c=>{if(byK[c.sp])cnt[c.sp]=(cnt[c.sp]||0)+qn(c)}));
-  const mi=new Date().getMonth(), fav=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
-  const season=SP.filter(x=>P.cats.includes(x.cat)&&x.m[mi]==='2').map(x=>x.k);
-  const L=[...new Set([...fav,...season])].slice(0,8);
+  const fav=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
+  // primeiro as que já apanhou; depois as habituais da crew
+  const CREW=['sargo','polvo','choco','tainha','robalo','navalheira','bruxa','peixeporco','safio'];
+  const L=[...new Set([...fav,...CREW])].filter(k=>byK[k]).slice(0,10);
   $('dQuick').innerHTML=L.map(k=>`<button type="button" data-qs="${k}">+ ${esc(byK[k].n)}</button>`).join('');
 }
 $('dQuick').addEventListener('click',e=>{const b=e.target.closest('[data-qs]');if(!b)return;addCapRow(b.dataset.qs);const r=[...document.querySelectorAll('#dCaps .dcap')].pop();r&&r.querySelectorAll('input')[1].focus()});
