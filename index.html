@@ -162,6 +162,26 @@ a.srcp:hover{border-color:var(--accent)}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:15px;max-width:calc(100vw - 32px)}
 .updbar .btn{padding:6px 14px;font-size:14px}
 .install{margin-bottom:18px}
+.soc{display:grid;gap:8px;border-top:1.5px dashed var(--line);padding-top:10px}
+.soc input{min-width:0}
+.grp{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;display:grid;gap:4px;background:var(--surface)}
+.invbox{display:grid;gap:8px;margin-top:12px}
+.invbox:empty{display:none}
+.invcard{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;border:2px solid var(--accent);border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.invcard .btn{padding:6px 12px;font-size:14px;min-height:36px}
+.sharedw{margin-top:12px;display:grid;gap:6px}
+.sharedw h4{margin:0;font-family:var(--f-display);font-size:18px}
+/* Conta */
+.acct{border:2px solid var(--accent);border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--accent) 6%,var(--surface));display:grid;gap:10px}
+.acct h4{margin:0;font-family:var(--f-display);font-size:19px}
+.acct .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.acct .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.acct .grid2{grid-template-columns:1fr}}
+.acct .tabs{display:flex;gap:6px}
+.acct .tabs button{all:unset;cursor:pointer;font-weight:700;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line)}
+.acct .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.acct .btn{padding:7px 14px;font-size:15px;min-height:40px}
+.acct .ok{color:var(--go);font-size:14px} .acct .err{color:var(--stop);font-size:14px}
 .amlist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
 .amlist .am{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:3px 6px 3px 12px;background:var(--surface);font-size:15px}
 .amlist .am button{all:unset;cursor:pointer;color:var(--stop);font-weight:700;padding:0 6px}
@@ -408,6 +428,7 @@ footer ul{padding-left:20px}
   <details class="pbox card" id="pbox" data-t="locais">
     <summary><span style="font-family:var(--f-display);font-size:22px">O seu perfil</span><span class="chips" id="pchips"></span><span class="edit">Editar</span></summary>
     <div class="prof">
+      <div class="f wide acct" id="acctBox"></div>
       <div class="f wide profbar">
         <label class="f" style="flex:1;min-width:180px">Perfil em uso<select id="pSel"></select></label>
         <button type="button" class="btn ghost" id="pNew">Novo perfil</button>
@@ -438,6 +459,7 @@ footer ul{padding-left:20px}
           <input type="file" id="fileIn" accept=".json,application/json" hidden>
         </div>
         <div class="spotlist" id="spotlist"></div>
+        <div id="sharedSpots"></div>
         <form class="spotform" id="spotform">
           <label class="f">Nome do local<input type="text" id="sNome" maxlength="40" placeholder="Ex.: Pedra do Cavalo" required></label>
           <label class="f">Coordenadas ou link<input type="text" id="sCoord" placeholder="38.4123, -9.1012" required autocomplete="off"></label>
@@ -589,6 +611,7 @@ footer ul{padding-left:20px}
   <!-- DIÁRIO -->
   <section class="block" id="diario" data-t="diario">
     <h2>O seu diário de mar</h2>
+    <div id="invBox" class="invbox"></div>
     <p class="lead">Registe cada saída. A app junta sozinha as condições previstas para essa hora e, com o tempo, aprende como se comporta cada um dos seus locais. Fica guardado só neste perfil, neste aparelho; só sai daqui o que escolher partilhar.</p>
     <div class="diary">
       <form class="card dform" id="dform">
@@ -602,6 +625,7 @@ footer ul{padding-left:20px}
         <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
         <div class="f"><span style="font-size:15px;font-weight:600">Com quem <span class="small muted" style="font-weight:400">(opcional)</span></span><div class="spchips" id="dAmigos"></div>
           <input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Outras pessoas (separe por vírgulas)" autocomplete="off" aria-label="Outras pessoas"><datalist id="dComL"></datalist></div>
+        <div class="f" id="dShareW" hidden><span style="font-size:15px;font-weight:600">Partilhar esta saída na app <span class="small muted" style="font-weight:400">(sem notas nem fotografias)</span></span><div class="spchips" id="dShareC"></div></div>
         <fieldset class="dfs"><legend>O que encontrou</legend>
           <div class="drow2">
             <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
@@ -628,6 +652,7 @@ footer ul{padding-left:20px}
     <p class="lead">Os seus recordes e as caçadas que se destacam. Conta só as suas saídas (não os relatórios de amigos).</p>
     <label class="f stctl">Período<select id="stYear"></select></label>
     <div id="statsBody" class="statsbody"></div>
+    <div id="grpStats" class="statsbody"></div>
   </section>
 </main>
 
@@ -661,13 +686,14 @@ footer ul{padding-left:20px}
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 
+<script src="vendor/supabase.js" onerror="window.__noSB=1"></script>
 <script>
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
-const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){return false}try{onLocalSave(k)}catch(e){}return true};
 const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 const MESF=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const DIA=['dom','seg','ter','qua','qui','sex','sáb'];
@@ -1235,7 +1261,7 @@ $('spotlist').addEventListener('click',e=>{
   if(ed)openSpotEdit(ed.dataset.edit);
   if(sh)openShare([sh.dataset.share]);
   if(d){const s=P.spots.find(x=>x.id===d.dataset.del);if(!s||!confirm(`Apagar «${s.n}»?`))return;
-    P.spots=P.spots.filter(x=>x.id!==s.id);if(P.spot===s.id)useLoc('');else commitProfile()}
+    P.spots=P.spots.filter(x=>x.id!==s.id);markDel('S',s.id);if(P.spot===s.id)useLoc('');else commitProfile()}
 });
 $('sGeo').addEventListener('click',()=>{
   if(!navigator.geolocation){$('smsg').textContent='Este navegador não dá a localização. Cole as coordenadas à mão.';return}
@@ -1336,6 +1362,7 @@ function openSpotEdit(id){
     <label class="f wide">Perigos<textarea id="ePer" maxlength="300" placeholder="Ex.: corrente forte na vazante; passagem de barcos junto à boia">${esc(s.perigos||'')}</textarea></label>
     <div class="f wide"><span style="font-size:15px;font-weight:600">Espécies que já viu aqui</span><div class="spchips">${SP.map(x=>`<label><input type="checkbox" value="${x.k}"${(s.especies||[]).includes(x.k)?' checked':''}>${esc(x.n)}</label>`).join('')}</div></div>
     <label class="f wide">Notas pessoais<textarea id="eNot" maxlength="600" placeholder="Só para si. Na partilha, escolhe se as envia.">${esc(s.notas||'')}</textarea></label>
+    ${ME?shareFieldsHTML('eShare',s.shareF,s.shareG||[],'Os amigos e os membros dos grupos marcados veem este local (sem as notas pessoais).'):''}
     <div class="wide" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit">Guardar ficha</button><span class="msg" id="eMsg"></span></div>
   </form>`);
   $('eForm').addEventListener('submit',e=>{
@@ -1351,7 +1378,8 @@ function openSpotEdit(id){
     s.pMin=num($('ePmin').value);s.pMax=num($('ePmax').value);
     if(s.pMin!=null&&s.pMax!=null&&s.pMin>s.pMax)[s.pMin,s.pMax]=[s.pMax,s.pMin];
     s.nivelMin=$('eNiv').value;s.entrada=$('eEnt').value.trim();s.perigos=$('ePer').value.trim();s.notas=$('eNot').value.trim();
-    s.especies=[...document.querySelectorAll('#eForm .spchips input:checked')].map(i=>i.value);
+    s.especies=[...document.querySelectorAll('#eForm .spchips:not(#eShare) input:checked')].map(i=>i.value);
+    const sh=readShare('eShare');if(sh){s.shareF=sh.f;s.shareG=sh.g}
     s.upd=Date.now();
     closeDlg();commitProfile();fillCoast();
   });
@@ -2332,14 +2360,14 @@ async function showCode(obj,titulo,intro,msgTopo,ficheiro){
 }
 $('amShare').addEventListener('click',()=>{
   if(!P.nome){alert('Ponha primeiro o seu nome ou alcunha no perfil: é o que os amigos vão ver.');$('pNome').focus();return}
-  showCode({app:'marlivre',t:'amigo',v:1,id:P.uid,nome:P.nome},'O meu cartão de amigo','Envie aos amigos da PeixeCrew. Quem o receber fica com o seu nome na lista de amigos.',`${P.nome} quer juntar-te aos amigos na app PeixeCrew.`,`amigo-${P.nome.replace(/[^\w-]+/g,'_')}.json`);
+  showCode({app:'marlivre',t:'amigo',v:1,id:myUid(),nome:P.nome},'O meu cartão de amigo','Envie aos amigos da PeixeCrew. Quem o receber fica com o seu nome na lista de amigos.',`${P.nome} quer juntar-te aos amigos na app PeixeCrew.`,`amigo-${P.nome.replace(/[^\w-]+/g,'_')}.json`);
 });
 $('amRecv').addEventListener('click',()=>openReceive(''));
 function previewAmigo(obj){
   if(!validId(obj.id))throw new Error('Cartão de amigo inválido.');
   const nome=String(obj.nome||'Amigo').slice(0,30).trim()||'Amigo', ex=P.amigos.find(a=>a.id===obj.id);
   const out=$('rvOut');
-  if(obj.id===P.uid){out.innerHTML='<p>Este cartão é o seu próprio.</p>';return}
+  if(isSelf(obj.id)){out.innerHTML='<p>Este cartão é o seu próprio.</p>';return}
   out.innerHTML=`<p style="margin:12px 0 6px">${ex?`<b>${esc(nome)}</b> já é seu amigo${ex.nome!==nome?` (estava como «${esc(ex.nome)}»)`:''}.`:`Juntar <b>${esc(nome)}</b> aos seus amigos?`}</p><button class="btn" id="rvAdd">${ex?'Atualizar o nome':'Juntar aos amigos'}</button>`;
   $('rvAdd').onclick=()=>{if(ex)ex.nome=nome;else P.amigos.push({id:obj.id,nome,em:iso(new Date())});commitProfile();paintAmigos();closeDlg();
     $('smsg').textContent=`${nome} ${ex?'atualizado':'juntado aos amigos'}.`;if(MQ.matches)setTab('locais')};
@@ -2357,15 +2385,25 @@ function cleanCond(c){
   return {h:N(c.h),hs:N(c.hs),med:N(c.med),mn:N(c.mn),mx:N(c.mx),n:N(c.n),swDir:N(c.swDir),tp:N(c.tp),wind:N(c.wind),wdDeg:N(c.wdDeg),gust:N(c.gust),rain48:N(c.rain48),hs48:N(c.hs48),visF:N(c.visF),
     mare:MAREN[c.mare]?c.mare:null,cls:['vivas','mortas','intermédias'].includes(c.cls)?c.cls:null};
 }
-function sendSaida(id){
+async function sendSaida(id){
   const e=D.find(x=>x.id===id);if(!e)return;
   if(!e.gid){e.gid='g'+rnd();save(KD,D)}
   const s=entrySpot(e), people=entryPeople(e);
-  const part=[{id:P.uid,n:P.nome||'Eu'},...people.map(p=>p.key.startsWith('id:')?{id:p.key.slice(3),n:p.n}:{n:p.n})];
-  const obj={app:'marlivre',t:'saida',v:1,de:P.nome||'Um amigo',deId:P.uid,em:iso(new Date()),
+  const part=[{id:myUid(),n:P.nome||(MEP&&MEP.nome)||'Eu'},...people.map(p=>p.key.startsWith('id:')?{id:p.key.slice(3),n:p.n}:{n:p.n})];
+  const obj={app:'marlivre',t:'saida',v:1,de:P.nome||'Um amigo',deId:myUid(),em:iso(new Date()),
     s:{gid:e.gid,date:e.date,t0:e.t0,t1:e.t1,tec:e.tec,local:s?{id:s.id,n:s.n,lat:s.lat,lon:s.lon,fundo:s.fundo,faceDeg:s.faceDeg,faceAuto:s.faceAuto,open:s.open}:{n:e.loc||'Local'},
       cond:e.cond||null,obs:{vis:e.obs&&e.obs.vis,marH:e.obs&&e.obs.marH,corr:e.obs&&e.obs.corr},part}};
-  showCode(obj,'Enviar aos companheiros',`Vai: o dia, as horas, o local, as condições e quem foi. Não vão as suas capturas, fotografias nem notas. Cada um junta a saída ao seu diário e acrescenta o que apanhou.`,
+  // com conta: o convite chega diretamente à app de quem também tem conta
+  const sent=[];
+  if(ME&&sbc()){
+    for(const p of people.filter(p=>p.key.startsWith('id:'))){
+      const a=P.amigos.find(x=>x.id===p.key.slice(3));if(!a||!a.acct)continue;
+      const r=await sbc().from('outing_invites').insert({from_user:ME.id,to_user:a.acct,gid:e.gid,payload:obj.s});
+      if(!r.error||String(r.error.code)==='23505')sent.push(a.nome);
+    }
+  }
+  if(sent.length&&sent.length===people.length){showDlg(`<h3>Enviado</h3><p>A saída de ${dLabel(e.date)} foi enviada na app a <b>${esc(sent.join(', '))}</b>. Vão vê-la no Diário, prontas a juntar as suas capturas.</p>`);return}
+  showCode(obj,'Enviar aos companheiros',`${sent.length?'Já enviado na app a '+sent.join(', ')+'. Para quem não tem conta, envie este código. ':''}Vai: o dia, as horas, o local, as condições e quem foi. Não vão as suas capturas, fotografias nem notas. Cada um junta a saída ao seu diário e acrescenta o que apanhou.`,
     `${obj.de} enviou-te a saída de ${dLabel(e.date)}${s?' em '+s.n:''} na app PeixeCrew.`,`saida-${e.date}.json`);
 }
 function previewSaida(obj){
@@ -2374,11 +2412,11 @@ function previewSaida(obj){
   const L=x.local&&isFinite(+x.local.lat)?cleanSpot(Object.assign({},x.local,{especies:[],notas:''})):null, nomeL=String((x.local&&x.local.n)||'Local').slice(0,40);
   const mine=L&&(P.spots.find(s=>s.id===L.id)||P.spots.find(s=>kmTo(s.lat,s.lon,L.lat,L.lon)<.15));
   const part=(Array.isArray(x.part)?x.part:[]).slice(0,12).map(p=>({id:validId(p&&p.id)?p.id:null,n:String((p&&p.n)||'').slice(0,30).trim()})).filter(p=>p.n);
-  const outros=part.filter(p=>p.id!==P.uid), novos=outros.filter(p=>p.id&&!P.amigos.some(a=>a.id===p.id));
+  const outros=part.filter(p=>!isSelf(p.id)), novos=outros.filter(p=>p.id&&!P.amigos.some(a=>a.id===p.id));
   const dup=D.find(e=>e.gid===x.gid);
   const same=!dup&&mine&&D.find(e=>!e.from&&!e.gid&&e.date===x.date&&(e.spot===mine.id));
   const out=$('rvOut');
-  out.innerHTML=`<p style="margin:12px 0 6px"><b>${esc(de)}</b> enviou a saída de <b>${dLabel(x.date)}</b>${t(x.t0)?' ('+t(x.t0)+(t(x.t1)?'–'+t(x.t1):'')+')':''} em <b>${esc(nomeL)}</b>, com ${esc(part.filter(p=>p.id!==P.uid).map(p=>p.n).join(', ')||'mais ninguém')}.</p>
+  out.innerHTML=`<p style="margin:12px 0 6px"><b>${esc(de)}</b> enviou a saída de <b>${dLabel(x.date)}</b>${t(x.t0)?' ('+t(x.t0)+(t(x.t1)?'–'+t(x.t1):'')+')':''} em <b>${esc(nomeL)}</b>${(()=>{const o=part.filter(p=>!isSelf(p.id)&&p.id!==obj.deId).map(p=>p.n);return o.length?', com '+esc(o.join(', ')):''})()}.</p>
     ${dup?'<p class="st-same">Já tem esta saída no diário.</p>':`<div class="chk">
       ${same?`<label><input type="checkbox" id="svLink" checked> Ligar à saída que já registou nesse dia em «${esc(mine.n)}» (em vez de criar outra)</label>`:''}
       ${L&&!mine?`<label><input type="checkbox" id="svSpot" checked> Juntar também o local «${esc(nomeL)}» aos seus locais</label>`:''}
@@ -2398,9 +2436,11 @@ function previewSaida(obj){
     else{const o=x.obs||{},N=v=>v==null||!isFinite(+v)?null:+v;
       e={id:rnd(),v:2,gid:x.gid,date:x.date,t0:t(x.t0),t1:t(x.t1),tec:String(x.tec||'').slice(0,30),spot:spot?spot.id:null,ll:spot?[spot.lat,spot.lon]:(L?[L.lat,L.lon]:null),loc:spot?spot.n:nomeL,
         obs:{vis:N(o.vis),marH:N(o.marH),corr:['nenhuma','fraca','forte'].includes(o.corr)?o.corr:'',saida:'',acerto:''},vistas:[],caps:[],notas:'',comIds,comNames,com,cond:cleanCond(x.cond)};
+      if(ME&&SOC.groups.length){e.shareG=SOC.groups.map(g=>g.id);e.shareF=false}
       if(!e.cond)delete e.cond;D.push(e)}
     save(KD,D);commitProfile();paintAmigos();closeDlg();renderDiary();
     if(!e.cond&&entrySpot(e))fetchCond(e);
+    if(obj.inv&&sbc())sbc().from('outing_invites').delete().eq('id',obj.inv).then(()=>refreshSocial());
     editEntry(e.id);$('dMsg').textContent='Acrescente as suas capturas e carregue em «Guardar alterações».';
   };
 }
@@ -2416,6 +2456,7 @@ function editEntry(id){
   $('dNotas').value=e.notas||'';$('dCaps').innerHTML='';(e.caps||[]).forEach(c=>addCapRow(c.sp,c.kg??'',c.cm??'',qn(c)));
   paintAmigos();document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=(e.comIds||[]).includes(i.value));
   $('dCom').value=(e.com||[]).join(', ');
+  paintDShare(!!e.shareF,e.shareG||[]);
   $('dSubmit').textContent='Guardar alterações';$('dCancel').hidden=false;$('dform').classList.add('editing');
   if(MQ.matches)setTab('diario');$('dform').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -2423,6 +2464,7 @@ function endEdit(){
   EDIT=null;$('dSubmit').textContent='Guardar saída';$('dCancel').hidden=true;$('dform').classList.remove('editing');
   $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';$('dTec').value='';
   document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);$('dDate').value=iso(new Date());
+  paintDShare(false,SOC.groups.map(x=>x.id));
 }
 $('dCancel').addEventListener('click',()=>{endEdit();$('dMsg').textContent=''});
 
@@ -2494,6 +2536,7 @@ $('dform').addEventListener('submit',ev=>{
     vistas:[...document.querySelectorAll('#dVistas input:checked')].map(i=>i.value),caps,notas:$('dNotas').value.trim(),
     com:splitNames($('dCom').value),comIds:[...document.querySelectorAll('#dAmigos input:checked')].map(i=>i.value)};
   e.comNames=Object.fromEntries(e.comIds.map(id=>[id,amName(id)]));
+  const shr=readShare('dShareC');if(shr){e.shareF=shr.f;e.shareG=shr.g}
   if(!e.date){$('dMsg').textContent='Indique a data.';return}
   if(EDIT){ // atualizar a saída existente
     const old=D.find(x=>x.id===EDIT);
@@ -2523,7 +2566,7 @@ $('dlist').addEventListener('click',ev=>{
   const se=ev.target.closest('[data-sende]');if(se){sendSaida(se.dataset.sende);return}
   const b=ev.target.closest('button[data-id]');if(!b)return;if(!confirm('Apagar este registo e as suas fotografias?'))return;
   const gone=D.find(x=>x.id===b.dataset.id);(gone&&gone.fotos||[]).forEach(id=>FDB.del(id).catch(()=>{}));
-  D=D.filter(x=>x.id!==b.dataset.id);save(KD,D);renderDiary();
+  D=D.filter(x=>x.id!==b.dataset.id);markDel('O',b.dataset.id);save(KD,D);renderDiary();
 });
 $('dlist').addEventListener('change',async ev=>{
   const inp=ev.target.closest('[data-addfoto]');if(!inp)return;
@@ -2659,6 +2702,322 @@ async function fillConds(){
 }
 save(KD,D);
 
+/* ================= Contas (Supabase) e sincronização =================
+ A app continua a funcionar sem conta e sem rede. Com conta, cada perfil deste aparelho liga-se a uma conta
+ e os locais, saídas e notas sincronizam entre aparelhos. Fotografias ficam só no aparelho.
+ Regras de acesso no servidor: supabase/schema.sql (cada um só vê o que é seu e o que lhe partilharam). */
+const SB_URL='https://ddoxfuuxooxoxxmqhmgx.supabase.co', SB_KEY='sb_publishable_dT6QbKf9LPrRLuu_gcKGlw_D5XjVC6c';
+const KS='ml_sync:'+PROFS.active;
+let SB=null, ME=null, MEP=null, SYNCING=false, syncT=null, lastSyncMsg='';
+let SYNC=Object.assign({sh:{},st:{},oh:{},ot:{},dS:[],dO:[],last:0},load(KS,{}));
+const saveSync=()=>{try{localStorage.setItem(KS,JSON.stringify(SYNC))}catch(e){}};
+function sbc(){
+  if(SB)return SB;
+  if(!window.supabase||!window.supabase.createClient||!/^https?:/.test(location.protocol))return null;
+  SB=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'ml_sb:'+PROFS.active}});
+  return SB;
+}
+function markDel(kind,id){
+  if(kind==='S'&&SYNC.sh[id]){SYNC.dS.push(id);delete SYNC.sh[id];saveSync()}
+  if(kind==='O'&&SYNC.oh[id]){SYNC.dO.push(id);delete SYNC.oh[id];saveSync()}
+}
+function onLocalSave(k){if(ME&&!SYNCING&&(k===KP||k===KD)){clearTimeout(syncT);syncT=setTimeout(()=>syncNow(),4000)}}
+const hstr=s=>{let x=5381;for(let i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return (x>>>0).toString(36)};
+const spotData=s=>{const o=Object.assign({},s);delete o.notas;delete o.shareF;delete o.shareG;return o};
+const outData=e=>{const o=Object.assign({},e);delete o.notas;delete o.fotos;delete o.shareF;delete o.shareG;delete o.condErr;return o};
+const hashS=s=>hstr(JSON.stringify([spotData(s),!!s.shareF,s.shareG||[],s.notas||'']));
+const hashO=e=>hstr(JSON.stringify([outData(e),!!e.shareF,e.shareG||[],e.notas||'']));
+
+async function syncNow(manual){
+  const sb=sbc();if(!sb||!ME||SYNCING)return;
+  if(!navigator.onLine){lastSyncMsg='Sem rede: sincroniza quando voltar a haver ligação.';paintAcct();return}
+  SYNCING=true;lastSyncMsg='A sincronizar…';paintAcct();
+  try{
+    const [rs,ro,rn]=await Promise.all([
+      sb.from('spots').select('id,data,share_friends,share_groups,deleted,updated_at').eq('owner',ME.id),
+      sb.from('outings').select('id,data,share_friends,share_groups,deleted,updated_at').eq('owner',ME.id),
+      sb.from('private_notes').select('kind,id,notas')]);
+    for(const r of [rs,ro,rn])if(r.error)throw r.error;
+    const notes={};(rn.data||[]).forEach(n=>notes[n.kind+':'+n.id]=n.notas);
+    let changedP=false,changedD=false;
+    // receber: o que mudou noutro aparelho (se aqui não mudou desde a última sincronização)
+    for(const r of rs.data){
+      const loc=P.spots.find(s=>s.id===r.id), localChanged=loc&&hashS(loc)!==SYNC.sh[r.id], remoteChanged=SYNC.st[r.id]!==r.updated_at;
+      if(r.deleted){if(loc&&!localChanged){P.spots=P.spots.filter(s=>s!==loc);changedP=true}delete SYNC.sh[r.id];SYNC.st[r.id]=r.updated_at;continue}
+      if(SYNC.dS.includes(r.id))continue;
+      if(!loc||(!localChanged&&remoteChanged)){
+        const s=Object.assign(cleanSpot(r.data)||{},r.data,{shareF:r.share_friends,shareG:r.share_groups||[],notas:notes['spot:'+r.id]||''});
+        if(loc)Object.assign(loc,s);else P.spots.push(s);
+        SYNC.sh[r.id]=hashS(loc||s);SYNC.st[r.id]=r.updated_at;changedP=true;
+      }
+    }
+    for(const r of ro.data){
+      const loc=D.find(e=>e.id===r.id), localChanged=loc&&hashO(loc)!==SYNC.oh[r.id], remoteChanged=SYNC.ot[r.id]!==r.updated_at;
+      if(r.deleted){if(loc&&!localChanged){D=D.filter(e=>e!==loc);changedD=true}delete SYNC.oh[r.id];SYNC.ot[r.id]=r.updated_at;continue}
+      if(SYNC.dO.includes(r.id))continue;
+      if(!loc||(!localChanged&&remoteChanged)){
+        const e=Object.assign({},r.data,{shareF:r.share_friends,shareG:r.share_groups||[],notas:notes['outing:'+r.id]||''});
+        if(loc){const fotos=loc.fotos;Object.keys(loc).forEach(k=>delete loc[k]);Object.assign(loc,e);if(fotos)loc.fotos=fotos}else D.push(e);
+        SYNC.oh[r.id]=hashO(loc||e);SYNC.ot[r.id]=r.updated_at;changedD=true;
+      }
+    }
+    // enviar: o que mudou aqui
+    const upS=P.spots.filter(s=>hashS(s)!==SYNC.sh[s.id]), upO=D.filter(e=>e.date&&hashO(e)!==SYNC.oh[e.id]);
+    if(upS.length){const r=await sb.from('spots').upsert(upS.map(s=>({owner:ME.id,id:s.id,data:spotData(s),share_friends:!!s.shareF,share_groups:s.shareG||[],deleted:false})),{onConflict:'owner,id'}).select('id,updated_at');if(r.error)throw r.error;
+      r.data.forEach(x=>SYNC.st[x.id]=x.updated_at);upS.forEach(s=>SYNC.sh[s.id]=hashS(s))}
+    if(upO.length){const r=await sb.from('outings').upsert(upO.map(e=>({owner:ME.id,id:e.id,gid:e.gid||null,date:e.date,data:outData(e),share_friends:!!e.shareF,share_groups:e.shareG||[],deleted:false})),{onConflict:'owner,id'}).select('id,updated_at');if(r.error)throw r.error;
+      r.data.forEach(x=>SYNC.ot[x.id]=x.updated_at);upO.forEach(e=>SYNC.oh[e.id]=hashO(e))}
+    const upN=[...upS.map(s=>({kind:'spot',id:s.id,notas:s.notas||''})),...upO.map(e=>({kind:'outing',id:e.id,notas:e.notas||''}))].filter(n=>n.notas||notes[n.kind+':'+n.id]);
+    if(upN.length){const r=await sb.from('private_notes').upsert(upN.map(n=>Object.assign({owner:ME.id},n)),{onConflict:'owner,kind,id'});if(r.error)throw r.error}
+    // apagados aqui
+    if(SYNC.dS.length){const r=await sb.from('spots').update({deleted:true,data:{}}).eq('owner',ME.id).in('id',SYNC.dS);if(r.error)throw r.error;SYNC.dS=[]}
+    if(SYNC.dO.length){const r=await sb.from('outings').update({deleted:true,data:{}}).eq('owner',ME.id).in('id',SYNC.dO);if(r.error)throw r.error;SYNC.dO=[]}
+    SYNC.last=Date.now();saveSync();if(upO.length||changedD)GRPC={};
+    if(changedP){save(KP,P);paintProfile();renderToday();evaluateAndRender();renderCal()}
+    if(changedD){save(KD,D);renderDiary()}
+    lastSyncMsg=`Sincronizado às ${new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}.`;
+  }catch(err){
+    lastSyncMsg='Não foi possível sincronizar: '+(err&&err.message||'erro desconhecido')+'. Tento de novo mais tarde.';
+  }finally{SYNCING=false;paintAcct()}
+}
+
+/* ================= Amigos, grupos, partilhas e convites (com conta) ================= */
+const accUid=u=>'u'+String(u).replace(/-/g,'');
+function myUid(){return ME?accUid(ME.id):P.uid}
+function isSelf(id){return !!id&&(id===P.uid||(ME&&id===accUid(ME.id)))}
+let SOC={friends:[],incoming:[],outgoing:[],prof:{},groups:[],members:{},shared:[],invites:[]}, socMsg='', socErr=false;
+const pname=id=>{const p=SOC.prof[id];return p?(p.nome||'@'+p.username):'…'};
+const puser=id=>SOC.prof[id]&&SOC.prof[id].nome?'@'+SOC.prof[id].username:'';
+const isAdm=g=>(SOC.members[g.id]||[]).some(m=>m.user_id===ME.id&&m.role==='admin');
+function setSoc(t,err){socMsg=t;socErr=!!err;paintSocial()}
+async function refreshSocial(){
+  const sb=sbc();if(!sb||!ME)return;
+  GRPC={};
+  try{
+    const [fr,gr,mm,sh,iv]=await Promise.all([
+      sb.from('friendships').select('requester,addressee,status'),
+      sb.from('groups').select('id,nome,owner,invite_code'),
+      sb.from('group_members').select('group_id,user_id,role'),
+      sb.from('spots').select('owner,id,data,updated_at').neq('owner',ME.id).eq('deleted',false),
+      sb.from('outing_invites').select('id,from_user,gid,payload,created_at').eq('to_user',ME.id)]);
+    for(const r of [fr,gr,mm,sh,iv])if(r.error)throw r.error;
+    const me=ME.id;
+    SOC.friends=fr.data.filter(x=>x.status==='accepted').map(x=>x.requester===me?x.addressee:x.requester);
+    SOC.incoming=fr.data.filter(x=>x.status==='pending'&&x.addressee===me).map(x=>x.requester);
+    SOC.outgoing=fr.data.filter(x=>x.status==='pending'&&x.requester===me).map(x=>x.addressee);
+    SOC.groups=gr.data;SOC.members={};mm.data.forEach(m=>(SOC.members[m.group_id]=SOC.members[m.group_id]||[]).push(m));
+    SOC.shared=sh.data;SOC.invites=iv.data;
+    const ids=[...new Set([...SOC.friends,...SOC.incoming,...SOC.outgoing,...mm.data.map(m=>m.user_id),...sh.data.map(s=>s.owner),...iv.data.map(i=>i.from_user)])];
+    if(ids.length){const pr=await sb.from('profiles').select('id,username,nome').in('id',ids);if(!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p)}
+    // os amigos da conta aparecem em «Com quem»
+    let ch=false;
+    for(const id of SOC.friends){const p=SOC.prof[id];if(!p)continue;const lid=accUid(id),nome=p.nome||p.username,a=P.amigos.find(x=>x.id===lid);
+      if(!a){P.amigos.push({id:lid,nome,acct:id,em:iso(new Date())});ch=true}else if(a.nome!==nome||a.acct!==id){a.nome=nome;a.acct=id;ch=true}}
+    if(ch){save(KP,P);paintAmigos()}
+  }catch(e){socMsg='Não foi possível atualizar amigos e grupos: '+(e&&e.message||e);socErr=true}
+  paintSocial();renderSharedSpots();paintInvites();renderGrpStats();paintDShare();
+}
+function shareFieldsHTML(id,f,g,nota){
+  return `<div class="f wide"><span style="font-size:15px;font-weight:600">Partilhar na app</span><div class="spchips" id="${id}"><label><input type="checkbox" data-sf${f?' checked':''}>Amigos</label>${SOC.groups.map(x=>`<label><input type="checkbox" value="${x.id}"${(g||[]).includes(x.id)?' checked':''}>${esc(x.nome)}</label>`).join('')}</div><span class="small muted">${esc(nota)}</span></div>`;
+}
+function readShare(id){
+  const el=$(id);if(!el||!ME||el.closest('[hidden]'))return null;
+  const sf=el.querySelector('[data-sf]');
+  return {f:!!(sf&&sf.checked),g:[...el.querySelectorAll('input[value]:checked')].map(i=>i.value)};
+}
+function paintDShare(f,g){
+  const w=$('dShareW');if(!w)return;w.hidden=!ME;if(!ME)return;
+  const c=$('dShareC'), had=c.querySelector('[data-sf]');
+  const pf=f!==undefined?f:(had?had.checked:false);
+  const shown=new Set([...c.querySelectorAll('input[value]')].map(i=>i.value));
+  const pg=g!==undefined?g:(had?[...[...c.querySelectorAll('input[value]:checked')].map(i=>i.value),...SOC.groups.map(x=>x.id).filter(id=>!shown.has(id))]:SOC.groups.map(x=>x.id));
+  c.innerHTML=`<label><input type="checkbox" data-sf${pf?' checked':''}>Amigos</label>`+SOC.groups.map(x=>`<label><input type="checkbox" value="${x.id}"${pg.includes(x.id)?' checked':''}>${esc(x.nome)}</label>`).join('');
+}
+function paintSocial(){
+  const box=$('socBox');if(!box||!ME)return;
+  box.innerHTML=`<div class="soc">
+    <h4>Amigos na app</h4>
+    <form id="frForm" class="row"><input id="frU" placeholder="@nome de utilizador" autocapitalize="none" autocomplete="off" required><button class="btn">Enviar pedido</button></form>
+    ${SOC.incoming.map(id=>`<div class="row"><span><b>${esc(pname(id))}</b> <span class="muted small">${esc(puser(id))}</span> quer ser seu amigo</span><button type="button" class="btn" data-fra="${id}">Aceitar</button><button type="button" class="btn ghost" data-frd="${id}">Recusar</button></div>`).join('')}
+    ${SOC.friends.length?`<div class="amlist">${SOC.friends.map(id=>`<span class="am">${esc(pname(id))} <span class="muted small">${esc(puser(id))}</span><button type="button" data-frd="${id}" aria-label="Remover amigo">✕</button></span>`).join('')}</div>`:'<p class="small muted" style="margin:0">Ainda sem amigos na app.</p>'}
+    ${SOC.outgoing.length?`<p class="small muted" style="margin:0">À espera de resposta: ${SOC.outgoing.map(id=>esc(puser(id)||'…')).join(', ')}</p>`:''}
+    <h4 style="margin-top:6px">Grupos</h4>
+    ${SOC.groups.map(g=>`<div class="grp"><div><b>${esc(g.nome)}</b> <span class="muted small">${(SOC.members[g.id]||[]).length} ${(SOC.members[g.id]||[]).length===1?'membro':'membros'}${isAdm(g)?' · é administrador':''}</span></div>
+      <div class="small muted">${(SOC.members[g.id]||[]).map(m=>esc(pname(m.user_id))+(m.role==='admin'?' (admin)':'')).join(', ')}</div>
+      <div class="row"><button type="button" class="btn ghost" data-ginv="${g.id}">Convidar</button><button type="button" class="btn ghost" data-gleave="${g.id}">Sair do grupo</button></div></div>`).join('')||'<p class="small muted" style="margin:0">Ainda não está em nenhum grupo.</p>'}
+    <form id="gNew" class="row"><input id="gNome" placeholder="Nome do grupo (ex.: PeixeCrew)" required minlength="2" maxlength="40"><button class="btn ghost">Criar grupo</button></form>
+    <form id="gJoin" class="row"><input id="gCode" placeholder="Código de convite" required autocomplete="off"><button class="btn ghost">Entrar no grupo</button></form>
+    ${socMsg?`<p class="${socErr?'err':'ok'}" style="margin:0">${esc(socMsg)}</p>`:''}</div>`;
+  const sb=sbc();
+  $('frForm').onsubmit=async e=>{e.preventDefault();const q=$('frU').value.trim().replace(/^@/,'').toLowerCase();
+    const {data,error}=await sb.rpc('find_profile',{q});if(error){setSoc(trErr(error),true);return}
+    const p=data&&data[0];if(!p){setSoc(`Não encontrei ninguém com o nome de utilizador @${q}.`,true);return}
+    if(p.id===ME.id){setSoc('Esse é o seu próprio nome de utilizador.',true);return}
+    if(SOC.incoming.includes(p.id)){await sb.from('friendships').update({status:'accepted'}).eq('requester',p.id).eq('addressee',ME.id);setSoc(`Agora é amigo de ${p.nome||'@'+p.username}.`);refreshSocial();return}
+    const r=await sb.from('friendships').insert({requester:ME.id,addressee:p.id});
+    if(r.error){setSoc(String(r.error.code)==='23505'?'Já existe um pedido ou amizade com esta pessoa.':trErr(r.error),true);return}
+    setSoc(`Pedido enviado a @${p.username}.`);refreshSocial()};
+  box.querySelectorAll('[data-fra]').forEach(b=>b.onclick=async()=>{const r=await sb.from('friendships').update({status:'accepted'}).eq('requester',b.dataset.fra).eq('addressee',ME.id);if(r.error)setSoc(trErr(r.error),true);else{setSoc('Pedido aceite.');refreshSocial()}});
+  box.querySelectorAll('[data-frd]').forEach(b=>b.onclick=async()=>{const o=b.dataset.frd;
+    if(SOC.friends.includes(o)&&!confirm(`Deixar de ser amigo de ${pname(o)}? Deixam de ver o que partilharam com «Amigos».`))return;
+    const r=await sb.from('friendships').delete().or(`and(requester.eq.${ME.id},addressee.eq.${o}),and(requester.eq.${o},addressee.eq.${ME.id})`);
+    if(r.error)setSoc(trErr(r.error),true);else{setSoc('');refreshSocial()}});
+  $('gNew').onsubmit=async e=>{e.preventDefault();const {error}=await sb.rpc('create_group',{nome:$('gNome').value.trim()});if(error){setSoc(trErr(error),true);return}setSoc('Grupo criado. Use «Convidar» para mandar o link aos amigos.');refreshSocial()};
+  $('gJoin').onsubmit=async e=>{e.preventDefault();await joinGroup($('gCode').value)};
+  box.querySelectorAll('[data-ginv]').forEach(b=>b.onclick=()=>{const g=SOC.groups.find(x=>x.id===b.dataset.ginv);if(!g)return;
+    const link=`${location.origin}${location.pathname}#grupo=${g.invite_code}`, msg=`Entra no grupo «${g.nome}» na app PeixeCrew: ${link}\n(ou, na app, «Locais» › «Entrar no grupo» com o código ${g.invite_code})`;
+    showDlg(`<h3>Convidar para «${esc(g.nome)}»</h3><p class="small muted" style="margin:-4px 0 0">Quem abrir o link e tiver conta entra no grupo. Mande só a quem quer no grupo.</p><textarea class="codebox" id="shTxt" readonly></textarea><div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<span class="small muted" id="shMsg"></span></div>`);
+    $('shTxt').value=msg;$('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('shMsg').textContent='Copiado.'}catch(e){$('shTxt').select()}};
+    if(navigator.share)$('shNative').onclick=()=>navigator.share({title:'Grupo PeixeCrew',text:msg}).catch(()=>{});});
+  box.querySelectorAll('[data-gleave]').forEach(b=>b.onclick=async()=>{const g=SOC.groups.find(x=>x.id===b.dataset.gleave);if(!g)return;
+    const n=(SOC.members[g.id]||[]).length;
+    if(!confirm(n<=1?`É o último membro: o grupo «${g.nome}» vai ser apagado. Continuar?`:`Sair do grupo «${g.nome}»?`))return;
+    const r=n<=1?await sb.from('groups').delete().eq('id',g.id):await sb.from('group_members').delete().eq('group_id',g.id).eq('user_id',ME.id);
+    if(r.error)setSoc(trErr(r.error),true);else{setSoc('');refreshSocial()}});
+}
+async function joinGroup(code){
+  const sb=sbc();code=String(code||'').trim().toLowerCase();if(!sb||!ME||!code)return;
+  const {data,error}=await sb.rpc('join_group',{code});
+  if(error){setSoc(/inválido|invalid/i.test(error.message)?'Código de convite inválido.':trErr(error),true);return}
+  setSoc('Entrou no grupo.');refreshSocial();
+}
+function renderSharedSpots(){
+  const el=$('sharedSpots');if(!el)return;
+  if(!ME||!SOC.shared.length){el.innerHTML='';return}
+  el.innerHTML=`<div class="sharedw"><h4>Partilhados comigo</h4>${SOC.shared.map((r,i)=>{const d=r.data||{},have=P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
+    return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted">de ${esc(pname(r.owner))} · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
+      <span class="acts">${have?'<span class="small muted">Já está nos seus locais</span>':`<button type="button" data-cpy="${i}">Juntar aos meus locais</button>`}${isFinite(+d.lat)?`<a href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Ver no mapa</a>`:''}</span></div>`}).join('')}</div>`;
+  el.querySelectorAll('[data-cpy]').forEach(b=>b.onclick=()=>{const r=SOC.shared[+b.dataset.cpy];const s=cleanSpot(Object.assign({},r.data,{notas:''}));if(!s)return;
+    if(P.spots.some(x=>x.id===s.id))s.id='s'+rnd();delete s.shareF;delete s.shareG;s.from={nome:pname(r.owner),em:iso(new Date())};
+    P.spots.push(s);commitProfile();fillCoast();renderSharedSpots();$('smsg').textContent=`«${s.n}» juntado aos seus locais.`});
+}
+function paintInvites(){
+  const el=$('invBox');if(!el)return;
+  if(!ME||!SOC.invites.length){el.innerHTML='';return}
+  el.innerHTML=SOC.invites.map(v=>{const x=v.payload||{};return `<div class="invcard"><span><b>${esc(pname(v.from_user))}</b> enviou-lhe a saída de <b>${x.date?dLabel(x.date):'?'}</b>${x.local&&x.local.n?' em '+esc(x.local.n):''}.</span><span style="display:flex;gap:8px"><button class="btn" data-invok="${v.id}">Ver e juntar</button><button class="btn ghost" data-invno="${v.id}">Ignorar</button></span></div>`}).join('');
+  el.querySelectorAll('[data-invok]').forEach(b=>b.onclick=()=>{const v=SOC.invites.find(x=>x.id===b.dataset.invok);if(!v)return;
+    openReceive('');try{previewSaida({app:'marlivre',t:'saida',v:1,de:pname(v.from_user),deId:accUid(v.from_user),s:v.payload,inv:v.id})}catch(e){$('rvOut').innerHTML=`<p class="msg">${esc(e.message||'Convite inválido.')}</p>`}});
+  el.querySelectorAll('[data-invno]').forEach(b=>b.onclick=async()=>{await sbc().from('outing_invites').delete().eq('id',b.dataset.invno);refreshSocial()});
+}
+/* Recordes do grupo: contam as saídas que cada membro partilhou com o grupo */
+let GRPC={};
+async function renderGrpStats(){
+  const el=$('grpStats');if(!el)return;
+  if(!ME||!SOC.groups.length){el.innerHTML='';return}
+  const cur=($('grpSel')&&$('grpSel').value)||SOC.groups[0].id, g=SOC.groups.find(x=>x.id===cur)||SOC.groups[0];
+  el.innerHTML=`<div><h3>Recordes do grupo</h3><label class="f stctl">Grupo<select id="grpSel">${SOC.groups.map(x=>`<option value="${x.id}"${x.id===g.id?' selected':''}>${esc(x.nome)}</option>`).join('')}</select></label><div id="grpBody"><p class="small muted">A carregar…</p></div></div>`;
+  $('grpSel').onchange=renderGrpStats;
+  let rows=GRPC[g.id]&&Date.now()-GRPC[g.id].t<3e5?GRPC[g.id].rows:null;
+  if(!rows){const r=await sbc().from('outings').select('owner,date,data').contains('share_groups',[g.id]).eq('deleted',false);
+    if(r.error){$('grpBody').innerHTML=`<p class="err">${esc(trErr(r.error))}</p>`;return}rows=r.data;GRPC[g.id]={t:Date.now(),rows}}
+  if(!rows.length){$('grpBody').innerHTML='<p class="small muted">Ainda ninguém partilhou saídas com este grupo. No Diário, em «Partilhar esta saída na app», marque o grupo.</p>';return}
+  const kg=d=>(d.caps||[]).reduce((a,c)=>a+(+c.kg||0),0), nc=d=>(d.caps||[]).filter(c=>c.sp).reduce((a,c)=>a+qn(c),0), kgT=v=>fmt(v,v<10?2:1);
+  const Pm={};rows.forEach(r=>{const o=Pm[r.owner]||(Pm[r.owner]={n:0,cap:0,kg:0});o.n++;o.cap+=nc(r.data);o.kg+=kg(r.data)});
+  const big={};rows.forEach(r=>(r.data.caps||[]).forEach(c=>{if(qn(c)===1&&c.kg&&byK[c.sp]&&(!big[c.sp]||c.kg>big[c.sp].kg))big[c.sp]={kg:c.kg,cm:c.cm,who:r.owner,date:r.date}}));
+  const top=[...rows].filter(r=>kg(r.data)).sort((a,b)=>kg(b.data)-kg(a.data)).slice(0,5);
+  $('grpBody').innerHTML=`<p class="small muted" style="margin:0 0 6px">Contam as saídas que cada membro partilhou com o grupo (${rows.length}).</p>
+    <div class="stwrap"><table class="sttable"><thead><tr><th>Quem</th><th class="n">Saídas</th><th class="n">Capturas</th><th class="n">kg</th><th class="n">kg/saída</th></tr></thead><tbody>${Object.entries(Pm).sort((a,b)=>b[1].kg-a[1].kg).map(([id,o])=>`<tr><td><b>${esc(id===ME.id?'Você':pname(id))}</b></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div>
+    ${Object.keys(big).length?`<h3 style="margin-top:10px">Maior peixe de cada espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th>Quem</th><th class="n">kg</th><th class="n">cm</th><th>Dia</th></tr></thead><tbody>${Object.entries(big).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>`<tr><td><b>${esc(byK[k].n)}</b></td><td>${esc(o.who===ME.id?'Você':pname(o.who))}</td><td class="n">${kgT(o.kg)}</td><td class="n">${o.cm?fmt(o.cm,o.cm%1?1:0):'—'}</td><td>${dLabel(o.date)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${top.length?`<h3 style="margin-top:10px">As melhores caçadas do grupo</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Quem</th><th>Local</th><th class="n">kg</th></tr></thead><tbody>${top.map(r=>`<tr><td>${dLabel(r.date)}</td><td>${esc(r.owner===ME.id?'Você':pname(r.owner))}</td><td>${esc(r.data.loc||'')}</td><td class="n"><b>${kgT(kg(r.data))}</b></td></tr>`).join('')}</tbody></table></div>`:''}`;
+}
+
+/* ---- Caixa da conta ---- */
+let acctMode='entrar', acctMsg='', acctErr=false, recovery=false;
+function paintAcct(){
+  const box=$('acctBox');if(!box)return;
+  const sb=sbc();
+  if(!sb){box.innerHTML=`<h4>Conta PeixeCrew</h4><p class="small muted" style="margin:0">${/^https?:/.test(location.protocol)?(window.__noSB?'Sem rede ao abrir a app: as contas ficam disponíveis quando voltar a haver ligação.':'A carregar…'):'As contas só funcionam na app online: <a href="https://lourenco10ucp.github.io/PeixeCrew/" target="_blank" rel="noopener">lourenco10ucp.github.io/PeixeCrew</a>.'}</p>`;return}
+  const msg=acctMsg?`<p class="${acctErr?'err':'ok'}" style="margin:0">${esc(acctMsg)}</p>`:'';
+  if(recovery){
+    box.innerHTML=`<h4>Nova palavra-passe</h4><form id="acNew" class="grid2"><label class="f">Nova palavra-passe<input type="password" id="acP1" minlength="8" required autocomplete="new-password"></label><label class="f">Repetir<input type="password" id="acP2" minlength="8" required autocomplete="new-password"></label><div class="row"><button class="btn">Guardar palavra-passe</button></div></form>${msg}`;
+    $('acNew').onsubmit=async e=>{e.preventDefault();if($('acP1').value!==$('acP2').value){setAcctMsg('As palavras-passe não são iguais.',true);return}
+      const {error}=await sb.auth.updateUser({password:$('acP1').value});if(error){setAcctMsg(trErr(error),true);return}recovery=false;setAcctMsg('Palavra-passe alterada.')};
+    return;
+  }
+  if(ME){
+    box.innerHTML=`<h4>Conta PeixeCrew</h4>
+      <p style="margin:0">Sessão iniciada como <b>@${esc(MEP?MEP.username:'…')}</b>${MEP&&MEP.nome?' ('+esc(MEP.nome)+')':''} · <span class="muted">${esc(ME.email||'')}</span></p>
+      <p class="small muted" style="margin:0">${esc(lastSyncMsg||'Os locais, as saídas e as notas deste perfil sincronizam com a conta. As fotografias ficam só neste aparelho.')}</p>
+      <div class="row"><button class="btn ghost" id="acSync">Sincronizar agora</button><button class="btn ghost" id="acOut">Terminar sessão</button><button class="btn ghost" id="acDel" style="color:var(--stop);border-color:var(--stop)">Apagar conta</button></div>${msg}<div id="socBox"></div>`;
+    paintSocial();
+    $('acSync').onclick=async()=>{await syncNow(true);refreshSocial()};
+    $('acOut').onclick=async()=>{await sb.auth.signOut();SOC={friends:[],incoming:[],outgoing:[],prof:{},groups:[],members:{},shared:[],invites:[]};renderSharedSpots();paintInvites();renderGrpStats();paintDShare();setAcctMsg('Sessão terminada. Os dados continuam neste aparelho.')};
+    $('acDel').onclick=async()=>{
+      if(!confirm('Apagar a conta e todos os dados guardados na conta (locais, saídas, notas, amizades, grupos)? Os dados deste aparelho ficam. Não dá para desfazer.'))return;
+      if(prompt('Para confirmar, escreva APAGAR')!=='APAGAR')return;
+      const {error}=await sb.rpc('delete_my_account');if(error){setAcctMsg(trErr(error),true);return}
+      await sb.auth.signOut();delete P.acct;save(KP,P);SYNC={sh:{},st:{},oh:{},ot:{},dS:[],dO:[],last:0};saveSync();setAcctMsg('Conta apagada.');
+    };
+    return;
+  }
+  const reg=acctMode==='criar';
+  box.innerHTML=`<h4>Conta PeixeCrew <span class="small muted" style="font-family:var(--f-body);font-weight:400">(opcional)</span></h4>
+    <p class="small muted" style="margin:0">Com conta, os seus locais e o diário ficam iguais no telemóvel e no PC, e pode ter amigos e grupos na app. Sem conta, tudo continua a funcionar só neste aparelho.</p>
+    <div class="tabs"><button type="button" data-am="entrar" aria-pressed="${!reg}">Entrar</button><button type="button" data-am="criar" aria-pressed="${reg}">Criar conta</button></div>
+    <form id="acForm" class="grid2">
+      ${reg?`<label class="f">Nome de utilizador<input id="acU" required minlength="3" maxlength="20" pattern="[a-z0-9_.]{3,20}" placeholder="ex.: lourenco" autocomplete="username" autocapitalize="none"></label><label class="f">Nome a mostrar<input id="acN" maxlength="40" value="${esc(P.nome||'')}" autocomplete="nickname"></label>`:''}
+      <label class="f">E-mail<input type="email" id="acE" required autocomplete="email"></label>
+      <label class="f">Palavra-passe<input type="password" id="acP" required minlength="8" autocomplete="${reg?'new-password':'current-password'}"></label>
+      <div class="row"><button class="btn">${reg?'Criar conta':'Entrar'}</button>${reg?'':'<button type="button" class="linkb" id="acForgot">Esqueci-me da palavra-passe</button>'}</div>
+    </form>${reg?'<p class="small muted" style="margin:0">Nome de utilizador: letras minúsculas, números, «.» ou «_». É assim que os amigos o encontram.</p>':''}${msg}`;
+  box.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{acctMode=b.dataset.am;acctMsg='';paintAcct()});
+  $('acForm').onsubmit=async e=>{
+    e.preventDefault();const email=$('acE').value.trim(),password=$('acP').value;
+    if(reg){
+      const username=$('acU').value.trim().toLowerCase();
+      const {error}=await sb.auth.signUp({email,password,options:{data:{username,nome:$('acN').value.trim()},emailRedirectTo:location.origin+location.pathname}});
+      if(error){setAcctMsg(trErr(error),true);return}
+      acctMode='entrar';setAcctMsg('Conta criada. Enviámos-lhe um e-mail: abra o link para confirmar e depois entre aqui.');
+    }else{
+      const {error}=await sb.auth.signInWithPassword({email,password});
+      if(error){setAcctMsg(trErr(error),true);return}
+      acctMsg='';
+    }
+  };
+  if($('acForgot'))$('acForgot').onclick=async()=>{
+    const email=$('acE').value.trim();if(!email){setAcctMsg('Escreva primeiro o seu e-mail.',true);return}
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+    setAcctMsg(error?trErr(error):'Se o e-mail tiver conta, vai receber um link para escolher uma nova palavra-passe.',!!error);
+  };
+}
+function setAcctMsg(t,err){acctMsg=t;acctErr=!!err;paintAcct()}
+function trErr(e){
+  const m=String(e&&e.message||e);
+  if(/Invalid login credentials/i.test(m))return 'E-mail ou palavra-passe errados.';
+  if(/Email not confirmed/i.test(m))return 'Ainda não confirmou o e-mail: abra o link que lhe enviámos.';
+  if(/already registered|already been registered/i.test(m))return 'Já existe uma conta com este e-mail. Entre, ou use «Esqueci-me da palavra-passe».';
+  if(/Password should be at least|weak/i.test(m))return 'A palavra-passe é demasiado fraca: use pelo menos 8 caracteres, com letras e números.';
+  if(/rate limit|too many/i.test(m))return 'Demasiadas tentativas. Espere uns minutos e tente de novo.';
+  if(/profiles_username_check|username/i.test(m))return 'Nome de utilizador inválido ou já usado.';
+  if(/Failed to fetch|NetworkError/i.test(m))return 'Sem ligação ao servidor. Tente quando tiver rede.';
+  return m;
+}
+async function onSession(session){
+  const sb=sbc();ME=session&&session.user||null;MEP=null;
+  if(ME){
+    if(P.acct&&P.acct!==ME.id){
+      setAcctMsg('Este perfil do aparelho já está ligado a outra conta. Para usar esta conta, crie um perfil novo neste aparelho (botão «Novo perfil») e entre lá.',true);
+      await sb.auth.signOut();return;
+    }
+    if(!P.acct){P.acct=ME.id;save(KP,P)}
+    const {data}=await sb.from('profiles').select('id,username,nome').eq('id',ME.id).maybeSingle();MEP=data||null;
+    if(MEP&&MEP.nome&&!P.nome){P.nome=MEP.nome;save(KP,P);paintProfile()}
+    else if(MEP&&!MEP.nome&&P.nome){const r=await sb.from('profiles').update({nome:P.nome.slice(0,40)}).eq('id',ME.id);if(!r.error)MEP.nome=P.nome}
+    paintAcct();await syncNow();await refreshSocial();
+    let jc=null;try{jc=sessionStorage.getItem('ml_join')}catch(e){}
+    if(jc){try{sessionStorage.removeItem('ml_join')}catch(e){}if(confirm('Abriu um convite para um grupo da PeixeCrew. Entrar no grupo?')){await joinGroup(jc);setTab('locais')}}
+  }else{paintAcct();let jc=null;try{jc=sessionStorage.getItem('ml_join')}catch(e){}if(jc)setAcctMsg('Recebeu um convite para um grupo: entre na sua conta (ou crie uma) para entrar no grupo.')}
+}
+function initAcct(){
+  const sb=sbc();paintAcct();if(!sb)return;
+  sb.auth.onAuthStateChange((ev,session)=>{
+    if(ev==='PASSWORD_RECOVERY'){recovery=true;setTab('locais');}
+    if(ev==='SIGNED_IN'||ev==='INITIAL_SESSION'||ev==='SIGNED_OUT'||ev==='USER_UPDATED')setTimeout(()=>onSession(session),0);
+  });
+  window.addEventListener('online',()=>syncNow());
+  setInterval(async()=>{if(ME&&document.visibilityState==='visible'){await syncNow();refreshSocial()}},5*60*1000);
+}
+
 /* ---------- Arranque ---------- */
 $('mPM').addEventListener('change',saveMares);$('mBM').addEventListener('change',saveMares);
 $('legend').innerHTML='Origem da informação: '+Object.keys(ST).map(t=>`<span class="srcp t-${t}" title="${esc(STD[t])}">${ST[t]}</span>`).join('');
@@ -2699,7 +3058,8 @@ let instEv=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;$('instBtn').hidden=false});
 $('instBtn').addEventListener('click',async()=>{if(!instEv)return;instEv.prompt();await instEv.userChoice.catch(()=>{});instEv=null;$('instBtn').hidden=true});
 window.addEventListener('appinstalled',()=>{$('instBtn').hidden=true});
-loadIPMA();fillCoast();fillConds();
+try{const m=(location.hash||'').match(/grupo=([0-9a-f]{12})/i);if(m){sessionStorage.setItem('ml_join',m[1].toLowerCase());history.replaceState(null,'',location.pathname+location.search);setTab('locais')}}catch(e){}
+loadIPMA();fillCoast();fillConds();initAcct();
 // aberta por um link de partilha (#partilha=MLV1…): mostra os locais recebidos
 try{const hs=decodeURIComponent(location.hash||'');if(/MLV1[AZ]/.test(hs)){history.replaceState(null,'',location.pathname+location.search);openReceive(hs)}}catch(e){}
 })();
