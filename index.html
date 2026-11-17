@@ -134,16 +134,16 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .shelfh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .shelfh h3{font-size:22px}
 .shelfrow{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:8px 2px 10px;scrollbar-width:thin}
-.scard{all:unset;box-sizing:border-box;cursor:pointer;scroll-snap-align:start;flex:0 0 min(62%,230px);background:var(--surface);border:2px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.scard .bar{height:8px;flex:none}
-.scard .in{padding:10px 12px 12px;display:grid;gap:3px}
-.scard b{font-size:17px;line-height:1.2}
-.scard .v{font-weight:800;font-size:14px}
-.scard .m{font-size:13.5px;color:var(--muted)}
-.scard .w{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.scard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.scard:focus-visible{outline:3px solid var(--focus)}
-.scard.add{align-items:center;justify-content:center;padding:16px;text-align:center;font-weight:700;color:var(--accent);border-style:dashed}
+.lcard{all:unset;box-sizing:border-box;cursor:pointer;scroll-snap-align:start;flex:0 0 min(62%,230px);background:var(--surface);border:2px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.lcard .bar{height:8px;flex:none}
+.lcard .in{padding:10px 12px 12px;display:grid;gap:3px}
+.lcard b{font-size:17px;line-height:1.2}
+.lcard .v{font-weight:800;font-size:14px}
+.lcard .m{font-size:13.5px;color:var(--muted)}
+.lcard .w{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lcard.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.lcard:focus-visible{outline:3px solid var(--focus)}
+.lcard.add{align-items:center;justify-content:center;padding:16px;text-align:center;font-weight:700;color:var(--accent);border-style:dashed}
 .hdet{margin-top:18px}
 .hdet>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:12px 16px;border:2px solid var(--line);border-radius:14px;background:var(--surface)}
 .hdet>summary::-webkit-details-marker{display:none}
@@ -400,8 +400,63 @@ ol.ethic li::before{content:counter(e);position:absolute;left:14px;top:10px;font
 .rule span{display:block;margin-top:6px;font-size:15px;color:var(--muted)}
 
 /* diário */
-.diary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px;margin-top:16px;align-items:start}
-@media (max-width:860px){.diary{grid-template-columns:minmax(0,1fr)}}
+.diary{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:14px;max-width:720px}
+.dtools{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.dtools .btn{padding:8px 14px;font-size:15px}
+.dempty{border:2px dashed var(--line);border-radius:16px;padding:22px 18px;text-align:center;color:var(--muted)}
+.dempty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+details.dlearn{border:2px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 14px}
+details.dlearn>summary{cursor:pointer;font-weight:700;color:var(--accent)}
+details.dlearn .sstats{margin-top:10px}
+/* Diário em cartões (como numa rede social) */
+.entry.post{display:block;padding:0;overflow:hidden;border-radius:18px}
+.post .phd{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.post .phd>div{flex:1;min-width:0;display:grid}
+.post .phd b{font-size:17px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.post .phd button.pdel{all:unset;cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;padding:6px}
+.post .pcover{all:unset;cursor:pointer;display:block;position:relative;width:100%;aspect-ratio:4/3;background:var(--surface2);overflow:hidden}
+.post .pcover img{width:100%;height:100%;object-fit:cover;display:block}
+.post .pmore{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:14px;border-radius:999px;padding:3px 10px}
+.post .pbody{padding:10px 14px 12px;display:grid;gap:6px}
+.pcaps{display:flex;flex-wrap:wrap;gap:6px}
+.pcap{background:var(--surface2);border:1.5px solid var(--line);border-radius:999px;padding:3px 11px;font-size:14.5px;font-weight:600}
+.post .eacts{display:flex;flex-wrap:wrap;gap:4px 16px;border-top:1.5px solid var(--line);padding-top:8px;margin-top:2px}
+.post .eacts .linkb{text-decoration:none;font-size:14.5px;color:var(--accent)}
+.post .addfoto{font-size:14.5px}
+.post.rel{border-style:dashed}
+.post .thumbs .thumb{all:unset;cursor:pointer;position:relative;width:64px;height:64px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);background:var(--surface2)}
+.post .thumbs .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+/* Registar uma saída: ecrã que sobe de baixo */
+body.noscroll{overflow:hidden}
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(5,15,20,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet>.sbody{background:var(--bg);width:min(720px,100%);max-height:94dvh;overflow:auto;border-radius:22px 22px 0 0;padding:0 16px;box-shadow:0 -8px 30px rgba(0,0,0,.25);animation:sheetUp .22s ease-out}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet>.sbody{animation:none}}
+@media (min-width:761px){.sheet{align-items:center}.sheet>.sbody{border-radius:22px;max-height:90vh}}
+.shead{position:sticky;top:0;z-index:3;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0 8px}
+.shead h3{font-size:24px}
+.sx{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);border:1.5px solid var(--line);font-weight:800}
+.sx:focus-visible{outline:3px solid var(--focus)}
+.sfoot{position:sticky;bottom:0;z-index:3;background:var(--bg);display:flex;gap:8px;padding:10px 0 calc(12px + env(safe-area-inset-bottom,0px));border-top:1.5px solid var(--line)}
+.sfoot .btn{flex:1}
+.sheet .dform{gap:14px}
+.sheet div.f{display:grid;gap:8px}
+.dtools .btn.ghost{font-size:14px;padding:6px 12px;min-height:38px}
+.flab{font-size:15px;font-weight:600}
+.qsp{display:flex;flex-wrap:wrap;gap:6px}
+.qsp button{all:unset;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:700;color:var(--accent)}
+.qsp button:focus-visible{outline:3px solid var(--focus)}
+details.dmore{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+details.dmore>summary{cursor:pointer;font-weight:700;color:var(--accent)}
+details.dmore[open]>summary{margin-bottom:10px}
+details.dmore>div{display:grid;gap:12px}
+.fotobtn.big{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-style:dashed;width:100%}
+.fab{display:none}
+body.m[data-tab="diario"] .fab,body.m[data-tab="hoje"] .fab{display:grid}
+.fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:45;width:60px;height:60px;border-radius:50%;place-items:center;background:var(--signal);color:#fff;border:0;font-size:34px;font-weight:400;line-height:1;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.fab:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:15px;max-width:calc(100vw - 32px);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+@media (min-width:761px){.toast{bottom:28px}}
 .dform{display:grid;gap:12px}
 .dlist{display:grid;gap:8px}
 .drow3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px}
@@ -687,39 +742,11 @@ footer ul{padding-left:20px}
   <section class="block" id="diario" data-t="diario">
     <h2>O seu diário de mar</h2>
     <div id="invBox" class="invbox"></div>
-    <p class="lead">Registe cada saída. A app junta sozinha as condições previstas para essa hora e, com o tempo, aprende como se comporta cada um dos seus locais. Fica guardado só neste perfil, neste aparelho; só sai daqui o que escolher partilhar.</p>
+    <p class="lead">Registe cada saída com o ＋. A app junta sozinha as condições previstas para essa hora e, com o tempo, aprende como se comporta cada um dos seus locais. Só sai daqui o que escolher partilhar.</p>
+    <div class="dtools"><button type="button" class="btn" id="dNew">＋ Registar saída</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button></div>
     <div class="diary">
-      <form class="card dform" id="dform">
-        <div class="drow3">
-          <label class="f">Data<input type="date" id="dDate" required></label>
-          <label class="f">Entrada<input type="time" id="dT0" value="09:00"></label>
-          <label class="f">Saída<input type="time" id="dT1" value="11:00"></label>
-        </div>
-        <label class="f">Local<select id="dSpot"></select></label>
-        <label class="f" id="dLocW" hidden>Nome do local<input type="text" id="dLoc" maxlength="60" list="dLocs" placeholder="Ex.: Pedra da Nau, Peniche"><datalist id="dLocs"></datalist></label>
-        <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
-        <div class="f"><span style="font-size:15px;font-weight:600">Com quem <span class="small muted" style="font-weight:400">(opcional)</span></span><div class="spchips" id="dAmigos"></div>
-          <input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Outras pessoas (separe por vírgulas)" autocomplete="off" aria-label="Outras pessoas"><datalist id="dComL"></datalist></div>
-        <div class="f" id="dShareW" hidden><span style="font-size:15px;font-weight:600">Partilhar esta saída na app <span class="small muted" style="font-weight:400">(sem notas nem fotografias)</span></span><div class="spchips" id="dShareC"></div></div>
-        <fieldset class="dfs"><legend>O que encontrou</legend>
-          <div class="drow2">
-            <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
-            <label class="f">Ondulação no local<select id="dMarH"><option value="">Não sei</option><option value="0.2">Plano (menos de 0,3 m)</option><option value="0.5">Cerca de 0,5 m</option><option value="1">Cerca de 1 m</option><option value="1.5">Cerca de 1,5 m</option><option value="2.2">2 m ou mais</option></select></label>
-            <label class="f">Corrente<select id="dCorr"><option value="">Não sei</option><option value="nenhuma">Nenhuma</option><option value="fraca">Fraca</option><option value="forte">Forte</option></select></label>
-            <label class="f">A previsão da app acertou?<select id="dAcerto"><option value="">Não sei</option><option value="sim">Acertou</option><option value="parcial">Mais ou menos</option><option value="nao">Errou</option></select></label>
-            <label class="f">Sair da água foi<select id="dSaida"><option value="">Normal</option><option value="facil">Fácil</option><option value="dificil">Difícil</option></select></label>
-          </div>
-        </fieldset>
-        <div class="f"><span style="font-size:15px;font-weight:600">Fotografias</span><div class="fotoprev" id="dFotoPrev"></div><label class="btn ghost fotobtn">📷 Juntar fotografias<input type="file" id="dFotos" accept="image/*" multiple hidden></label></div>
-        <div class="f"><span style="font-size:15px;font-weight:600">Capturas <span class="small muted" style="font-weight:400">(espécie · quantidade · peso total · tamanho, só com quantidade 1)</span></span><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Juntar captura</button></div>
-        <label class="f">Notas<textarea id="dNotas" maxlength="300" placeholder="Só para si: o que correu bem, o que mudaria…"></textarea></label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit" id="dSubmit">Guardar saída</button><button class="btn ghost" type="button" id="dCancel" hidden>Cancelar edição</button><button class="btn ghost" type="button" id="dCsv">Exportar CSV</button><button class="btn ghost" type="button" id="dShare">Partilhar relatórios</button></div>
-        <p class="msg" id="dMsg" aria-live="polite"></p>
-      </form>
-      <div style="display:grid;gap:12px;min-width:0">
-        <div class="stats" id="dstats"></div>
-        <div class="dlist" id="dlist"></div>
-      </div>
+      <div id="dstats" style="display:grid;gap:10px;min-width:0"></div>
+      <div class="dlist" id="dlist"></div>
     </div>
   </section>
   <!-- PERFIL -->
@@ -797,6 +824,40 @@ footer ul{padding-left:20px}
   </section>
 </main>
 
+<div class="sheet" id="dSheet" hidden>
+  <div class="sbody" role="dialog" aria-modal="true" aria-labelledby="dSheetT">
+    <form class="dform" id="dform">
+      <div class="shead"><h3 id="dSheetT">Nova saída</h3><button type="button" class="sx" id="dClose" aria-label="Fechar">✕</button></div>
+      <div class="drow3">
+        <label class="f">Data<input type="date" id="dDate" required></label>
+        <label class="f">Entrada<input type="time" id="dT0" value="09:00"></label>
+        <label class="f">Saída<input type="time" id="dT1" value="11:00"></label>
+      </div>
+      <label class="f">Local<select id="dSpot"></select></label>
+      <label class="f" id="dLocW" hidden>Nome do local<input type="text" id="dLoc" maxlength="60" list="dLocs" placeholder="Ex.: Pedra da Nau, Peniche"><datalist id="dLocs"></datalist></label>
+      <div class="f"><div class="fotoprev" id="dFotoPrev"></div><label class="btn ghost fotobtn big">📷 Juntar fotografias<input type="file" id="dFotos" accept="image/*" multiple hidden></label></div>
+      <div class="f"><span class="flab">O que apanhou</span><div class="qsp" id="dQuick"></div><div id="dCaps" class="dcaps"></div><button type="button" class="btn ghost" id="dCapAdd" style="justify-self:start;padding:6px 12px;font-size:14px">+ Outra espécie</button><span class="small muted">Quantidade · peso total (kg) · tamanho (cm, só com 1 peixe). Pode deixar o peso em branco.</span></div>
+      <div class="f"><span class="flab">Com quem</span><div class="spchips" id="dAmigos"></div>
+        <input type="text" id="dCom" maxlength="120" list="dComL" placeholder="Outras pessoas (separe por vírgulas)" autocomplete="off" aria-label="Outras pessoas"><datalist id="dComL"></datalist></div>
+      <div class="f" id="dShareW" hidden><span class="flab">Partilhar na app <span class="small muted" style="font-weight:400">(sem notas nem fotografias)</span></span><div class="spchips" id="dShareC"></div></div>
+      <details class="dmore" id="dMore"><summary>Mais detalhes <span class="small muted" style="font-weight:400">(técnica, visibilidade, mar, corrente, notas)</span></summary><div>
+        <label class="f">Técnica<select id="dTec"><option value="">Escolha</option><option>Ao buraco</option><option>Borda (espuma)</option><option>À índio</option><option>Espera</option><option>Apanha à mão</option></select></label>
+        <div class="drow2">
+          <label class="f">Visibilidade (m)<input type="number" id="dVis" min="0" max="40" step="0.5" inputmode="decimal" placeholder="Ex.: 4"></label>
+          <label class="f">Ondulação no local<select id="dMarH"><option value="">Não sei</option><option value="0.2">Plano (menos de 0,3 m)</option><option value="0.5">Cerca de 0,5 m</option><option value="1">Cerca de 1 m</option><option value="1.5">Cerca de 1,5 m</option><option value="2.2">2 m ou mais</option></select></label>
+          <label class="f">Corrente<select id="dCorr"><option value="">Não sei</option><option value="nenhuma">Nenhuma</option><option value="fraca">Fraca</option><option value="forte">Forte</option></select></label>
+          <label class="f">A previsão da app acertou?<select id="dAcerto"><option value="">Não sei</option><option value="sim">Acertou</option><option value="parcial">Mais ou menos</option><option value="nao">Errou</option></select></label>
+          <label class="f">Sair da água foi<select id="dSaida"><option value="">Normal</option><option value="facil">Fácil</option><option value="dificil">Difícil</option></select></label>
+        </div>
+        <label class="f">Notas<textarea id="dNotas" maxlength="300" placeholder="Só para si: o que correu bem, o que mudaria…"></textarea></label>
+      </div></details>
+      <p class="msg" id="dMsg" aria-live="polite"></p>
+      <div class="sfoot"><button class="btn" type="submit" id="dSubmit">Guardar saída</button><button class="btn ghost" type="button" id="dCancel" style="flex:0 0 auto">Cancelar</button></div>
+    </form>
+  </div>
+</div>
+<button type="button" class="fab" id="dFab" aria-label="Registar uma saída">＋</button>
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 <nav class="tabbar" id="tabbar" aria-label="Separadores">
   <button data-tab="hoje"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c2 0 2-1.6 4-1.6S9 14 11 14s2-1.6 4-1.6 2 1.6 4 1.6M3 19c2 0 2-1.6 4-1.6S9 19 11 19s2-1.6 4-1.6 2 1.6 4 1.6"/><circle cx="12" cy="6.5" r="3"/></svg>Hoje</button>
   <button data-tab="locais"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Locais</button>
@@ -2220,23 +2281,23 @@ function renderShelf(force){
   const d=C.date, k=d+'|'+P.spot+'|'+P.spots.map(s=>s.id+(SPFC[s.id]?SPFC[s.id].t:'')).join(',');
   if(!force&&k===SHELFK)return;SHELFK=k;
   $('shelfT').textContent='Os seus locais · '+dayLbl(d).toLowerCase().replace(/^./,c=>c.toUpperCase());
-  if(!P.spots.length){$('shelfS').textContent='';el.innerHTML='<button type="button" class="scard add" data-shgo="locais">＋ Junte os sítios onde costuma ir e a app diz qual está melhor</button>';return}
+  if(!P.spots.length){$('shelfS').textContent='';el.innerHTML='<button type="button" class="lcard add" data-shgo="locais">＋ Junte os sítios onde costuma ir e a app diz qual está melhor</button>';return}
   ONDE=P.spots.map(s=>{const c=SPFC[s.id];if(!c)return {s,load:true};if(c.err||!c.fc)return {s,err:true};const loc=spotLoc(s);return {s,fc:c.fc,loc,best:bestHour(d,c.fc,loc)}});
   ONDE.sort((a,b)=>(b.best?b.best.sc:-1e9)-(a.best?a.best.sc:-1e9));
   const nl=ONDE.filter(x=>x.load).length;
   $('shelfS').textContent=nl?`a carregar ${nl}…`:'do melhor para o pior · toque para ver';
   el.innerHTML=ONDE.map((x,i)=>{
     const on=x.s.id===P.spot?' on':'';
-    if(x.load)return `<div class="scard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">a carregar…</span></span></div>`;
-    if(x.err||!x.best)return `<div class="scard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">${x.err?'sem previsão (sem ligação?)':'sem horas de luz com previsão'}</span></span></div>`;
+    if(x.load)return `<div class="lcard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">a carregar…</span></span></div>`;
+    if(x.err||!x.best)return `<div class="lcard${on}"><span class="bar" style="background:var(--line)"></span><span class="in"><b>${esc(x.s.n)}</b><span class="m">${x.err?'sem previsão (sem ligação?)':'sem horas de luz com previsão'}</span></span></div>`;
     const {E,o,h}=x.best, w=o.fc.wdDeg, rel=x.loc.off==null||w==null?'':angDiff(w,x.loc.off)<=60?' de terra':angDiff(w,x.loc.off)>=120?' do mar':'';
     const main=E.R.find(r=>r.l==='stop')||E.R.find(r=>r.l==='warn');
-    return `<button type="button" class="scard${on}" data-i="${i}"><span class="bar" style="background:${VCOL[E.verdict]}"></span><span class="in"><b>${esc(x.s.n)}</b><span class="v" style="color:${VCOL[E.verdict]}">${VLAB[E.verdict]} · ${String(h).padStart(2,'0')}h</span><span class="m">🌊 ${fmt(E.hsLoc)} m${E.expo===0?' (abrigado)':''} · 💨 ${o.wind} nós${rel}</span>${main?`<span class="w">${main.l==='stop'?'⛔':'⚠️'} ${esc(main.t.length>70?main.t.slice(0,68)+'…':main.t)}</span>`:''}</span></button>`;
+    return `<button type="button" class="lcard${on}" data-i="${i}"><span class="bar" style="background:${VCOL[E.verdict]}"></span><span class="in"><b>${esc(x.s.n)}</b><span class="v" style="color:${VCOL[E.verdict]}">${VLAB[E.verdict]} · ${String(h).padStart(2,'0')}h</span><span class="m">🌊 ${fmt(E.hsLoc)} m${E.expo===0?' (abrigado)':''} · 💨 ${o.wind} nós${rel}</span>${main?`<span class="w">${main.l==='stop'?'⛔':'⚠️'} ${esc(main.t.length>70?main.t.slice(0,68)+'…':main.t)}</span>`:''}</span></button>`;
   }).join('');
 }
 $('shelf').addEventListener('click',e=>{
   if(e.target.closest('[data-shgo]')){if(MQ.matches)setTab('locais');else $('locais').scrollIntoView({behavior:'smooth'});return}
-  const b=e.target.closest('.scard[data-i]');if(!b)return;
+  const b=e.target.closest('.lcard[data-i]');if(!b)return;
   const x=ONDE[+b.dataset.i];if(!x||!x.best)return;
   P.spot=x.s.id;save(KP,P);paintProfile();renderToday();renderCal();
   FC=x.fc;FCT=SPFC[x.s.id].t;buildDays(true);applyForecast(C.date,x.best.h);renderShelf(true);
@@ -2583,7 +2644,7 @@ function renderDiary(){
   const mine=D.filter(e=>!e.from), kg=mine.reduce((a,e)=>a+(e.caps||[]).reduce((x,c)=>x+(+c.kg||0),0),0);
   const byM={};mine.forEach(e=>{const m=+e.date.slice(5,7)-1;byM[m]=(byM[m]||0)+1});
   const bestM=Object.entries(byM).sort((a,b)=>b[1]-a[1])[0];
-  let h=mine.length?`<div class="stats"><span class="stat"><b>${mine.length}</b>saídas</span><span class="stat"><b>${fmt(kg)}</b>kg no total</span>${bestM?`<span class="stat"><b>${MES[bestM[0]]}</b>o mês com mais saídas</span>`:''}${D.length>mine.length?`<span class="stat"><b>${D.length-mine.length}</b>relatórios de amigos</span>`:''}</div>`:'<span class="muted">Ainda sem saídas registadas.</span>';
+  let h=mine.length?`<div class="stats"><span class="stat"><b>${mine.length}</b>saídas</span><span class="stat"><b>${fmt(kg)}</b>kg no total</span>${bestM?`<span class="stat"><b>${MES[bestM[0]]}</b>o mês com mais saídas</span>`:''}${D.length>mine.length?`<span class="stat"><b>${D.length-mine.length}</b>relatórios de amigos</span>`:''}</div>`:'';
   // por local
   const cards=P.spots.map(s=>{
     const E=entriesAt(spotLoc(s));if(!E.length)return '';
@@ -2600,25 +2661,32 @@ function renderDiary(){
       ${hard?`<span style="color:var(--stop)">Saída da água difícil em ${hard} ${hard===1?'vez':'vezes'}</span>`:''}
       ${ac.length?`<span>A previsão da app acertou em ${acS} de ${ac.length}${acP?` (e mais ou menos em ${acP})`:''}</span>`:''}</div>`;
   }).join('');
-  if(cards)h+=`<div class="sstats">${cards}</div>`;
+  if(cards)h+=`<details class="dlearn"><summary>O que a app já sabe dos seus locais</summary><div class="sstats">${cards}</div></details>`;
+  if(!D.length)h+='<div class="dempty"><b>Ainda sem saídas</b>Carregue em «＋ Registar saída» depois de ir ao mar: local, fotografias e o que apanhou. O resto é opcional.</div>';
   $('dstats').innerHTML=h;
   $('dlist').innerHTML=all.map(e=>{
-    const s=entrySpot(e), L=e.from?{W:[],I:[]}:lawCheck(e), o=e.obs||{};
-    const caps=(e.caps||[]).map(c=>`${qn(c)>1?qn(c)+' × ':''}${esc(byK[c.sp]?.n||'Outra')}${c.kg?' '+fmt(c.kg,c.kg<1?2:1)+' kg'+(qn(c)>1?' no total':''):''}${c.cm?' ('+fmt(c.cm,c.cm%1?1:0)+' cm)':''}`).join(' · ');
+    const s=entrySpot(e), L=e.from?{W:[],I:[]}:lawCheck(e), o=e.obs||{}, fot=e.from?[]:(e.fotos||[]), ppl=entryPeople(e);
+    const caps=(e.caps||[]).map(c=>`<span class="pcap">🐟 ${qn(c)>1?qn(c)+' × ':''}${esc(byK[c.sp]?.n||'Outra')}${c.kg?' · '+fmt(c.kg,c.kg<1?2:1)+' kg':''}${c.cm?' · '+fmt(c.cm,c.cm%1?1:0)+' cm':''}</span>`).join('');
     const ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m${e.cond&&e.cond.visF!=null?` (a estimativa geral era ${e.cond.visF} m)`:''}`:'',o.marH!=null?`mar no local ≈ ${fmt(o.marH)} m`:'',o.corr?'corrente '+o.corr:'',o.saida==='dificil'?'saída difícil':o.saida==='facil'?'saída fácil':'',o.acerto==='sim'?'a app acertou':o.acerto==='parcial'?'a app acertou mais ou menos':o.acerto==='nao'?'a app errou':''].filter(Boolean).join(' · ');
-    return `<div class="entry"><div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b> <span class="small muted">${dLabel(e.date)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span>
+    const dt=new Date(e.date+'T12:00'), dia=dt.toLocaleDateString('pt-PT',{weekday:'short',day:'numeric',month:'short',year:dt.getFullYear()===new Date().getFullYear()?undefined:'numeric'});
+    const who=e.from?avSpan(e.from.nome,null,38):avSpan(myName(),P.foto,38);
+    return `<article class="entry post${e.from?' rel':''}">
+      <div class="phd">${who}<div><b>${esc(s?s.n:(e.loc||'Local sem nome'))}</b><span class="small muted">${esc(dia)}${e.t0?' · '+e.t0+(e.t1?'–'+e.t1:''):''}${e.tec?' · '+esc(e.tec):''}</span></div><button type="button" class="pdel" data-id="${e.id}" aria-label="Apagar registo">Apagar</button></div>
+      ${fot.length?`<button type="button" class="pcover" data-foto="${fot[0]}" data-entry="${e.id}" aria-label="Ver fotografia"><img data-ffull="${fot[0]}" alt="Fotografia da caçada">${fot.length>1?`<span class="pmore">+${fot.length-1}</span>`:''}</button>`:''}
+      <div class="pbody">
       ${e.from?`<div class="from small">Relatório de ${esc(e.from.nome)}</div>`:''}
-      ${entryPeople(e).length?`<div class="small">👥 Com ${esc(entryPeople(e).map(p=>p.n).join(', '))}</div>`:''}
-      ${caps?`<div>${caps}</div>`:''}
+      ${ppl.length?`<div class="small">👥 Com ${esc(ppl.map(p=>p.n).join(', '))}</div>`:''}
+      ${caps?`<div class="pcaps">${caps}</div>`:(e.from?'':'<div class="small muted">Sem capturas</div>')}
       ${e.vistas&&e.vistas.length?`<div class="small">Viu: ${esc(e.vistas.map(k=>byK[k]?.n).filter(Boolean).join(', '))}</div>`:''}
       ${ob?`<div class="small">${esc(ob)}</div>`:''}
       <div class="cond">${condText(e)}</div>
       ${L.W.map(t=>`<div class="laww">⛔ ${esc(t)}</div>`).join('')}${L.I.map(t=>`<div class="lawi">⚠️ ${esc(t)}</div>`).join('')}
-      ${e.notas?`<div class="small">${esc(e.notas)}</div>`:''}
-      ${e.from?'':`<div class="eacts"><button type="button" class="linkb" data-edite="${e.id}">Editar</button>${entryPeople(e).length?`<button type="button" class="linkb" data-sende="${e.id}">Enviar aos companheiros</button>`:''}</div>`}
-      ${e.from?'':`<div class="thumbs" style="margin-top:6px">${(e.fotos||[]).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}<label class="addfoto">+ foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label></div>`}</div>
-      <button data-id="${e.id}" aria-label="Apagar registo">Apagar</button></div>`;
+      ${e.notas?`<div class="small">📝 ${esc(e.notas)}</div>`:''}
+      ${fot.length>1?`<div class="thumbs">${fot.slice(1).map(id=>`<button type="button" class="thumb" data-foto="${id}" data-entry="${e.id}"><img data-fid="${id}" alt="Fotografia da caçada"></button>`).join('')}</div>`:''}
+      ${e.from?'':`<div class="eacts"><button type="button" class="linkb" data-edite="${e.id}">✏️ Editar</button><label class="linkb addfoto">📷 Foto<input type="file" accept="image/*" multiple hidden data-addfoto="${e.id}"></label>${ppl.length?`<button type="button" class="linkb" data-sende="${e.id}">📤 Enviar aos companheiros</button>`:''}</div>`}
+      </div></article>`;
   }).join('');
+  hydrateFull($('dlist'));
   hydrateThumbs($('dlist'));paintCom();paintAmigos();renderStats();
 }
 /* ---- Amigos (cartão de amigo) ---- */
@@ -2732,6 +2800,32 @@ function previewSaida(obj){
   };
 }
 
+/* ---- Ecrã «Registar saída» ---- */
+let toastT;
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3500)}
+function paintQuick(){
+  const cnt={};D.filter(e=>!e.from).forEach(e=>(e.caps||[]).forEach(c=>{if(byK[c.sp])cnt[c.sp]=(cnt[c.sp]||0)+qn(c)}));
+  const mi=new Date().getMonth(), fav=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k])=>k);
+  const season=SP.filter(x=>P.cats.includes(x.cat)&&x.m[mi]==='2').map(x=>x.k);
+  const L=[...new Set([...fav,...season])].slice(0,8);
+  $('dQuick').innerHTML=L.map(k=>`<button type="button" data-qs="${k}">+ ${esc(byK[k].n)}</button>`).join('');
+}
+$('dQuick').addEventListener('click',e=>{const b=e.target.closest('[data-qs]');if(!b)return;addCapRow(b.dataset.qs);const r=[...document.querySelectorAll('#dCaps .dcap')].pop();r&&r.querySelectorAll('input')[1].focus()});
+function openSheet(){
+  $('dSheetT').textContent=EDIT?'Editar saída':'Nova saída';
+  if(!EDIT){paintDSpot();if(!$('dCaps').children.length)$('dMore').open=false}
+  paintQuick();$('dSheet').hidden=false;document.body.classList.add('noscroll');
+  $('dSheet').querySelector('.sbody').scrollTop=0;
+}
+function closeSheet(){$('dSheet').hidden=true;document.body.classList.remove('noscroll')}
+function newOuting(){if(EDIT)endEdit();$('dMsg').textContent='';openSheet()}
+$('dNew').addEventListener('click',newOuting);
+$('dFab').addEventListener('click',newOuting);
+const dropSheet=()=>{if(EDIT)endEdit();closeSheet()};
+$('dClose').addEventListener('click',dropSheet);
+$('dSheet').addEventListener('click',e=>{if(e.target===$('dSheet'))dropSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('dSheet').hidden&&!($('dlg').open))dropSheet()});
+
 /* ---- Editar uma saída já guardada ---- */
 let EDIT=null;
 function editEntry(id){
@@ -2745,15 +2839,15 @@ function editEntry(id){
   $('dCom').value=(e.com||[]).join(', ');
   paintDShare(!!e.shareF,e.shareG||[]);
   $('dSubmit').textContent='Guardar alterações';$('dCancel').hidden=false;$('dform').classList.add('editing');
-  if(MQ.matches)setTab('diario');$('dform').scrollIntoView({behavior:'smooth',block:'start'});
+  $('dMore').open=!!(e.tec||o.vis!=null||o.marH!=null||o.corr||o.saida||o.acerto||e.notas);openSheet();
 }
 function endEdit(){
-  EDIT=null;$('dSubmit').textContent='Guardar saída';$('dCancel').hidden=true;$('dform').classList.remove('editing');
+  EDIT=null;$('dSubmit').textContent='Guardar saída';$('dform').classList.remove('editing');
   $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';$('dTec').value='';
   document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);$('dDate').value=iso(new Date());
   paintDShare(false,SOC.groups.map(x=>x.id));
 }
-$('dCancel').addEventListener('click',()=>{endEdit();$('dMsg').textContent=''});
+$('dCancel').addEventListener('click',()=>{endEdit();PEND.forEach(p=>URL.revokeObjectURL(p.url));PEND=[];paintPend();$('dMsg').textContent='';closeSheet()});
 
 /* ---- Fotografias das caçadas: guardadas no aparelho (IndexedDB), reduzidas para ocupar pouco ---- */
 const FDB=(()=>{let p=null;
@@ -2799,6 +2893,13 @@ async function storeFotos(entry,list){
   for(const p of list){await FDB.put({id:p.id,prof:PROFS.active,entry:entry.id,full:p.full,thumb:p.thumb,t:Date.now()});(entry.fotos=entry.fotos||[]).push(p.id)}
   save(KD,D);
 }
+const FURL={};
+function hydrateFull(root=document){
+  root.querySelectorAll('img[data-ffull]:not([src])').forEach(async img=>{
+    const id=img.dataset.ffull;
+    try{if(!FURL[id]){const r=await FDB.get(id);if(!r){img.closest('.pcover')?.remove();return}FURL[id]=URL.createObjectURL(r.full)}img.src=FURL[id]}catch(e){}
+  });
+}
 function hydrateThumbs(root=document){
   root.querySelectorAll('img[data-fid]:not([src])').forEach(async img=>{
     const id=img.dataset.fid;
@@ -2834,14 +2935,15 @@ $('dform').addEventListener('submit',ev=>{
       save(KD,D);const fot=PEND;PEND=[];paintPend();endEdit();renderDiary();
       if(fot.length)storeFotos(old,fot).then(renderDiary).catch(()=>{});
       if(!condOk&&entrySpot(old))fetchCond(old);
-      $('dMsg').textContent='Alterações guardadas.';return;
+      closeSheet();toast('Alterações guardadas.');return;
     }
     EDIT=null;
   }
   D.push(e);
   if(!save(KD,D))alert('O navegador não deixou guardar. O registo fica só até fechar a página.');
   const L=lawCheck(e);
-  $('dMsg').textContent=L.W.length?'Saída guardada, mas veja os avisos legais no registo.':'Saída guardada.'+(s?' A obter as condições previstas para essa hora…':'');
+  closeSheet();toast(L.W.length?'Saída guardada. Veja os avisos legais no cartão.':'Saída guardada 🐟');$('dTec').value='';$('dMore').open=false;
+  if(MQ.matches&&document.body.dataset.tab!=='diario')setTab('diario');else $('dlist').scrollIntoView({behavior:'smooth',block:'start'});
   $('dVis').value='';$('dMarH').value='';$('dCorr').value='';$('dSaida').value='';$('dAcerto').value='';$('dNotas').value='';$('dCaps').innerHTML='';$('dCom').value='';document.querySelectorAll('#dAmigos input').forEach(i=>i.checked=false);
   const fot=PEND;PEND=[];paintPend();
   renderDiary();if(fot.length)storeFotos(e,fot).then(renderDiary).catch(()=>alert('Não foi possível guardar as fotografias neste aparelho.'));if(s)fetchCond(e);
@@ -2979,7 +3081,7 @@ function previewRel(obj){
     const idx=[...document.querySelectorAll('#rvList input:checked')].map(i=>+i.value);let n=0;
     for(const i of idx){const r=R[i];if(D.some(e=>e.id===r.id&&e.from&&e.from.nome===de))continue;D.push(r);n++}
     save(KD,D);closeDlg();renderDiary();evaluateAndRender();
-    $('dMsg').textContent=n?`${n} ${n===1?'relatório juntado':'relatórios juntados'} ao diário.`:'Nada juntado.';
+    toast(n?`${n} ${n===1?'relatório juntado':'relatórios juntados'} ao diário.`:'Nada juntado.');
     if(MQ.matches)setTab('diario');else $('diario').scrollIntoView({behavior:'smooth'});
   };
 }
