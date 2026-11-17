@@ -83,7 +83,7 @@ section.block{padding-block:46px 6px;scroll-margin-top:60px}
 /* formulários */
 label.f{display:grid;gap:4px;font-size:15px;font-weight:600}
 label.f span.v{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px;width:100%}
+input:not([type]),input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=time],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px;width:100%}
 textarea{min-height:70px;resize:vertical}
 input[type=range]{width:100%;accent-color:var(--accent);min-height:30px}
 .btn{font:inherit;font-weight:700;font-size:16px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:44px}
@@ -207,14 +207,18 @@ a.srcp:hover{border-color:var(--accent)}
 /* Conta */
 .acct{border:2px solid var(--accent);border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--accent) 6%,var(--surface));display:grid;gap:10px}
 .acct h4{margin:0;font-family:var(--f-display);font-size:19px}
-.acct .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.acct .row,#socCard .soc .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .acct .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:560px){.acct .grid2{grid-template-columns:1fr}}
 .acct .tabs{display:flex;gap:6px}
 .acct .tabs button{all:unset;cursor:pointer;font-weight:700;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line)}
 .acct .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.acct .btn{padding:7px 14px;font-size:15px;min-height:40px}
-.acct .ok{color:var(--go);font-size:14px} .acct .err{color:var(--stop);font-size:14px}
+.acct .btn,#socCard .btn{padding:7px 14px;font-size:15px;min-height:40px}
+.acct .ok,#socCard .ok{color:var(--go);font-size:14px} .acct .err,#socCard .err{color:var(--stop);font-size:14px}
+#socCard .soc{border-top:0;padding-top:0}
+#socCard .soc h4{margin:4px 0 0;font-size:16px}
+#socCard .soc .row input{flex:1 1 160px;width:auto}
+#socCard .amigos{border-top:1.5px dashed var(--line);margin-top:12px;padding-top:2px}
 .amlist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
 .amlist .am{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:3px 6px 3px 12px;background:var(--surface);font-size:15px}
 .amlist .am button{all:unset;cursor:pointer;color:var(--stop);font-weight:700;padding:0 6px}
@@ -2509,7 +2513,9 @@ function renderDiary(){
 const amName=id=>(P.amigos.find(a=>a.id===id)||{}).nome;
 const validId=x=>typeof x==='string'&&/^u[a-z0-9]{6,40}$/.test(x);
 function paintAmigos(){
-  $('amList').innerHTML=P.amigos.length?P.amigos.map(a=>`<span class="am">${esc(a.nome)}<button type="button" data-rmam="${a.id}" aria-label="Tirar ${esc(a.nome)} dos amigos">✕</button></span>`).join(''):'<span class="small muted">Ainda não tem amigos na app.</span>';
+  const L=P.acct?P.amigos.filter(a=>!a.acct):P.amigos;
+  if($('amLead'))$('amLead').innerHTML=P.acct?'<b>Amigos sem conta na app</b><br>Quem ainda não tem conta pode trocar consigo o «cartão de amigo» e aparece na mesma em «Com quem» no diário.':'Aparecem em «Com quem» no diário. Troque o «cartão de amigo» com os amigos da PeixeCrew.';
+  $('amList').innerHTML=L.length?L.map(a=>`<span class="am">${esc(a.nome)}<button type="button" data-rmam="${a.id}" aria-label="Tirar ${esc(a.nome)} dos amigos">✕</button></span>`).join(''):`<span class="small muted">${P.acct?'Nenhum.':'Ainda não tem amigos.'}</span>`;
   const keep=new Set([...document.querySelectorAll('#dAmigos input:checked')].map(i=>i.value));
   $('dAmigos').innerHTML=P.amigos.map(a=>`<label><input type="checkbox" value="${a.id}"${keep.has(a.id)?' checked':''}>${esc(a.nome)}</label>`).join('');
 }
@@ -3188,7 +3194,7 @@ async function onSession(session){
       setAcctMsg('Este perfil do aparelho já está ligado a outra conta. Para usar esta conta, crie um perfil novo neste aparelho (botão «Novo perfil») e entre lá.',true);
       await sb.auth.signOut();return;
     }
-    if(!P.acct){snapNow('antes de entrar na conta');P.acct=ME.id;save(KP,P)}
+    if(!P.acct){snapNow('antes de entrar na conta');P.acct=ME.id;save(KP,P);paintAmigos()}
     const {data}=await selProfiles(c=>sb.from('profiles').select(c).eq('id',ME.id).maybeSingle());MEP=data||null;
     if(MEP&&MEP.nome&&!P.nome){P.nome=MEP.nome;save(KP,P);paintProfile()}
     else if(MEP&&!MEP.nome&&P.nome){const r=await sb.from('profiles').update({nome:P.nome.slice(0,40)}).eq('id',ME.id);if(!r.error)MEP.nome=P.nome}
