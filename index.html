@@ -662,6 +662,52 @@ footer ul{padding-left:20px}
   .dlg{padding:12px 16px calc(28px + env(safe-area-inset-bottom,0px))}
   .dlg .close{position:sticky;top:0;z-index:2}
 }
+/* ===== Perfil de outra pessoa e página do grupo: ecrã próprio, com «‹ Voltar» ===== */
+body[data-pv] main.wrap,body[data-pv] > footer,body[data-pv] .fab{display:none!important}
+.pview{padding-bottom:48px}
+.pvbar{position:sticky;top:var(--toph,56px);z-index:15;background:var(--bg);display:flex;align-items:center;gap:12px;padding:10px 0 8px;border-bottom:1.5px solid var(--line)}
+.pvbar button{all:unset;cursor:pointer;font-weight:800;color:var(--accent);font-size:16px;padding:6px 4px;flex:none}
+.pvbar button:focus-visible{outline:3px solid var(--focus)}
+.pvbar span{font-weight:800;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pview .phead{margin-top:14px}
+.pview .pav{cursor:default}
+.pview .pav.gav,.pview .pav.gav .av{border-radius:26px}
+.pview [id]{scroll-margin-top:120px}
+.pchipb{all:unset;cursor:pointer;font-size:14px;font-weight:700;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--accent);border:1.5px solid color-mix(in srgb,var(--accent) 35%,var(--line))}
+.pchipb:focus-visible,.linku:focus-visible,.pu:focus-visible,.pmem:focus-visible,.post button.fgrp:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.pcount.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pvnote{margin:10px 2px 0}
+.pvgrid{display:grid;gap:16px;margin-top:14px;grid-template-areas:"rec" "feed" "spots"}
+.pvgrid>*{min-width:0;align-self:start}
+@media (min-width:900px){.pvgrid{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:"feed rec" "feed spots";grid-template-rows:auto 1fr}}
+.pvfeed{grid-area:feed;display:grid;gap:14px}
+.pvrec{grid-area:rec}.pvspots{grid-area:spots}
+.pvh{font-size:22px;margin:0 0 8px}
+.pvrec h4{margin:12px 0 6px;font-size:16px}
+.pvsp{display:grid;gap:8px}
+.pvmap{height:240px;border:2px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;background:var(--surface2)}
+.linku{all:unset;cursor:pointer;font-weight:inherit;color:inherit}
+.linku:hover{text-decoration:underline}
+.amlist .am button.linku,.gmem button.linku,.sharedw button.linku,.pvsp button.linku,.soc .row button.linku{all:unset;cursor:pointer;color:inherit;padding:0;display:inline-flex;align-items:center;gap:6px}
+.mpop button.linku{font-weight:700;text-decoration:underline}
+.pu{all:unset;cursor:pointer;display:block;border-radius:50%;flex:none}
+.entry button.linku,.entry button.pu{color:inherit;font-size:inherit;font-weight:inherit;padding:0;align-self:auto}
+.post button.fgrp{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px;padding:2px 9px;white-space:nowrap;max-width:40%;overflow:hidden;text-overflow:ellipsis}
+.pmems{display:flex;gap:10px;overflow-x:auto;padding:2px 18px 14px;scrollbar-width:thin}
+.pmem{all:unset;cursor:pointer;display:grid;justify-items:center;gap:4px;width:66px;font-size:12.5px;font-weight:700;text-align:center;flex:none;padding:4px 0;border-radius:12px}
+.pmem .nm{max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pmem .rl{font-size:11px;color:var(--muted);font-weight:700;margin-top:-3px}
+.pvadm{margin-top:14px}
+.pvadm summary{cursor:pointer;font-weight:800;color:var(--accent)}
+.pvadm form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 6px}
+.pvadm input{font:inherit;flex:1 1 200px;min-width:0;min-height:44px;padding:8px 12px;border:2px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.pvmrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.pvmrow b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvmrow .btn{padding:6px 12px;font-size:14px;min-height:38px}
+.grp .gname{all:unset;cursor:pointer;font-weight:800}
+.grp .gname:hover{text-decoration:underline}
+.grp .gname:focus-visible{outline:3px solid var(--focus)}
+@media (max-width:760px){.pvmap{height:200px}.pview .phead{margin-top:8px}.pmems{padding:2px 14px 12px}}
 </style>
 </head>
 <body>
@@ -955,6 +1001,7 @@ footer ul{padding-left:20px}
     <div id="grpStats" class="statsbody"></div>
   </section>
 </main>
+<div class="pview" id="pv" hidden><div class="wrap"><div class="pvbar"><button type="button" id="pvBack">‹ Voltar</button><span id="pvTitle"></span></div><div id="pvBody" aria-live="polite"></div></div></div>
 
 <div class="sheet" id="dSheet" hidden>
   <div class="sbody" role="dialog" aria-modal="true" aria-labelledby="dSheetT">
@@ -2479,7 +2526,7 @@ function paintMap(fit){
   }
   (SOC&&SOC.shared||[]).forEach((r,i)=>{const d=r.data||{};if(!isFinite(+d.lat)||!isFinite(+d.lon))return;
     if(P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05))return;pts.push([+d.lat,+d.lon]);
-    L.marker([+d.lat,+d.lon],{icon:pinIcon('fr','#fff',d.n||'Local'),title:d.n||'Local'}).bindPopup(`<div class="mpop"><b>${esc(d.n||'Local')}</b><span>Partilhado por ${esc(pname(r.owner))}</span>${d.perigos?`<span>⚠️ ${esc(d.perigos)}</span>`:''}<div class="acts"><button type="button" data-mcp="${i}">Juntar aos meus locais</button><a class="gh" href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Google Maps</a></div></div>`).addTo(MAPL)});
+    L.marker([+d.lat,+d.lon],{icon:pinIcon('fr','#fff',d.n||'Local'),title:d.n||'Local'}).bindPopup(`<div class="mpop"><b>${esc(d.n||'Local')}</b><span>Partilhado por <button type="button" class="linku" data-pu="${r.owner}">${esc(pname(r.owner))}</button></span>${d.perigos?`<span>⚠️ ${esc(d.perigos)}</span>`:''}<div class="acts"><button type="button" data-mcp="${i}">Juntar aos meus locais</button><a class="gh" href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Google Maps</a></div></div>`).addTo(MAPL)});
   if(MAPNEW)MAPNEW.addTo(MAPL);
   if(fit){
     if(pts.length>1)MAP.fitBounds(pts,{padding:[40,40],maxZoom:13});
@@ -3560,13 +3607,13 @@ function paintSocial(){
   box.innerHTML=`<div class="soc">
     <h4>Amigos na app</h4>
     <form id="frForm" class="row"><input id="frU" placeholder="@nome de utilizador" autocapitalize="none" autocomplete="off" required><button class="btn">Enviar pedido</button></form>
-    ${SOC.incoming.map(id=>`<div class="row">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,34)}<span><b>${esc(pname(id))}</b> <span class="muted small">${esc(puser(id))}</span> quer ser seu amigo</span><button type="button" class="btn" data-fra="${id}">Aceitar</button><button type="button" class="btn ghost" data-frd="${id}">Recusar</button></div>`).join('')}
-    ${SOC.friends.length?`<div class="amlist">${SOC.friends.map(id=>`<span class="am amf">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,26)}${esc(pname(id))} <span class="muted small">${esc(puser(id))}</span><button type="button" data-frd="${id}" aria-label="Remover amigo">✕</button></span>`).join('')}</div>`:'<p class="small muted" style="margin:0">Ainda sem amigos na app.</p>'}
-    ${SOC.outgoing.length?`<p class="small muted" style="margin:0">À espera de resposta: ${SOC.outgoing.map(id=>esc(puser(id)||'…')).join(', ')}</p>`:''}
+    ${SOC.incoming.map(id=>`<div class="row"><button type="button" class="linku" data-pu="${id}">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,34)}<span><b>${esc(pname(id))}</b> <span class="muted small">${esc(puser(id))}</span></span></button><span>quer ser seu amigo</span><button type="button" class="btn" data-fra="${id}">Aceitar</button><button type="button" class="btn ghost" data-frd="${id}">Recusar</button></div>`).join('')}
+    ${SOC.friends.length?`<div class="amlist">${SOC.friends.map(id=>`<span class="am amf"><button type="button" class="linku" data-pu="${id}">${avSpan(pname(id),SOC.prof[id]&&SOC.prof[id].foto,26)}${esc(pname(id))} <span class="muted small">${esc(puser(id))}</span></button><button type="button" data-frd="${id}" aria-label="Remover amigo">✕</button></span>`).join('')}</div>`:'<p class="small muted" style="margin:0">Ainda sem amigos na app.</p>'}
+    ${SOC.outgoing.length?`<p class="small muted" style="margin:0">À espera de resposta: ${SOC.outgoing.map(id=>`<button type="button" class="linku" data-pu="${id}" style="text-decoration:underline">${esc(puser(id)||pname(id))}</button>`).join(', ')}</p>`:''}
     <h4 style="margin-top:6px">Grupos</h4>
-    ${SOC.groups.map(g=>`<div class="grp"><div><b>${esc(g.nome)}</b> <span class="muted small">${(SOC.members[g.id]||[]).length} ${(SOC.members[g.id]||[]).length===1?'membro':'membros'}${isAdm(g)?' · é administrador':''}</span></div>
-      <div class="small muted gmem">${(SOC.members[g.id]||[]).map(m=>`<span>${avSpan(pname(m.user_id),m.user_id===ME.id?P.foto:SOC.prof[m.user_id]&&SOC.prof[m.user_id].foto,22)}${esc(m.user_id===ME.id?'Você':pname(m.user_id))}${m.role==='admin'?' (admin)':''}</span>`).join('')}</div>
-      <div class="row"><button type="button" class="btn ghost" data-ginv="${g.id}">Convidar</button><button type="button" class="btn ghost" data-gleave="${g.id}">Sair do grupo</button></div></div>`).join('')||'<p class="small muted" style="margin:0">Ainda não está em nenhum grupo.</p>'}
+    ${SOC.groups.map(g=>`<div class="grp"><div><button type="button" class="gname" data-pg="${g.id}">${esc(g.nome)}</button> <span class="muted small">${(SOC.members[g.id]||[]).length} ${(SOC.members[g.id]||[]).length===1?'membro':'membros'}${isAdm(g)?' · é administrador':''}</span></div>
+      <div class="small muted gmem">${(SOC.members[g.id]||[]).map(m=>`<span><button type="button" class="linku" data-pu="${m.user_id}">${avSpan(pname(m.user_id),m.user_id===ME.id?P.foto:SOC.prof[m.user_id]&&SOC.prof[m.user_id].foto,22)}${esc(m.user_id===ME.id?'Você':pname(m.user_id))}</button>${m.role==='admin'?' (admin)':''}</span>`).join('')}</div>
+      <div class="row"><button type="button" class="btn" data-pg="${g.id}">Ver o grupo</button><button type="button" class="btn ghost" data-ginv="${g.id}">Convidar</button><button type="button" class="btn ghost" data-gleave="${g.id}">Sair do grupo</button></div></div>`).join('')||'<p class="small muted" style="margin:0">Ainda não está em nenhum grupo.</p>'}
     <form id="gNew" class="row"><input id="gNome" placeholder="Nome do grupo (ex.: PeixeCrew)" required minlength="2" maxlength="40"><button class="btn ghost">Criar grupo</button></form>
     <form id="gJoin" class="row"><input id="gCode" placeholder="Código de convite" required autocomplete="off"><button class="btn ghost">Entrar no grupo</button></form>
     ${socMsg?`<p class="${socErr?'err':'ok'}" style="margin:0">${esc(socMsg)}</p>`:''}</div>`;
@@ -3586,16 +3633,21 @@ function paintSocial(){
     if(r.error)setSoc(trErr(r.error),true);else{setSoc('');refreshSocial()}});
   $('gNew').onsubmit=async e=>{e.preventDefault();const {error}=await sb.rpc('create_group',{nome:$('gNome').value.trim()});if(error){setSoc(trErr(error),true);return}setSoc('Grupo criado. Use «Convidar» para mandar o link aos amigos.');refreshSocial()};
   $('gJoin').onsubmit=async e=>{e.preventDefault();await joinGroup($('gCode').value)};
-  box.querySelectorAll('[data-ginv]').forEach(b=>b.onclick=()=>{const g=SOC.groups.find(x=>x.id===b.dataset.ginv);if(!g)return;
+  box.querySelectorAll('[data-ginv]').forEach(b=>b.onclick=()=>{const g=SOC.groups.find(x=>x.id===b.dataset.ginv);if(g)groupInvite(g)});
+  box.querySelectorAll('[data-gleave]').forEach(b=>b.onclick=()=>{const g=SOC.groups.find(x=>x.id===b.dataset.gleave);if(g)groupLeave(g)});
+}
+function groupInvite(g){
     const link=`${location.origin}${location.pathname}#grupo=${g.invite_code}`, msg=`Entra no grupo «${g.nome}» na app PeixeCrew: ${link}\n(ou, na app, «Perfil» › «Entrar no grupo» com o código ${g.invite_code})`;
     showDlg(`<h3>Convidar para «${esc(g.nome)}»</h3><p class="small muted" style="margin:-4px 0 0">Quem abrir o link e tiver conta entra no grupo. Mande só a quem quer no grupo.</p><textarea class="codebox" id="shTxt" readonly></textarea><div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="shCopy">Copiar</button>${navigator.share?'<button class="btn ghost" id="shNative">Partilhar…</button>':''}<span class="small muted" id="shMsg"></span></div>`);
     $('shTxt').value=msg;$('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('shMsg').textContent='Copiado.'}catch(e){$('shTxt').select()}};
-    if(navigator.share)$('shNative').onclick=()=>navigator.share({title:'Grupo PeixeCrew',text:msg}).catch(()=>{});});
-  box.querySelectorAll('[data-gleave]').forEach(b=>b.onclick=async()=>{const g=SOC.groups.find(x=>x.id===b.dataset.gleave);if(!g)return;
-    const n=(SOC.members[g.id]||[]).length;
-    if(!confirm(n<=1?`É o último membro: o grupo «${g.nome}» vai ser apagado. Continuar?`:`Sair do grupo «${g.nome}»?`))return;
+    if(navigator.share)$('shNative').onclick=()=>navigator.share({title:'Grupo PeixeCrew',text:msg}).catch(()=>{});
+}
+async function groupLeave(g){
+    const sb=sbc(), n=(SOC.members[g.id]||[]).length;
+    if(!confirm(n<=1?`É o último membro: o grupo «${g.nome}» vai ser apagado. Continuar?`:`Sair do grupo «${g.nome}»?`))return false;
     const r=n<=1?await sb.from('groups').delete().eq('id',g.id):await sb.from('group_members').delete().eq('group_id',g.id).eq('user_id',ME.id);
-    if(r.error)setSoc(trErr(r.error),true);else{setSoc('');refreshSocial()}});
+    if(r.error){setSoc(trErr(r.error),true);if(PVS.length)toast(trErr(r.error));return false}
+    setSoc('');await refreshSocial();return true;
 }
 async function joinGroup(code){
   const sb=sbc();code=String(code||'').trim().toLowerCase();if(!sb||!ME||!code)return;
@@ -3607,12 +3659,15 @@ function renderSharedSpots(){
   const el=$('sharedSpots');if(!el)return;
   if(!ME||!SOC.shared.length){el.innerHTML='';paintMap();return}
   el.innerHTML=`<div class="sharedw"><h4>Partilhados comigo</h4>${SOC.shared.map((r,i)=>{const d=r.data||{},have=P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
-    return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${avSpan(pname(r.owner),SOC.prof[r.owner]&&SOC.prof[r.owner].foto,20)}de ${esc(pname(r.owner))} · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
+    return `<div class="spot"><b>${esc(d.n||'Local')}</b><span class="muted" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><button type="button" class="linku" data-pu="${r.owner}">${avSpan(pname(r.owner),SOC.prof[r.owner]&&SOC.prof[r.owner].foto,20)}de ${esc(pname(r.owner))}</button> · ${isFinite(+d.lat)?(+d.lat).toFixed(4)+', '+(+d.lon).toFixed(4):''}</span>${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
       <span class="acts">${have?'<span class="small muted">Já está nos seus locais</span>':`<button type="button" data-cpy="${i}">Juntar aos meus locais</button>`}${isFinite(+d.lat)?`<a href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Ver no mapa</a>`:''}</span></div>`}).join('')}</div>`;
-  el.querySelectorAll('[data-cpy]').forEach(b=>b.onclick=()=>{const r=SOC.shared[+b.dataset.cpy];const s=cleanSpot(Object.assign({},r.data,{notas:''}));if(!s)return;
-    if(P.spots.some(x=>x.id===s.id))s.id='s'+rnd();delete s.shareF;delete s.shareG;s.from={nome:pname(r.owner),em:iso(new Date())};
-    P.spots.push(s);commitProfile();fillCoast();renderSharedSpots();$('smsg').textContent=`«${s.n}» juntado aos seus locais.`});
+  el.querySelectorAll('[data-cpy]').forEach(b=>b.onclick=()=>{const s=addSharedSpot(SOC.shared[+b.dataset.cpy]);if(s)$('smsg').textContent=`«${s.n}» juntado aos seus locais.`});
   paintMap();
+}
+function addSharedSpot(r){
+  const s=r&&cleanSpot(Object.assign({},r.data,{notas:''}));if(!s)return null;
+  if(P.spots.some(x=>x.id===s.id))s.id='s'+rnd();delete s.shareF;delete s.shareG;s.from={nome:pname(r.owner),em:iso(new Date())};
+  P.spots.push(s);commitProfile();fillCoast();renderSharedSpots();return s;
 }
 function paintInvites(){
   const el=$('invBox');if(!el)return;
@@ -3641,7 +3696,7 @@ async function loadFeed(force){
       if(su.error){if(/bucket/i.test(su.error.message||''))HASSTO=false}else(su.data||[]).forEach(z=>{if(z&&z.signedUrl&&!z.error)PURL[z.path]={u:z.signedUrl,t:Date.now()}})}
     if(HASREAC&&FEED.length){
       const rr=await sb.from('reactions').select('outing_owner,outing_id,user_id,emoji').in('outing_id',FEED.map(x=>x.id));
-      if(rr.error){if(/reactions|relation|does not exist|schema cache/i.test(rr.error.message||''))HASREAC=false}else REAC=rr.data;
+      if(rr.error){if(/reactions|relation|does not exist|schema cache/i.test(rr.error.message||''))HASREAC=false}else{const k=new Set(FEED.map(x=>x.owner+'|'+x.id));REAC=[...REAC.filter(q=>!k.has(q.outing_owner+'|'+q.outing_id)),...rr.data]}
     }
     const seen=load('ml_feedseen:'+PROFS.active,0), nNew=FEED.filter(x=>x.owner!==ME.id&&new Date(x.updated_at).getTime()>seen).length;
     $('feedBadge').hidden=!nNew||$('diario').classList.contains('crew');$('feedBadge').textContent=nNew>9?'9+':nNew;
@@ -3661,14 +3716,13 @@ function reacSummary(list){
   const by={};list.forEach(x=>(by[x.emoji]=by[x.emoji]||[]).push(x.user_id));
   return EMO.filter(e=>by[e]).map(e=>`${e} ${by[e].length}`).join(' · ')+` <span class="muted">(${esc([...new Set(list.map(x=>pname(x.user_id)))].join(', '))})</span>`;
 }
-function renderFeed(){
-  const el=$('feed');if(!el||!ME)return;
-  if(!FEED.length){el.innerHTML=`<div class="dempty"><b>Ainda nada partilhado</b>${SOC.groups.length||SOC.friends.length?'Quando um amigo ou alguém do grupo registar uma saída e a partilhar, aparece aqui.':'Junte amigos ou entre num grupo em «Perfil» para ver as saídas deles.'}</div>`;return}
-  const gname=id=>(SOC.groups.find(g=>g.id===id)||{}).nome;
-  el.innerHTML=FEED.map((x,i)=>{
+const gname=id=>(SOC.groups.find(g=>g.id===id)||{}).nome;
+/* cartão de uma saída (feed da crew, perfil de uma pessoa e página do grupo) */
+function postHTML(x,i,pg){
     const d=x.data||{}, mine=x.owner===ME.id, nome=mine?'Você':pname(x.owner), foto=mine?P.foto:SOC.prof[x.owner]&&SOC.prof[x.owner].foto;
     const dt=new Date(x.date+'T12:00'), dia=dt.toLocaleDateString('pt-PT',{weekday:'short',day:'numeric',month:'short',year:dt.getFullYear()===new Date().getFullYear()?undefined:'numeric'});
-    const grp=(x.share_groups||[]).map(gname).filter(Boolean)[0]||(x.share_friends?'Amigos':'');
+    const sg=x.share_groups||[], gid=pg&&sg.includes(pg)?pg:sg.find(id=>gname(id)), grp=gid?gname(gid):(x.share_friends?'Amigos':'');
+    const tag=gid?`<button type="button" class="fgrp" data-pg="${gid}" title="Abrir a página do grupo">${esc(grp)}</button>`:grp?`<span class="fgrp">${esc(grp)}</span>`:'';
     const caps=(d.caps||[]).filter(c=>c&&c.sp).map(c=>`<span class="pcap">🐟 ${qn(c)>1?qn(c)+' × ':''}${esc(byK[c.sp]?.n||'Outra')}${c.kg?' · '+fmt(c.kg,c.kg<1?2:1)+' kg':''}${c.cm?' · '+fmt(c.cm,c.cm%1?1:0)+' cm':''}</span>`).join('');
     const c=d.cond, cond=c&&c.med!=null?`${c.hist?'Reconstrução':'Previsto'}: ondulação ${fmt(c.med)} m${c.tp?', '+c.tp+' s':''} · vento ${c.wind} nós${c.mare?' · '+MAREN[c.mare]:''}`:'';
     const o=d.obs||{}, ob=[o.vis!=null?`visibilidade ${fmt(o.vis,o.vis%1?1:0)} m`:'',d.tec||''].filter(Boolean).join(' · ');
@@ -3677,21 +3731,29 @@ function renderFeed(){
       return `<button type="button" data-rx="${i}" data-em="${e}" aria-pressed="${me}" title="${esc(who.map(r=>r.user_id===ME.id?'Você':pname(r.user_id)).join(', '))}">${e}${who.length?' '+who.length:''}</button>`}).join('')}</div>`:'';
     const fp=((d.pf||[]).map(f=>PURL[`${x.owner}/${x.id}/${f}.jpg`]).filter(Boolean));
     return `<article class="entry post">
-      <div class="phd">${avSpan(mine?myName():nome,foto,38)}<div><b>${esc(nome)}${d.loc?` <span style="font-weight:400">em</span> ${esc(d.loc)}`:''}</b><span class="small muted">${esc(dia)}${d.t0?' · '+esc(d.t0)+(d.t1?'–'+esc(d.t1):''):''}</span></div>${grp?`<span class="fgrp">${esc(grp)}</span>`:''}</div>
+      <div class="phd"><button type="button" class="pu" data-pu="${x.owner}" aria-label="${mine?'Abrir o seu perfil':'Abrir o perfil de '+esc(nome)}">${avSpan(mine?myName():nome,foto,38)}</button><div><b><button type="button" class="linku" data-pu="${x.owner}">${esc(nome)}</button>${d.loc?` <span style="font-weight:400">em</span> ${esc(d.loc)}`:''}</b><span class="small muted">${esc(dia)}${d.t0?' · '+esc(d.t0)+(d.t1?'–'+esc(d.t1):''):''}</span></div>${tag}</div>
       ${fp.length?`<button type="button" class="pcover" data-fg="${i}" aria-label="Ver fotografias"><img src="${esc(fp[0].u)}" alt="Fotografia da saída" loading="lazy">${fp.length>1?`<span class="pmore">+${fp.length-1}</span>`:''}</button>`:''}
       <div class="pbody">${caps?`<div class="pcaps">${caps}</div>`:'<div class="small muted">Sem capturas</div>'}${ob?`<div class="small">${esc(ob)}</div>`:''}${cond?`<div class="cond small muted">${esc(cond)}</div>`:''}${btns}</div></article>`;
-  }).join('')+(HASREAC?'':'<p class="small muted">As reações ficam disponíveis depois de correr o SQL das reações no Supabase.</p>');
 }
-$('feed').addEventListener('click',async e=>{
-  const g=e.target.closest('[data-fg]');if(g){const x=FEED[+g.dataset.fg];if(!x)return;
+function renderFeed(){
+  const el=$('feed');if(!el||!ME)return;
+  if(!FEED.length){el.innerHTML=`<div class="dempty"><b>Ainda nada partilhado</b>${SOC.groups.length||SOC.friends.length?'Quando um amigo ou alguém do grupo registar uma saída e a partilhar, aparece aqui.':'Junte amigos ou entre num grupo em «Perfil» para ver as saídas deles.'}</div>`;return}
+  el.innerHTML=FEED.map((x,i)=>postHTML(x,i)).join('')+(HASREAC?'':'<p class="small muted">As reações ficam disponíveis depois de correr o SQL das reações no Supabase.</p>');
+}
+/* toque num cartão: fotografias ou reação (devolve true se tratou o toque) */
+function postClick(e,list,rerender){
+  const g=e.target.closest('[data-fg]');if(g){const x=list[+g.dataset.fg];if(!x)return true;
     const fp=((x.data.pf||[]).map(f=>PURL[`${x.owner}/${x.id}/${f}.jpg`]).filter(Boolean));
-    showDlg(`<h3>${esc(x.owner===ME.id?'Você':pname(x.owner))}${x.data.loc?' em '+esc(x.data.loc):''}</h3><p class="small muted" style="margin:-4px 0 0">${dLabel(x.date)}</p>${fp.map(p=>`<img class="fotobig" src="${esc(p.u)}" alt="Fotografia da saída">`).join('')}`);return}
-  const b=e.target.closest('[data-rx]');if(!b||!ME)return;
-  const x=FEED[+b.dataset.rx], em=b.dataset.em;if(!x)return;
+    showDlg(`<h3>${esc(x.owner===ME.id?'Você':pname(x.owner))}${x.data.loc?' em '+esc(x.data.loc):''}</h3><p class="small muted" style="margin:-4px 0 0">${dLabel(x.date)}</p>${fp.map(p=>`<img class="fotobig" src="${esc(p.u)}" alt="Fotografia da saída">`).join('')}`);return true}
+  const b=e.target.closest('[data-rx]');if(!b||!ME)return false;
+  const x=list[+b.dataset.rx];if(x)toggleReact(x,b.dataset.em,rerender);return true;
+}
+async function toggleReact(x,em,rerender){
   const sb=sbc(), ex=REAC.find(r=>r.outing_owner===x.owner&&r.outing_id===x.id&&r.user_id===ME.id&&r.emoji===em);
-  if(ex){REAC=REAC.filter(r=>r!==ex);renderFeed();const r=await sb.from('reactions').delete().match({outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em});if(r.error){REAC.push(ex);renderFeed();toast(trErr(r.error))}}
-  else{const n={outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em};REAC.push(n);renderFeed();const r=await sb.from('reactions').insert({outing_owner:x.owner,outing_id:x.id,emoji:em});if(r.error&&String(r.error.code)!=='23505'){REAC=REAC.filter(q=>q!==n);renderFeed();toast(trErr(r.error))}}
-});
+  if(ex){REAC=REAC.filter(r=>r!==ex);rerender();const r=await sb.from('reactions').delete().match({outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em});if(r.error){REAC.push(ex);rerender();toast(trErr(r.error))}}
+  else{const n={outing_owner:x.owner,outing_id:x.id,user_id:ME.id,emoji:em};REAC.push(n);rerender();const r=await sb.from('reactions').insert({outing_owner:x.owner,outing_id:x.id,emoji:em});if(r.error&&String(r.error.code)!=='23505'){REAC=REAC.filter(q=>q!==n);rerender();toast(trErr(r.error))}}
+}
+$('feed').addEventListener('click',e=>{postClick(e,FEED,renderFeed)});
 function setSeg(v){
   const crew=v==='crew'&&!!ME;$('diario').classList.toggle('crew',crew);
   document.querySelectorAll('#dSeg [data-seg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.seg===(crew?'crew':'eu')));
@@ -3706,21 +3768,253 @@ async function renderGrpStats(){
   const el=$('grpStats');if(!el)return;
   if(!ME||!SOC.groups.length){el.innerHTML='';return}
   const cur=($('grpSel')&&$('grpSel').value)||SOC.groups[0].id, g=SOC.groups.find(x=>x.id===cur)||SOC.groups[0];
-  el.innerHTML=`<div><h3>Recordes do grupo</h3><label class="f stctl">Grupo<select id="grpSel">${SOC.groups.map(x=>`<option value="${x.id}"${x.id===g.id?' selected':''}>${esc(x.nome)}</option>`).join('')}</select></label><div id="grpBody"><p class="small muted">A carregar…</p></div></div>`;
+  el.innerHTML=`<div><h3>Recordes do grupo</h3><label class="f stctl">Grupo<select id="grpSel">${SOC.groups.map(x=>`<option value="${x.id}"${x.id===g.id?' selected':''}>${esc(x.nome)}</option>`).join('')}</select></label><button type="button" class="btn ghost" data-pg="${g.id}" style="margin:0 0 10px">Abrir a página do grupo</button><div id="grpBody"><p class="small muted">A carregar…</p></div></div>`;
   $('grpSel').onchange=renderGrpStats;
   let rows=GRPC[g.id]&&Date.now()-GRPC[g.id].t<3e5?GRPC[g.id].rows:null;
   if(!rows){const r=await sbc().from('outings').select('owner,date,data').contains('share_groups',[g.id]).eq('deleted',false);
     if(r.error){$('grpBody').innerHTML=`<p class="err">${esc(trErr(r.error))}</p>`;return}rows=r.data;GRPC[g.id]={t:Date.now(),rows}}
   if(!rows.length){$('grpBody').innerHTML='<p class="small muted">Ainda ninguém partilhou saídas com este grupo. No Diário, em «Partilhar esta saída na app», marque o grupo.</p>';return}
+  $('grpBody').innerHTML=grpRecHTML(rows);
+}
+function grpRecHTML(rows){
   const kg=d=>(d.caps||[]).reduce((a,c)=>a+(+c.kg||0),0), nc=d=>(d.caps||[]).filter(c=>c.sp).reduce((a,c)=>a+qn(c),0), kgT=v=>fmt(v,v<10?2:1);
   const Pm={};rows.forEach(r=>{const o=Pm[r.owner]||(Pm[r.owner]={n:0,cap:0,kg:0});o.n++;o.cap+=nc(r.data);o.kg+=kg(r.data)});
   const big={};rows.forEach(r=>(r.data.caps||[]).forEach(c=>{if(qn(c)===1&&c.kg&&byK[c.sp]&&(!big[c.sp]||c.kg>big[c.sp].kg))big[c.sp]={kg:c.kg,cm:c.cm,who:r.owner,date:r.date}}));
   const top=[...rows].filter(r=>kg(r.data)).sort((a,b)=>kg(b.data)-kg(a.data)).slice(0,5);
-  $('grpBody').innerHTML=`<p class="small muted" style="margin:0 0 6px">Contam as saídas que cada membro partilhou com o grupo (${rows.length}).</p>
-    <div class="stwrap"><table class="sttable"><thead><tr><th>Quem</th><th class="n">Saídas</th><th class="n">Capturas</th><th class="n">kg</th><th class="n">kg/saída</th></tr></thead><tbody>${Object.entries(Pm).sort((a,b)=>b[1].kg-a[1].kg).map(([id,o])=>`<tr><td><span style="display:inline-flex;align-items:center;gap:6px">${avSpan(id===ME.id?myName():pname(id),id===ME.id?P.foto:SOC.prof[id]&&SOC.prof[id].foto,24)}<b>${esc(id===ME.id?'Você':pname(id))}</b></span></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div>
-    ${Object.keys(big).length?`<h3 style="margin-top:10px">Maior peixe de cada espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th>Quem</th><th class="n">kg</th><th class="n">cm</th><th>Dia</th></tr></thead><tbody>${Object.entries(big).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>`<tr><td><b>${esc(byK[k].n)}</b></td><td>${esc(o.who===ME.id?'Você':pname(o.who))}</td><td class="n">${kgT(o.kg)}</td><td class="n">${o.cm?fmt(o.cm,o.cm%1?1:0):'—'}</td><td>${dLabel(o.date)}</td></tr>`).join('')}</tbody></table></div>`:''}
-    ${top.length?`<h3 style="margin-top:10px">As melhores caçadas do grupo</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Quem</th><th>Local</th><th class="n">kg</th></tr></thead><tbody>${top.map(r=>`<tr><td>${dLabel(r.date)}</td><td>${esc(r.owner===ME.id?'Você':pname(r.owner))}</td><td>${esc(r.data.loc||'')}</td><td class="n"><b>${kgT(kg(r.data))}</b></td></tr>`).join('')}</tbody></table></div>`:''}`;
+    return `<p class="small muted" style="margin:0 0 6px">Contam as saídas que cada membro partilhou com o grupo (${rows.length}).</p>
+    <div class="stwrap"><table class="sttable"><thead><tr><th>Quem</th><th class="n">Saídas</th><th class="n">Capturas</th><th class="n">kg</th><th class="n">kg/saída</th></tr></thead><tbody>${Object.entries(Pm).sort((a,b)=>b[1].kg-a[1].kg).map(([id,o])=>`<tr><td><span style="display:inline-flex;align-items:center;gap:6px">${avSpan(id===ME.id?myName():pname(id),id===ME.id?P.foto:SOC.prof[id]&&SOC.prof[id].foto,24)}<b><button type="button" class="linku" data-pu="${id}">${esc(id===ME.id?'Você':pname(id))}</button></b></span></td><td class="n">${o.n}</td><td class="n">${o.cap}</td><td class="n">${kgT(o.kg)}</td><td class="n">${kgT(o.kg/o.n)}</td></tr>`).join('')}</tbody></table></div>
+    ${Object.keys(big).length?`<h3 style="margin-top:10px">Maior peixe de cada espécie</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th>Quem</th><th class="n">kg</th><th class="n">cm</th><th>Dia</th></tr></thead><tbody>${Object.entries(big).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>`<tr><td><b>${esc(byK[k].n)}</b></td><td><button type="button" class="linku" data-pu="${o.who}">${esc(o.who===ME.id?'Você':pname(o.who))}</button></td><td class="n">${kgT(o.kg)}</td><td class="n">${o.cm?fmt(o.cm,o.cm%1?1:0):'—'}</td><td>${dLabel(o.date)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${top.length?`<h3 style="margin-top:10px">As melhores caçadas do grupo</h3><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Quem</th><th>Local</th><th class="n">kg</th></tr></thead><tbody>${top.map(r=>`<tr><td>${dLabel(r.date)}</td><td><button type="button" class="linku" data-pu="${r.owner}">${esc(r.owner===ME.id?'Você':pname(r.owner))}</button></td><td>${esc(r.data.loc||'')}</td><td class="n"><b>${kgT(kg(r.data))}</b></td></tr>`).join('')}</tbody></table></div>`:''}`;
 }
+
+/* ================= Perfil de outra pessoa e página do grupo =================
+   Abrem num ecrã próprio, por cima dos separadores («‹ Voltar» e o botão de recuar do telemóvel fecham-no).
+   Só mostram o que as regras do servidor já deixam ver: nada de novo sai da conta de ninguém. */
+var PVS=[], PVC={}, PVF=[], PVSP=[], PVMAP=null, PVMK=[], PVY=0, PVAFTER=null;
+const PVWAVES='<svg viewBox="0 0 600 46" preserveAspectRatio="none"><path d="M0 26 C60 10 120 10 180 24 S300 40 360 24 480 8 540 22 600 30 600 30 V46 H0Z" fill="rgba(255,255,255,.16)"/><path d="M0 34 C70 22 130 24 200 34 S330 46 400 34 520 22 600 34 V46 H0Z" fill="rgba(255,255,255,.22)"/></svg>';
+const kgOf=d=>((d&&d.caps)||[]).reduce((a,c)=>a+(+c.kg||0),0), ncOf=d=>((d&&d.caps)||[]).filter(c=>c&&c.sp).reduce((a,c)=>a+qn(c),0);
+const kgTxt=v=>v?fmt(v,v<10?2:1):'0';
+const frState=id=>SOC.friends.includes(id)?'f':SOC.incoming.includes(id)?'in':SOC.outgoing.includes(id)?'out':'';
+const pvTop=()=>PVS[PVS.length-1];
+const pvScroll=y=>{try{window.scrollTo({top:y,behavior:'instant'})}catch(e){window.scrollTo(0,y)}};
+function avBig(nome,foto){const ok=!!foto&&FOTO_RE.test(foto);
+  return `<span class="av" style="background:${ok?'var(--surface2)':bgOf(nome)};font-size:42px">${ok?`<img src="${foto}" alt="">`:esc(iniOf(nome))}</span>`}
+
+function openPV(k,id){
+  if(!ME||!id)return;
+  if(k==='u'&&id===ME.id){closePVAll();setTab('perfil');if(!MQ.matches)$('perfil').scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(k==='g'&&!SOC.groups.some(g=>g.id===id)){toast('Já não faz parte deste grupo.');return}
+  const t=pvTop();if(t&&t.k===k&&t.id===id){pvScroll(0);return}
+  if(!PVS.length){PVY=window.scrollY;try{history.scrollRestoration='manual'}catch(e){}}
+  PVS.push({k,id});
+  try{history.pushState({pv:PVS.length},'')}catch(e){}
+  showPV();
+}
+function showPV(){
+  const v=pvTop();if(!v){hidePV(true);return}
+  if(PVMAP){PVMAP.remove();PVMAP=null}
+  const top=document.querySelector('header.top');$('pv').style.setProperty('--toph',(top?top.offsetHeight:56)+'px');
+  document.body.dataset.pv=v.k;$('pv').hidden=false;$('pvTitle').textContent='';pvScroll(0);
+  renderPV(false);
+}
+function hidePV(restore){
+  if(PVMAP){PVMAP.remove();PVMAP=null}
+  $('pv').hidden=true;$('pvBody').innerHTML='';delete document.body.dataset.pv;PVF=[];PVSP=[];
+  if(restore){const y=PVY;requestAnimationFrame(()=>pvScroll(y))}
+  if(MAP)setTimeout(()=>MAP.invalidateSize(),60);
+  setTimeout(()=>{if(!PVS.length)try{history.scrollRestoration='auto'}catch(e){}},600);
+}
+function pvBack(){
+  if(history.state&&history.state.pv===PVS.length)history.back();
+  else{PVS.pop();showPV()}
+}
+/* fecha todos (ao mudar de separador ou de secção); «after» corre depois de o histórico voltar atrás */
+function closePVAll(after){
+  if(!PVS||!PVS.length){if(after)after();return}
+  const n=PVS.length, st=history.state&&history.state.pv;PVS=[];hidePV(false);
+  if(st===n){PVAFTER=after||(()=>{});history.go(-n);setTimeout(()=>{if(PVAFTER){const f=PVAFTER;PVAFTER=null;f()}},500)}
+  else if(after)after();
+}
+window.addEventListener('popstate',()=>{
+  if(PVAFTER){const f=PVAFTER;PVAFTER=null;setTimeout(f,0);return}
+  const n=(history.state&&history.state.pv)||0;
+  if(n<PVS.length){PVS.length=n;showPV()}
+});
+try{if(history.state&&history.state.pv)history.replaceState(null,'')}catch(e){}
+$('pvBack').addEventListener('click',pvBack);
+// no PC, os links do cabeçalho também fecham o ecrã próprio
+document.querySelectorAll('header.top a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  if(!PVS.length)return;e.preventDefault();const id=a.getAttribute('href').slice(1);
+  closePVAll(()=>{const el=$(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})});
+}));
+// tocar numa pessoa ou num grupo, em qualquer sítio da app
+document.addEventListener('click',e=>{
+  const u=e.target.closest('[data-pu]'), g=!u&&e.target.closest('[data-pg]');if(!u&&!g)return;
+  e.preventDefault();
+  if(e.target.closest('.leaflet-popup')){if(MAP)MAP.closePopup();if(PVMAP)PVMAP.closePopup()}
+  if(e.target.closest('#dlg'))closeDlg();
+  if(u)openPV('u',u.dataset.pu);else openPV('g',g.dataset.pg);
+});
+
+/* ---- dados ---- */
+async function pvExtras(rows){
+  const sb=sbc(), L=rows.slice(0,40);if(!L.length)return;
+  const paths=[];L.forEach(x=>((x.data&&x.data.pf)||[]).forEach(f=>{const p=`${x.owner}/${x.id}/${f}.jpg`;if(!PURL[p]||PURL[p].t<Date.now()-3e6)paths.push(p)}));
+  if(HASSTO&&paths.length&&sb.storage){try{const su=await sb.storage.from('fotos').createSignedUrls(paths,3600);
+    if(su.error){if(/bucket/i.test(su.error.message||''))HASSTO=false}else(su.data||[]).forEach(z=>{if(z&&z.signedUrl&&!z.error)PURL[z.path]={u:z.signedUrl,t:Date.now()}})}catch(e){}}
+  if(HASREAC){const rr=await sb.from('reactions').select('outing_owner,outing_id,user_id,emoji').in('outing_id',L.map(x=>x.id));
+    if(rr.error){if(/reactions|relation|does not exist|schema cache/i.test(rr.error.message||''))HASREAC=false}
+    else{const k=new Set(L.map(x=>x.owner+'|'+x.id));REAC=[...REAC.filter(q=>!k.has(q.outing_owner+'|'+q.outing_id)),...rr.data.filter(q=>k.has(q.outing_owner+'|'+q.outing_id))];
+      await pvProfiles(rr.data.map(q=>q.user_id))}}
+}
+async function pvProfiles(ids){
+  const miss=[...new Set(ids)].filter(id=>id&&id!==ME.id&&!SOC.prof[id]);if(!miss.length)return;
+  const pr=await selProfiles(c=>sbc().from('profiles').select(c).in('id',miss));if(pr&&!pr.error)pr.data.forEach(p=>SOC.prof[p.id]=p);
+}
+const OUTCOLS='owner,id,date,data,share_friends,share_groups,updated_at';
+async function pvLoadUser(id){
+  const sb=sbc();await pvProfiles([id]);
+  const r=await sb.from('outings').select(OUTCOLS).eq('owner',id).eq('deleted',false).order('date',{ascending:false}).order('updated_at',{ascending:false}).limit(300);
+  if(r.error)throw r.error;
+  await pvExtras(r.data);PVC['u:'+id]={t:Date.now(),rows:r.data};
+}
+async function pvLoadGroup(gid){
+  const sb=sbc();
+  const [r,sp]=await Promise.all([
+    sb.from('outings').select(OUTCOLS).contains('share_groups',[gid]).eq('deleted',false).order('date',{ascending:false}).order('updated_at',{ascending:false}).limit(300),
+    sb.from('spots').select('owner,id,data,updated_at').contains('share_groups',[gid]).eq('deleted',false)]);
+  if(r.error)throw r.error;
+  const spots=sp.error?[]:sp.data;
+  await pvProfiles([...r.data.map(x=>x.owner),...spots.map(x=>x.owner),...(SOC.members[gid]||[]).map(m=>m.user_id)]);
+  await pvExtras(r.data);PVC['g:'+gid]={t:Date.now(),rows:r.data,spots};
+}
+async function renderPV(force){
+  const v=pvTop();if(!v)return;
+  const key=v.k+':'+v.id, c=PVC[key], fresh=c&&Date.now()-c.t<12e4;
+  if(!fresh||force){
+    if(!c)$('pvBody').innerHTML='<div class="hload" style="margin-top:20px"><span class="spin" aria-hidden="true"></span>A carregar…</div>';
+    try{v.k==='u'?await pvLoadUser(v.id):await pvLoadGroup(v.id)}
+    catch(e){if(pvTop()===v&&!c){$('pvBody').innerHTML=`<p class="err" style="margin-top:16px">Não foi possível carregar: ${esc(trErr(e))}</p>`;return}}
+    if(pvTop()!==v)return; // entretanto mudou de ecrã
+  }
+  if(!PVC[key])return;
+  v.k==='u'?paintUser(v.id):paintGroup(v.id);
+}
+
+/* ---- partes comuns ---- */
+function pvPaintFeed(){
+  const el=$('pvFeed');if(!el)return;const v=pvTop();
+  el.innerHTML=PVF.length?PVF.map((x,i)=>postHTML(x,i,v&&v.k==='g'?v.id:null)).join(''):`<div class="dempty">${v&&v.k==='g'?'<b>Ainda sem saídas</b>No Diário, em «Partilhar esta saída na app», marque o grupo.':'<b>Ainda sem saídas</b>Não há saídas partilhadas consigo.'}</div>`;
+}
+function pvSpotsHTML(list,showOwner){
+  return list.map((r,i)=>{const d=r.data||{}, mine=r.owner===ME.id, ok=isFinite(+d.lat)&&isFinite(+d.lon), have=!mine&&ok&&P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
+    return `<div class="spot"><b>${esc(d.n||'Local')}</b>${showOwner?`<span class="muted"><button type="button" class="linku" data-pu="${r.owner}">${avSpan(mine?myName():pname(r.owner),mine?P.foto:SOC.prof[r.owner]&&SOC.prof[r.owner].foto,20)}de ${esc(mine?'Você':pname(r.owner))}</button></span>`:(ok?`<span class="muted">${(+d.lat).toFixed(4)}, ${(+d.lon).toFixed(4)}</span>`:'')}${d.perigos?`<span class="extra">⚠️ ${esc(d.perigos)}</span>`:''}
+      <span class="acts">${mine?'<span class="small muted">É um local seu</span>':have?'<span class="small muted">Já está nos seus locais</span>':`<button type="button" data-pvcp="${i}">Juntar aos meus locais</button>`}${ok&&window.L?`<button type="button" data-pvctr="${i}">Ver no mapa</button>`:''}${ok?`<a href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Google Maps</a>`:''}</span></div>`}).join('');
+}
+function pvMapInit(list){
+  PVMK=[];const el=$('pvMap');if(!el)return;
+  const pts=list.map((r,i)=>[r,i]).filter(([r])=>r.data&&isFinite(+r.data.lat)&&isFinite(+r.data.lon));
+  if(!window.L||!pts.length){el.hidden=true;return}
+  PVMAP=L.map(el,{zoomControl:true,scrollWheelZoom:false});
+  const k=load('ml_maplayer','mapa'), T=TILES[k]||TILES.mapa;L.tileLayer(T[0],T[1]).addTo(PVMAP);
+  pts.forEach(([r,i])=>{const d=r.data, mine=r.owner===ME.id, have=!mine&&P.spots.some(s=>kmTo(s.lat,s.lon,+d.lat,+d.lon)<.05);
+    PVMK[i]=L.marker([+d.lat,+d.lon],{icon:pinIcon(mine?'':'fr',mine?'#0E5A6E':'#fff',d.n||'Local'),title:d.n||'Local'})
+      .bindPopup(`<div class="mpop"><b>${esc(d.n||'Local')}</b><span>${mine?'Local seu':`Partilhado por <button type="button" class="linku" data-pu="${r.owner}">${esc(pname(r.owner))}</button>`}</span>${d.perigos?`<span>⚠️ ${esc(d.perigos)}</span>`:''}<div class="acts">${mine||have?'':`<button type="button" data-pvcp="${i}">Juntar aos meus locais</button>`}<a class="gh" href="https://www.google.com/maps?q=${+d.lat},${+d.lon}" target="_blank" rel="noopener">Google Maps</a></div></div>`).addTo(PVMAP)});
+  const ll=pts.map(([r])=>[+r.data.lat,+r.data.lon]);
+  if(ll.length>1)PVMAP.fitBounds(ll,{padding:[36,36],maxZoom:13});else PVMAP.setView(ll[0],13);
+  setTimeout(()=>PVMAP&&PVMAP.invalidateSize(),80);
+}
+function userRecHTML(rows){
+  const big={};rows.forEach(r=>((r.data||{}).caps||[]).forEach(c=>{if(qn(c)===1&&c.kg&&byK[c.sp]&&(!big[c.sp]||c.kg>big[c.sp].kg))big[c.sp]={kg:c.kg,cm:c.cm,date:r.date}}));
+  const top=rows.filter(r=>kgOf(r.data)).sort((a,b)=>kgOf(b.data)-kgOf(a.data)).slice(0,5);
+  if(!Object.keys(big).length&&!top.length)return '<p class="small muted" style="margin:0">Ainda sem capturas com peso nas saídas partilhadas.</p>';
+  return `${Object.keys(big).length?`<h4 style="margin-top:0">Maior peixe de cada espécie</h4><div class="stwrap"><table class="sttable"><thead><tr><th>Espécie</th><th class="n">kg</th><th class="n">cm</th><th>Dia</th></tr></thead><tbody>${Object.entries(big).sort((a,b)=>b[1].kg-a[1].kg).map(([k,o])=>`<tr><td><b>${esc(byK[k].n)}</b></td><td class="n">${kgTxt(o.kg)}</td><td class="n">${o.cm?fmt(o.cm,o.cm%1?1:0):'—'}</td><td>${dLabel(o.date)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${top.length?`<h4>As melhores caçadas</h4><div class="stwrap"><table class="sttable"><thead><tr><th>Dia</th><th>Local</th><th class="n">kg</th></tr></thead><tbody>${top.map(r=>`<tr><td>${dLabel(r.date)}</td><td>${esc(r.data.loc||'')}</td><td class="n"><b>${kgTxt(kgOf(r.data))}</b></td></tr>`).join('')}</tbody></table></div>`:''}`;
+}
+const pvCount=(cls,T)=>`<div class="pcount ${cls}">${T.map(([k,n,s1,s2])=>`<button type="button" data-pvgo="${k}"><b>${n}</b><span>${n===1||n==='1'?s1:s2}</span></button>`).join('')}</div>`;
+
+/* ---- perfil de uma pessoa ---- */
+function paintUser(id){
+  const p=SOC.prof[id], c=PVC['u:'+id], b=$('pvBody');if(PVMAP){PVMAP.remove();PVMAP=null}
+  if(!p){$('pvTitle').textContent='Perfil';PVF=[];PVSP=[];
+    b.innerHTML='<div class="dempty" style="margin-top:16px"><b>Perfil não disponível</b>Só pode ver o perfil de amigos, de quem tem um pedido de amizade consigo e de colegas de grupo.</div>';return}
+  const nome=p.nome||'@'+p.username, rows=c.rows, sp=SOC.shared.filter(r=>r.owner===id), st=frState(id);
+  const comuns=SOC.groups.filter(g=>(SOC.members[g.id]||[]).some(m=>m.user_id===id));
+  $('pvTitle').textContent=nome;
+  const acts={f:'<button type="button" class="btn ghost" data-pvfr="rm">Deixar de ser amigo</button>',
+    in:'<button type="button" class="btn" data-pvfr="ok">Aceitar</button><button type="button" class="btn ghost" data-pvfr="no">Recusar</button>',
+    out:'<button type="button" class="btn ghost" disabled style="cursor:default">Pedido enviado</button><button type="button" class="btn ghost" data-pvfr="cancel">Cancelar pedido</button>',
+    '':'<button type="button" class="btn" data-pvfr="add">Pedir amizade</button>'}[st];
+  b.innerHTML=`<div class="phead"><div class="pcover" aria-hidden="true">${PVWAVES}</div>
+    <div class="pmain"><div class="pav">${avBig(nome,p.foto)}</div>
+      <div class="pid"><h2>${esc(nome)}</h2><p class="muted">@${esc(p.username)}${st==='f'?' · amigo':st==='in'?' · quer ser seu amigo':''}</p>
+        <div class="chips">${comuns.length?comuns.map(g=>`<button type="button" class="pchipb" data-pg="${g.id}" title="Abrir a página do grupo">👥 ${esc(g.nome)}</button>`).join(''):'<span class="small muted">Sem grupos em comum</span>'}</div></div>
+      <div class="pacts">${acts}</div></div>
+    ${pvCount('',[['feed',rows.length,'saída','saídas'],['rec',rows.reduce((a,r)=>a+ncOf(r.data),0),'captura','capturas'],['rec',kgTxt(rows.reduce((a,r)=>a+kgOf(r.data),0)),'kg','kg'],['spots',sp.length,'local','locais']])}</div>
+    <p class="small muted pvnote">Aparece só o que ${esc(nome)} partilhou consigo: com «Amigos» ou com um grupo em que estão os dois.</p>
+    <div class="pvgrid">
+      <div class="pvfeed" id="pvFeedW"><h3 class="pvh">Saídas</h3><div id="pvFeed" class="dlist"></div>${rows.length>40?'<p class="small muted">Mostram-se as 40 mais recentes.</p>':''}</div>
+      <div class="card psec pvrec" id="pvRec"><h3 class="pvh">Recordes</h3>${userRecHTML(rows)}</div>
+      <div class="card psec pvspots" id="pvSpots"><h3 class="pvh">Locais partilhados consigo</h3><div class="pvsp">${pvSpotsHTML(sp,false)||'<p class="small muted" style="margin:0">Ainda não partilhou locais consigo.</p>'}</div></div>
+    </div>`;
+  PVF=rows.slice(0,40);PVSP=sp;pvPaintFeed();
+}
+
+/* ---- página do grupo ---- */
+function paintGroup(gid){
+  const g=SOC.groups.find(x=>x.id===gid), c=PVC['g:'+gid], b=$('pvBody');if(PVMAP){PVMAP.remove();PVMAP=null}
+  if(!g){$('pvTitle').textContent='Grupo';PVF=[];PVSP=[];b.innerHTML='<div class="dempty" style="margin-top:16px"><b>Grupo não disponível</b>Já não faz parte deste grupo.</div>';return}
+  const adm=isAdm(g), rows=c.rows, sp=c.spots||[];
+  const mem=(SOC.members[gid]||[]).slice().sort((a,b)=>(a.user_id===ME.id?-1:b.user_id===ME.id?1:0)||((b.role==='admin')-(a.role==='admin'))||pname(a.user_id).localeCompare(pname(b.user_id),'pt'));
+  const first=id=>{if(id===ME.id)return 'Você';const p=SOC.prof[id];return p?String(p.nome||p.username).split(/\s+/)[0]:'…'};
+  $('pvTitle').textContent=g.nome;
+  b.innerHTML=`<div class="phead"><div class="pcover" aria-hidden="true">${PVWAVES}</div>
+    <div class="pmain"><div class="pav gav">${avBig(g.nome,null)}</div>
+      <div class="pid"><h2>${esc(g.nome)}</h2><p class="muted">Grupo${adm?' · é administrador':''}</p></div>
+      <div class="pacts"><button type="button" class="btn" data-pvinv="1">Convidar</button><button type="button" class="btn ghost" data-pvleave="1">Sair do grupo</button></div></div>
+    <div class="pmems" id="pvMem" aria-label="Membros">${mem.map(m=>`<button type="button" class="pmem" data-pu="${m.user_id}" aria-label="${m.user_id===ME.id?'O seu perfil':'Perfil de '+esc(pname(m.user_id))}">${avSpan(m.user_id===ME.id?myName():pname(m.user_id),m.user_id===ME.id?P.foto:SOC.prof[m.user_id]&&SOC.prof[m.user_id].foto,54)}<span class="nm">${esc(first(m.user_id))}</span>${m.role==='admin'?'<span class="rl">admin</span>':''}</button>`).join('')}</div>
+    ${pvCount('c3',[['mem',mem.length,'membro','membros'],['feed',rows.length,'saída','saídas'],['rec',kgTxt(rows.reduce((a,r)=>a+kgOf(r.data),0)),'kg','kg']])}</div>
+    ${adm?`<details class="card pvadm"><summary>Gerir o grupo</summary>
+      <form id="pvRen"><input id="pvRenN" value="${esc(g.nome)}" required minlength="2" maxlength="40" aria-label="Nome do grupo"><button class="btn">Mudar o nome</button></form>
+      ${mem.filter(m=>m.user_id!==ME.id).map(m=>`<div class="pvmrow">${avSpan(pname(m.user_id),SOC.prof[m.user_id]&&SOC.prof[m.user_id].foto,30)}<b>${esc(pname(m.user_id))}</b>${m.role==='admin'?'<span class="small muted">administrador</span>':`<button type="button" class="btn ghost" data-pvkick="${m.user_id}">Tirar do grupo</button>`}</div>`).join('')||'<p class="small muted" style="margin:0">Ainda não há outros membros.</p>'}</details>`:''}
+    <div class="pvgrid">
+      <div class="pvfeed" id="pvFeedW"><h3 class="pvh">Saídas do grupo</h3><div id="pvFeed" class="dlist"></div>${rows.length>40?'<p class="small muted">Mostram-se as 40 mais recentes.</p>':''}</div>
+      <div class="card psec pvrec" id="pvRec"><h3 class="pvh">Recordes do grupo</h3>${rows.length?grpRecHTML(rows):'<p class="small muted" style="margin:0">Ainda ninguém partilhou saídas com este grupo.</p>'}</div>
+      <div class="card psec pvspots" id="pvSpots"><h3 class="pvh">Locais do grupo</h3>${sp.length?`<div class="pvmap" id="pvMap"></div><div class="pvsp">${pvSpotsHTML(sp,true)}</div>`:'<p class="small muted" style="margin:0">Ainda ninguém partilhou locais com este grupo. Na ficha do local, em «Partilhar», marque o grupo.</p>'}</div>
+    </div>`;
+  PVF=rows.slice(0,40);PVSP=sp;pvPaintFeed();pvMapInit(sp);
+  const f=$('pvRen');if(f)f.onsubmit=async e=>{e.preventDefault();const n=$('pvRenN').value.trim().slice(0,40);if(n.length<2||n===g.nome)return;
+    const r=await sbc().from('groups').update({nome:n}).eq('id',g.id);if(r.error){toast(trErr(r.error));return}
+    toast('Nome do grupo mudado.');await refreshSocial();if(pvTop()&&pvTop().id===gid)renderPV(false)};
+}
+
+/* ---- toques dentro do ecrã próprio ---- */
+$('pv').addEventListener('click',async e=>{
+  if(postClick(e,PVF,()=>{pvPaintFeed();renderFeed()}))return;
+  const t=e.target.closest('[data-pvgo],[data-pvfr],[data-pvcp],[data-pvctr],[data-pvkick],[data-pvinv],[data-pvleave]');if(!t)return;
+  const v=pvTop();if(!v)return;const sb=sbc();
+  if(t.dataset.pvgo){const el=$({feed:'pvFeedW',rec:'pvRec',spots:'pvSpots',mem:'pvMem'}[t.dataset.pvgo]);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(t.dataset.pvcp!==undefined){if(PVMAP)PVMAP.closePopup();const s=addSharedSpot(PVSP[+t.dataset.pvcp]);if(s){toast(`«${s.n}» juntado aos seus locais.`);v.k==='u'?paintUser(v.id):paintGroup(v.id)}return}
+  if(t.dataset.pvctr!==undefined){const m=PVMK[+t.dataset.pvctr];if(m&&PVMAP){$('pvMap').scrollIntoView({behavior:'smooth',block:'center'});PVMAP.setView(m.getLatLng(),14);setTimeout(()=>m.openPopup(),250)}return}
+  if(t.dataset.pvinv){const g=SOC.groups.find(x=>x.id===v.id);if(g)groupInvite(g);return}
+  if(t.dataset.pvleave){const g=SOC.groups.find(x=>x.id===v.id);if(g&&await groupLeave(g)){toast(`Saiu do grupo «${g.nome}».`);if(pvTop()===v)pvBack()}return}
+  if(t.dataset.pvkick){const g=SOC.groups.find(x=>x.id===v.id), u=t.dataset.pvkick;if(!g)return;
+    if(!confirm(`Tirar ${pname(u)} do grupo «${g.nome}»? Deixa de ver o que foi partilhado com o grupo.`))return;
+    t.disabled=true;const r=await sb.from('group_members').delete().eq('group_id',g.id).eq('user_id',u);
+    if(r.error){t.disabled=false;toast(trErr(r.error));return}
+    toast(`${pname(u)} saiu do grupo.`);await refreshSocial();if(pvTop()===v)renderPV(true);return}
+  if(t.dataset.pvfr){const id=v.id, a=t.dataset.pvfr;let r;
+    if(a==='rm'&&!confirm(`Deixar de ser amigo de ${pname(id)}? Deixam de ver o que partilharam com «Amigos».`))return;
+    t.disabled=true;
+    if(a==='add'){r=await sb.from('friendships').insert({requester:ME.id,addressee:id});
+      if(r.error&&String(r.error.code)==='23505'){toast('Já existe um pedido ou amizade com esta pessoa.');r={}}else if(!r.error)toast('Pedido de amizade enviado.')}
+    else if(a==='ok'){r=await sb.from('friendships').update({status:'accepted'}).eq('requester',id).eq('addressee',ME.id);if(!r.error)toast(`Agora é amigo de ${pname(id)}.`)}
+    else{r=await sb.from('friendships').delete().or(`and(requester.eq.${ME.id},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${ME.id})`);
+      if(!r.error)toast(a==='rm'?`Deixou de ser amigo de ${pname(id)}.`:a==='no'?'Pedido recusado.':'Pedido cancelado.')}
+    if(r&&r.error){t.disabled=false;toast(trErr(r.error));return}
+    await refreshSocial();if(pvTop()===v)renderPV(true);
+  }
+});
 
 /* ---- Caixa da conta ---- */
 let acctMode='entrar', acctMsg='', acctErr=false, recovery=false;
@@ -3832,6 +4126,7 @@ if(!FC)useLastForecast(false);
 /* Telemóvel: separadores em baixo (no PC a página fica igual, com tudo à vista) */
 const MQ=matchMedia('(max-width:760px)');
 function setTab(t,scroll=true){
+  if(PVS&&PVS.length)closePVAll();
   document.body.dataset.tab=t;
   document.querySelectorAll('#tabbar button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
   try{sessionStorage.setItem('ml_tab',t)}catch(e){}
